@@ -8,3 +8,206 @@
   <p>Kurulum başarılı.</p>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Araç Bakım Fiyatları</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+}
+
+/* NAVBAR */
+header {
+    position: absolute;
+    width: 100%;
+    padding: 20px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    z-index: 10;
+}
+
+header h2 {
+    font-weight: 700;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 30px;
+    font-weight: 500;
+}
+
+/* HERO */
+.hero {
+    height: 90vh;
+    background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                url("https://images.unsplash.com/photo-1517520287167-4bbf64a00d66") center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.hero p {
+    margin-top: 15px;
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+/* FILTER CARD */
+.filter-box {
+    margin-top: 40px;
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 12px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.filter-box select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    min-width: 160px;
+}
+
+.filter-box button {
+    padding: 12px 30px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filter-box button:hover {
+    background-color: #1d4ed8;
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    padding: 40px 20px;
+    background: white;
+    flex-wrap: wrap;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat h3 {
+    font-size: 28px;
+    color: #2563eb;
+}
+
+.stat p {
+    margin-top: 8px;
+    color: #555;
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px){
+    .hero h1 {
+        font-size: 32px;
+    }
+    .filter-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <h2>bakimim.com</h2>
+    <nav>
+        <a href="#">Anasayfa</a>
+        <a href="#">Hakkımızda</a>
+        <a href="#">İletişim</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Araç Bakım Fiyatlarını Karşılaştır!</h1>
+    <p>En uygun bakım fiyatlarını şehir şehir karşılaştır ve hemen bul.</p>
+
+    <div class="filter-box">
+        <select>
+            <option>Marka Seçin</option>
+            <option>BMW</option>
+            <option>Mercedes</option>
+            <option>Toyota</option>
+        </select>
+
+        <select>
+            <option>Model Seçin</option>
+        </select>
+
+        <select>
+            <option>Şehir Seçin</option>
+            <option>İstanbul</option>
+            <option>Ankara</option>
+            <option>İzmir</option>
+        </select>
+
+        <select>
+            <option>Bakım Tipi</option>
+            <option>Periyodik Bakım</option>
+            <option>Fren Değişimi</option>
+            <option>Yağ Değişimi</option>
+        </select>
+
+        <button>Fiyatları Bul</button>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="stat">
+        <h3>500+</h3>
+        <p>Bakım Fiyatı</p>
+    </div>
+
+    <div class="stat">
+        <h3>30+</h3>
+        <p>Şehirde Servis</p>
+    </div>
+
+    <div class="stat">
+        <h3>100+</h3>
+        <p>Marka & Model</p>
+    </div>
+</section>
+
+</body>
+</html>
