@@ -134,3 +134,7 @@ export default function Home() {
             <span className="flex items-center gap-2 text-white"><ShieldCheck className="text-blue-400" size={18}/> 100+ Marka & Model</span>
           </div>
         </div>
+      </div>
+    </main>
+  );
+}
