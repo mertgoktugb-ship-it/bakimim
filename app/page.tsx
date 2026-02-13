@@ -1,8 +1,8 @@
 import React from 'react';
-import { Car, MapPin, Wrench, Search, ShieldCheck, Truck, LayoutGrid } from 'lucide-react';
+import { Car, MapPin, Wrench, Search, ShieldCheck, LayoutGrid } from 'lucide-react';
 
 export default function Home() {
-  // Kategorize edilmiş marka listesi
+  // Marka listeleri - parantez içindeki modelleri sildim
   const otomobilMarkalar = [
     "Alfa Romeo", "Aston Martin", "Audi", "Bentley", "BMW", "Cadillac", "Chery", 
     "Chevrolet", "Chrysler", "Citroen", "Cupra", "Dacia", "Fiat", "Ford", "Geely", 
@@ -12,15 +12,15 @@ export default function Home() {
     "Subaru", "Suzuki", "Tesla", "Tofaş", "Toyota", "Volkswagen", "Volvo"
   ];
 
-  const araziSuvMarkalar = ["Hyundai (Tucson)", "Nissan (Qashqai)", "Dacia (Duster)", "Land Rover", "Jeep"];
-  const minivanVanMarkalar = ["Fiat (Doblo)", "Ford (Transit)", "Volkswagen (Transporter)", "Renault (Kangoo)"];
+  const araziSuvMarkalar = ["Dacia", "Hyundai", "Jeep", "Land Rover", "Nissan"];
+  const minivanVanMarkalar = ["Fiat", "Ford", "Renault", "Volkswagen"];
 
   return (
     <main className="min-h-screen bg-white" style={{ fontFamily: 'sans-serif' }}>
       {/* Navbar */}
       <nav className="flex items-center justify-between px-10 py-5 border-b bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2 group cursor-pointer">
-          <div className="bg-blue-600 p-2 rounded-lg text-white shadow-blue-200 shadow-lg group-hover:scale-110 transition-transform text-center">
+          <div className="bg-blue-600 p-2 rounded-lg text-white shadow-blue-200 shadow-lg group-hover:scale-110 transition-transform">
             <Car size={26} strokeWidth={2.5} />
           </div>
           <div className="flex flex-col text-left">
@@ -56,22 +56,19 @@ export default function Home() {
           <div className="bg-white/10 backdrop-blur-xl p-3 rounded-2xl shadow-2xl max-w-6xl mx-auto border border-white/20">
             <div className="bg-white p-6 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shadow-inner">
               
-              {/* Kategori ve Marka Seçimi (Gruplandırılmış) */}
-              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left">
+              {/* Marka Grubu Seçimi */}
+              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <LayoutGrid size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
                   <label className="text-[10px] font-bold text-gray-400 uppercase">Araç Grubu & Marka</label>
                   <select className="bg-transparent text-gray-800 font-bold outline-none w-full cursor-pointer appearance-none">
                     <option>Seçim Yapınız</option>
-                    
                     <optgroup label="1. OTOMOBİL">
                       {otomobilMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
                     </optgroup>
-
                     <optgroup label="2. ARAZİ, SUV, PICKUP">
                       {araziSuvMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
                     </optgroup>
-
                     <optgroup label="3. MİNİVAN, VAN, PANELVAN">
                       {minivanVanMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
                     </optgroup>
@@ -79,8 +76,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Model Seçimi */}
-              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left">
+              {/* Model Seçimi (Modeller Buraya Geldi) */}
+              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <Car size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
                   <label className="text-[10px] font-bold text-gray-400 uppercase">Model</label>
@@ -89,12 +86,15 @@ export default function Home() {
                     <option>Tucson</option>
                     <option>Qashqai</option>
                     <option>Duster</option>
+                    <option>Doblo</option>
+                    <option>Transit</option>
+                    <option>Egea</option>
                   </select>
                 </div>
               </div>
 
               {/* Şehir Seçimi */}
-              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left">
+              <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <MapPin size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
                   <label className="text-[10px] font-bold text-gray-400 uppercase">Şehir</label>
@@ -103,6 +103,7 @@ export default function Home() {
                     <option>İstanbul</option>
                     <option>Ankara</option>
                     <option>Antalya</option>
+                    <option>İzmir</option>
                   </select>
                 </div>
               </div>
@@ -122,7 +123,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="text-center py-20 bg-gray-50 text-center">
+      <div className="text-center py-20 bg-gray-50">
         <h2 className="text-4xl font-black text-slate-800 mb-2">Güvenilir Servis Fiyatlarını</h2>
         <span className="text-2xl font-bold text-blue-600 uppercase tracking-[0.3em]">Kolayca Öğrenin!</span>
       </div>
