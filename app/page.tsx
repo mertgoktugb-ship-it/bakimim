@@ -2,7 +2,6 @@ import React from 'react';
 import { Car, MapPin, Wrench, Search, ShieldCheck, LayoutGrid } from 'lucide-react';
 
 export default function Home() {
-  // Marka listeleri - parantez içindeki modelleri sildim
   const otomobilMarkalar = [
     "Alfa Romeo", "Aston Martin", "Audi", "Bentley", "BMW", "Cadillac", "Chery", 
     "Chevrolet", "Chrysler", "Citroen", "Cupra", "Dacia", "Fiat", "Ford", "Geely", 
@@ -14,6 +13,16 @@ export default function Home() {
 
   const araziSuvMarkalar = ["Dacia", "Hyundai", "Jeep", "Land Rover", "Nissan"];
   const minivanVanMarkalar = ["Fiat", "Ford", "Renault", "Volkswagen"];
+
+  // Hızlı erişim için logo listesi (Vektörel logolar veya PNG bağlantıları)
+  const popülerMarkalar = [
+    { name: "Hyundai", logo: "https://www.carlogos.org/car-logos/hyundai-logo.png" },
+    { name: "Nissan", logo: "https://www.carlogos.org/car-logos/nissan-logo.png" },
+    { name: "Fiat", logo: "https://www.carlogos.org/car-logos/fiat-logo.png" },
+    { name: "Volkswagen", logo: "https://www.carlogos.org/car-logos/volkswagen-logo.png" },
+    { name: "Renault", logo: "https://www.carlogos.org/car-logos/renault-logo.png" },
+    { name: "Dacia", logo: "https://www.carlogos.org/car-logos/dacia-logo.png" }
+  ];
 
   return (
     <main className="min-h-screen bg-white" style={{ fontFamily: 'sans-serif' }}>
@@ -31,14 +40,14 @@ export default function Home() {
           </div>
         </div>
         <div className="hidden md:flex gap-10 text-sm font-bold text-gray-500 uppercase tracking-widest">
-          <a href="#" className="hover:text-blue-600 transition">Anasayfa</a>
-          <a href="#" className="hover:text-blue-600 transition">Hakkımızda</a>
-          <a href="#" className="hover:text-blue-600 transition">İletişim</a>
+          <a href="#" className="hover:text-blue-600 transition font-sans">Anasayfa</a>
+          <a href="#" className="hover:text-blue-600 transition font-sans">Hakkımızda</a>
+          <a href="#" className="hover:text-blue-600 transition font-sans">İletişim</a>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative h-[650px] flex items-center justify-center text-white text-center overflow-hidden">
+      <div className="relative h-[750px] flex items-center justify-center text-white text-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center z-0 scale-105"
           style={{ 
@@ -49,14 +58,12 @@ export default function Home() {
         
         <div className="relative z-10 px-4 w-full max-w-6xl">
           <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight drop-shadow-2xl">
-            Araç Bakım Fiyatlarını <br/> <span className="text-blue-400">Karşılaştır!</span>
+            Araç Bakım Fiyatlarını <br/> <span className="text-blue-400 font-sans">Karşılaştır!</span>
           </h1>
           
           {/* Arama Kutusu */}
-          <div className="bg-white/10 backdrop-blur-xl p-3 rounded-2xl shadow-2xl max-w-6xl mx-auto border border-white/20">
+          <div className="bg-white/10 backdrop-blur-xl p-3 rounded-2xl shadow-2xl max-w-6xl mx-auto border border-white/20 mb-8">
             <div className="bg-white p-6 rounded-xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shadow-inner">
-              
-              {/* Marka Grubu Seçimi */}
               <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <LayoutGrid size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
@@ -76,7 +83,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Model Seçimi (Modeller Buraya Geldi) */}
               <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <Car size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
@@ -87,13 +93,10 @@ export default function Home() {
                     <option>Qashqai</option>
                     <option>Duster</option>
                     <option>Doblo</option>
-                    <option>Transit</option>
-                    <option>Egea</option>
                   </select>
                 </div>
               </div>
 
-              {/* Şehir Seçimi */}
               <div className="flex items-center group border-b-2 border-gray-100 hover:border-blue-500 transition-colors py-2 px-1 text-left font-sans">
                 <MapPin size={20} className="text-blue-500 mr-3 opacity-70" />
                 <div className="flex flex-col items-start w-full">
@@ -103,16 +106,26 @@ export default function Home() {
                     <option>İstanbul</option>
                     <option>Ankara</option>
                     <option>Antalya</option>
-                    <option>İzmir</option>
                   </select>
                 </div>
               </div>
 
-              {/* Buton */}
               <button className="bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 hover:shadow-blue-500/50 shadow-lg transition-all active:scale-95 py-4">
                 Fiyatları Bul
               </button>
             </div>
+          </div>
+
+          {/* Logo Bölümü (Hızlı Erişim) */}
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 max-w-4xl mx-auto py-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-6">
+            {popülerMarkalar.map((marka) => (
+              <div key={marka.name} className="group cursor-pointer flex flex-col items-center gap-2">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center p-3 shadow-lg group-hover:scale-110 transition-transform border border-gray-100">
+                  <img src={marka.logo} alt={marka.name} className="w-full h-auto object-contain grayscale group-hover:grayscale-0 transition-all" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-tighter text-gray-300 group-hover:text-blue-400">{marka.name}</span>
+              </div>
+            ))}
           </div>
 
           <div className="flex flex-wrap justify-center gap-10 mt-12 text-sm font-bold tracking-wide">
@@ -121,12 +134,3 @@ export default function Home() {
             <span className="flex items-center gap-2 text-white"><ShieldCheck className="text-blue-400" size={18}/> 100+ Marka & Model</span>
           </div>
         </div>
-      </div>
-
-      <div className="text-center py-20 bg-gray-50">
-        <h2 className="text-4xl font-black text-slate-800 mb-2">Güvenilir Servis Fiyatlarını</h2>
-        <span className="text-2xl font-bold text-blue-600 uppercase tracking-[0.3em]">Kolayca Öğrenin!</span>
-      </div>
-    </main>
-  );
-}
