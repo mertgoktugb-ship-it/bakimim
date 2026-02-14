@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Car, MapPin, Search, Calendar, ChevronDown, ChevronUp, TrendingUp, ShieldCheck, BadgePercent, Database, Edit3, Save, X, Check, Info } from 'lucide-react';
+import { Car, MapPin, Search, Calendar, ChevronDown, ChevronUp, TrendingUp, ShieldCheck, BadgePercent, Database, Edit3, Save, X, Check, Info, Mail } from 'lucide-react';
 import bakimData from './data.json';
 
 export default function Home() {
@@ -33,7 +33,7 @@ export default function Home() {
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
     const servisIsmi = (item.servis_adi || "").toLowerCase();
-    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "herter", "alj", "toyotronik", "mais", "toyan", "efe", "akten", "kardelen", "çekmeköy", "mıçı", "tekbaş"];
+    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "herter", "alj", "toyotronik", "mais", "toyan", "efe", "akten", "kardelen", "çekmeköy", "mıçı", "tekbaş", "asal", "kamer"];
     
     if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) duzeltilmis.yetkili_mi = "Evet";
 
@@ -109,17 +109,22 @@ export default function Home() {
       {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
            <a href="/" className="flex items-center gap-3 group">
-              <div className="bg-blue-600 p-2.5 rounded-2xl text-white shadow-lg transition-transform group-hover:scale-105">
-                <Car size={28} strokeWidth={2.5} />
+              <div className="bg-[#1E293B] p-2.5 rounded-2xl text-white shadow-lg transition-transform group-hover:scale-105 flex items-center justify-center">
+                <Car size={28} strokeWidth={2.5} className="text-blue-400" />
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="text-3xl font-black text-slate-800 tracking-normal italic">bakımım<span className="text-blue-600">.com</span></span>
                 <span className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase">Şeffaf Servis Rehberi</span>
               </div>
            </a>
-           <button onClick={() => setAdminModu(!adminModu)} className={`text-[10px] font-black px-5 py-2.5 rounded-xl border transition-all ${adminModu ? 'bg-orange-500 text-white border-orange-600 shadow-orange-200' : 'bg-slate-50 text-slate-400 border-slate-200'} shadow-md`}>
-             {adminModu ? 'YÖNETİCİ MODU AKTİF' : 'YÖNETİCİ GİRİŞİ'}
-           </button>
+           <div className="flex items-center gap-4">
+              <button className="hidden md:flex items-center gap-2 text-xs font-black text-slate-600 hover:text-blue-600 transition-colors px-4 py-2 uppercase tracking-widest border border-slate-200 rounded-xl">
+                 <Mail size={16}/> Bize Ulaşın
+              </button>
+              <button onClick={() => setAdminModu(!adminModu)} className={`text-[10px] font-black px-5 py-2.5 rounded-xl border transition-all ${adminModu ? 'bg-orange-500 text-white border-orange-600 shadow-orange-200' : 'bg-slate-50 text-slate-400 border-slate-200'} shadow-md`}>
+                {adminModu ? 'YÖNETİCİ MODU AKTİF' : 'YÖNETİCİ GİRİŞİ'}
+              </button>
+           </div>
       </nav>
 
       {adminModu && (
@@ -133,18 +138,18 @@ export default function Home() {
       <div className="bg-[#1E293B] py-20 px-6 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter uppercase italic">FİYAT <span className="text-blue-400">KIYASLA</span></h1>
-          <p className="text-slate-400 font-bold mb-12 text-sm md:text-base tracking-[0.4em] uppercase opacity-80">Güncel Servis Veri Bankası</p>
+          <p className="text-blue-400 font-bold mb-12 text-sm md:text-lg tracking-wide uppercase opacity-90">Güncel servis fiyatlarını hemen öğrenin!</p>
           <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-base outline-none focus:ring-4 ring-blue-100 transition-all">
-                  <option value="">Marka</option>
+                  <option value="">Marka Seçin</option>
                   {tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
               <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-base outline-none focus:ring-4 ring-blue-100 transition-all">
-                  <option value="">Model</option>
+                  <option value="">Model Seçin</option>
                   {musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
               <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-base outline-none focus:ring-4 ring-blue-100 transition-all">
-                  <option value="">Şehir</option>
+                  <option value="">Şehir Seçin</option>
                   {tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase tracking-widest shadow-xl transition-all active:scale-95 text-lg">
@@ -158,18 +163,18 @@ export default function Home() {
       {sonuclar.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
             <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center">
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center justify-center gap-2">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center justify-center gap-2 text-center">
                 <ShieldCheck size={18} className="text-blue-500"/> Yetkili Servis Ortalaması
               </p>
-              <p className="text-4xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
-              <p className="text-[11px] font-bold text-blue-400 mt-2 uppercase italic">Son 6 Ay Piyasa Verisi</p>
+              <p className="text-4xl font-black text-slate-900 text-center">{avgYetkili.toLocaleString('tr-TR')} TL</p>
+              <p className="text-[11px] font-bold text-blue-400 mt-2 uppercase italic text-center">Son 6 Ay Piyasa Verisi</p>
             </div>
             <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center">
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center justify-center gap-2">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center justify-center gap-2 text-center">
                 <BadgePercent size={18} className="text-emerald-500"/> Özel Servis Ortalaması
               </p>
-              <p className="text-4xl font-black text-slate-900">{avgOzel.toLocaleString('tr-TR')} TL</p>
-              <p className="text-[11px] font-bold text-emerald-400 mt-2 uppercase italic">Son 6 Ay Piyasa Verisi</p>
+              <p className="text-4xl font-black text-slate-900 text-center">{avgOzel.toLocaleString('tr-TR')} TL</p>
+              <p className="text-[11px] font-bold text-emerald-400 mt-2 uppercase italic text-center">Son 6 Ay Piyasa Verisi</p>
             </div>
         </div>
       )}
@@ -214,7 +219,7 @@ export default function Home() {
                       <input type="text" value={editForm.tarih} onChange={(e) => setEditForm({...editForm, tarih: e.target.value})} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-lg outline-none focus:ring-4 ring-emerald-100" />
                     </div>
                     <div className="col-span-full flex flex-col gap-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Kullanıcı Notu (Özel İsimleri Buradan Temizleyebilirsin)</label>
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Kullanıcı Notu</label>
                       <textarea rows={4} value={editForm.not} onChange={(e) => setEditForm({...editForm, not: e.target.value})} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-base outline-none focus:ring-4 ring-emerald-100 leading-relaxed" />
                     </div>
                   </div>
@@ -241,10 +246,7 @@ export default function Home() {
                       <div className="flex flex-col"><span className="text-[11px] font-black text-slate-300 uppercase mb-2 tracking-[0.2em]">Bakım Türü</span><p className="text-base font-bold text-slate-700">{item.bakim_turu}</p></div>
                       <div className="flex flex-col"><span className="text-[11px] font-black text-slate-300 uppercase mb-2 tracking-[0.2em]">Konum</span><p className="text-base font-bold text-slate-700">{item.sehir}</p></div>
                       <div className="flex flex-col"><span className="text-[11px] font-black text-slate-300 uppercase mb-2 tracking-[0.2em]">İşlem Tarihi</span><div className="flex items-center gap-2 text-base font-bold text-slate-500"><Calendar size={18} className="text-slate-200"/> {item.tarih}</div></div>
-                      <div className="flex flex-col items-end md:items-start"><span className="text-[11px] font-black text-slate-300 uppercase mb-2 tracking-[0.2em]">Ödenen Tutar</span><p className="text-3xl font-black text-blue-600 tracking-tighter">{item.ekran_fiyat}</p></div>
-                    </div>
-                    <div className="ml-6 text-slate-200 hidden md:block group-hover:text-blue-400 transition-colors">
-                       {acikKartId === item.id ? <ChevronUp size={32} /> : <ChevronDown size={32} />}
+                      <div className="flex flex-col items-end md:items-start"><span className="text-[11px] font-black text-slate-300 uppercase mb-2 tracking-[0.2em]">Ödenen Tutar</span><p className="text-3xl font-black text-blue-600 tracking-tighter text-right md:text-left">{item.ekran_fiyat}</p></div>
                     </div>
                   </div>
                 </div>
@@ -252,31 +254,30 @@ export default function Home() {
 
               {acikKartId === item.id && isEditing !== item.id && (
                 <div className="px-10 pb-12 pt-6 bg-slate-50/50 border-t border-slate-100 animate-in slide-in-from-top-4 duration-500 text-left">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+                    <div className="space-y-5 text-left">
                       <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-[0.3em] border-b border-slate-200 pb-3 flex items-center gap-2">ARAÇ KİMLİĞİ</h4>
-                      <div className="space-y-4 text-xs font-bold text-slate-500 uppercase">
+                      <div className="space-y-4 text-xs font-bold text-slate-500 uppercase text-left">
                         <p className="flex justify-between">MODEL YILI: <span className="text-slate-900">{item.model_yili || 'BİLİNMİYOR'}</span></p>
                         <p className="flex justify-between">KİLOMETRE: <span className="text-slate-900">{item.km} KM</span></p>
                         <p className="flex justify-between">MOTOR: <span className="text-slate-900">{item.motor || 'BİLİNMİYOR'}</span></p>
                       </div>
                     </div>
-                    <div className="space-y-5">
+                    <div className="space-y-5 text-left">
                       <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-[0.3em] border-b border-slate-200 pb-3">YAPILAN İŞLEMLER</h4>
                       <div className="flex flex-wrap gap-2.5">
                         {item.yapilan_islemler?.length > 0 ? item.yapilan_islemler.map((islem: string, i: number) => (
-                          <span key={i} className="bg-white border border-slate-200 px-4 py-2 rounded-2xl text-[11px] font-bold text-slate-600 shadow-sm transition-all hover:bg-slate-50">{islem}</span>
-                        )) : <span className="text-slate-400 italic text-xs">Ayrıntılı işlem dökümü girilmemiş.</span>}
+                          <span key={i} className="bg-white border border-slate-200 px-4 py-2 rounded-2xl text-[11px] font-bold text-slate-600 shadow-sm">{islem}</span>
+                        )) : <span className="text-slate-400 italic text-xs">Döküm girilmemiş.</span>}
                       </div>
                     </div>
-                    <div className="space-y-5">
-                      <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-[0.3em] border-b border-slate-200 pb-3 uppercase">SERVİS & NOT</h4>
+                    <div className="space-y-5 text-left">
+                      <h4 className="text-[12px] font-black text-slate-800 uppercase tracking-[0.3em] border-b border-slate-200 pb-3">SERVİS & NOT</h4>
                       <div className="space-y-4">
                          <div className="flex items-center gap-3 text-xs font-black text-slate-400 uppercase bg-white border border-slate-200 p-3 rounded-2xl w-fit shadow-sm">
                             <MapPin size={16} className="text-blue-500"/> {item.servis_adi}
                          </div>
-                         <div className="bg-blue-600 text-white p-6 rounded-[2rem] italic text-[13px] leading-relaxed font-medium shadow-2xl shadow-blue-200 relative">
-                            <div className="absolute -top-3 left-6 bg-blue-400 text-[10px] px-3 py-1 rounded-full not-italic font-black uppercase">Kullanıcı Notu</div>
+                         <div className="bg-blue-600 text-white p-6 rounded-[2rem] italic text-[13px] leading-relaxed font-medium shadow-2xl shadow-blue-200 relative text-left">
                            "{item.temiz_not}"
                          </div>
                       </div>
