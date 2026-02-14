@@ -29,68 +29,68 @@ export default function Home() {
     setDuzenlenenVeri(bakimData);
   }, []);
 
+  // Kelime formatlama (Chery -> Chery yapar, bilinmiyor çıkmasını önler)
   const formatYazi = (str: string) => {
-    if (!str) return "";
+    if (!str || str === "bilinmiyor") return "Belirtilmemiş";
     return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
   };
 
-  // İSİM VE NOT FİLTRELEME - EN KRİTİK KISIM
-  const veriyiFiltrele = (item: any) => {
+  const isimFiltrele = (str: string) => {
+    if (!str) return "";
+    return str.replace(/\b([A-ZÇĞİÖŞÜa-zçğıöşü])[a-zçğıöşüöü]*\s+([A-ZÇĞİÖŞÜa-zçğıöşü])[a-zçğıöşüöü]*\b/g, "$1. $2.");
+  };
+
+  const veriyiDuzenleVeGizle = (item: any) => {
     let d = { ...item };
     
-    // 1. Gerçek İsimden Baş Harf Çıkarma (Tolga Karan -> T. K.)
-    const hamIsim = d.ad_soyad || d.isim || "";
-    if (hamIsim) {
-      const parcalar = hamIsim.trim().split(/\s+/);
-      d.kullanici_bas_harf = parcalar.map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ");
+    // İSİM İŞLEME
+    const asilIsim = d.ad_soyad || d.isim || "";
+    if (asilIsim) {
+      const parcalar = asilIsim.trim().split(/\s+/);
+      d.bas_harfler = parcalar.map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ");
     } else {
-      d.kullanici_bas_harf = "K. V.";
+      d.bas_harfler = "M. S."; // Varsayılan Mert Şen gibi durması için
     }
 
-    // 2. Notun İçindeki İsimleri Temizleme (Tolga Karan'ın aldığı teklif -> Alınan teklif)
+    // NOT İŞLEME
     let temizNot = d.not || "";
-    if (hamIsim) {
-      // İsmi notun içinden silen regex
-      const isimRegex = new RegExp(hamIsim, 'gi');
-      temizNot = temizNot.replace(isimRegex, "Kullanıcı");
-    }
-    // Ekstra güvenlik: Not içindeki isim benzeri yapıları da (Yasin Yilman gibi) kısalt
     d.temiz_not = temizNot.replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşüöü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşüöü]+\b/g, "$1. $2.");
 
+    // MARKA/MODEL TANIMA (CHERY DÜZELTMESİ)
+    const hamMarka = d.marka || d.Marka || "Bilinmiyor";
+    const hamModel = d.model || d.Model || "Bilinmiyor";
+    d.marka_format = formatYazi(hamMarka);
+    d.model_format = formatYazi(hamModel);
+    
+    // SERVİS TİPİ
+    const servisIsmi = (d.servis_adi || "").toLowerCase();
+    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "alj", "toyotronik", "mais", "toyan", "efe", "akten", "mermerler"];
+    if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) d.yetkili_mi = "Evet";
+    
+    // FİYAT
+    let hamFiyat = d.fiyat_tl || d.fiyat || 0;
+    let fiyatSayi = typeof hamFiyat === 'string' ? parseFloat(hamFiyat.replace(/[^\d]/g, '')) : hamFiyat;
+    d.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
+    d.ekran_fiyat = d.fiyat_sayi > 0 ? d.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
+    
     return d;
   };
 
-  const veriyiDüzelt = (item: any) => {
-    let duzeltilmis = veriyiFiltrele(item);
-    const servisIsmi = (item.servis_adi || "").toLowerCase();
-    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "alj", "toyotronik", "mais", "toyan", "efe", "akten"];
-    if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) duzeltilmis.yetkili_mi = "Evet";
-    
-    let hamFiyat = item.fiyat_tl || item.fiyat || 0;
-    let fiyatSayi = typeof hamFiyat === 'string' ? parseFloat(hamFiyat.replace(/[^\d]/g, '')) : hamFiyat;
-    duzeltilmis.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
-    duzeltilmis.ekran_fiyat = duzeltilmis.fiyat_sayi > 0 ? duzeltilmis.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
-    duzeltilmis.marka_format = formatYazi(item.marka);
-    duzeltilmis.model_format = formatYazi(item.model);
-    
-    return duzeltilmis;
-  };
-
-  const islenmisVeri = duzenlenenVeri.map(veriyiDüzelt);
-  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka))).sort();
+  const islenmisVeri = duzenlenenVeri.map(veriyiDuzenleVeGizle);
+  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).sort();
   const tumSehirler = Array.from(new Set(islenmisVeri.map(item => item.sehir))).filter(s => s && s !== "bilinmiyor").sort();
 
   useEffect(() => {
     if (secilenMarka) {
-      const modeller = Array.from(new Set(islenmisVeri.filter(item => item.marka === secilenMarka).map(item => item.model))).sort();
+      const modeller = Array.from(new Set(islenmisVeri.filter(item => item.marka_format === secilenMarka).map(item => item.model_format))).sort();
       setMusaitModeller(modeller);
     } else { setMusaitModeller([]); }
   }, [secilenMarka, duzenlenenVeri]);
 
   const sorgula = () => {
     const filtrelenmis = islenmisVeri.filter(item => {
-      const markaUygun = !secilenMarka || item.marka === secilenMarka;
-      const modelUygun = !secilenModel || item.model === secilenModel;
+      const markaUygun = !secilenMarka || item.marka_format === secilenMarka;
+      const modelUygun = !secilenModel || item.model_format === secilenModel;
       const sehirUygun = !secilenSehir || item.sehir === secilenSehir;
       return markaUygun && modelUygun && sehirUygun;
     });
@@ -103,6 +103,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative">
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
            <Link href="/" className="flex items-center gap-3">
               <div className="bg-[#0f172a] p-2.5 rounded-2xl text-white shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} strokeWidth={2.5} className="text-blue-400" /></div>
@@ -115,11 +116,11 @@ export default function Home() {
            </div>
       </nav>
 
-      {/* ARAMA VE STATS ALANLARI AYNI ŞEKİLDE DEVAM EDİYOR... */}
-      <div className="relative h-[60vh] flex items-center justify-center px-6 overflow-hidden text-left">
+      {/* SEARCH AREA WITH IMAGE */}
+      <div className="relative h-[60vh] flex items-center justify-center px-6 overflow-hidden">
         <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=2000" alt="Background" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-[2px]"></div>
-        <div className="relative max-w-4xl mx-auto text-center w-full text-left">
+        <div className="relative max-w-4xl mx-auto text-center w-full">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-10 uppercase italic tracking-tighter leading-none text-center">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
           <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
@@ -130,31 +131,45 @@ export default function Home() {
         </div>
       </div>
 
+      {/* STATS */}
+      {sonuclar.length > 0 && (
+        <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-blue-600"/> Yetkili Ortalaması</p>
+              <p className="text-4xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
+            </div>
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2 text-emerald-500"><BadgePercent size={18}/> Özel Ortalaması</p>
+              <p className="text-4xl font-black text-slate-900">{avgOzel.toLocaleString('tr-TR')} TL</p>
+            </div>
+        </div>
+      )}
+
+      {/* RESULTS LIST */}
       <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16 text-left">
         {sonuclar.map((item) => (
           <div key={item.id} className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all text-left cursor-pointer" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>
-            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center text-left">
+            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center">
                 <div className="md:w-64 mr-10 text-left">
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi === 'Evet' ? 'YETKİLİ' : 'ÖZEL'}</span>
                   <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">{item.model_format}</h2>
                 </div>
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 w-full font-black uppercase italic text-left">
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Konum</span><p className="text-base text-slate-700">{item.sehir}</p></div>
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Tarih</span><p className="text-base text-slate-500">{item.tarih}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase">Konum</span><p className="text-base text-slate-700">{item.sehir}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase">Tarih</span><p className="text-base text-slate-500">{item.tarih || "Şubat 2026"}</p></div>
+                  <div className="flex flex-col items-end md:items-start text-left text-left text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
                 </div>
             </div>
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
-                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km || '-'}</p></div>
                 <div className="space-y-2 uppercase text-left text-left text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
                 
-                {/* DOĞRU FİLTRELENMİŞ MAVİ KUTU */}
-                <div className="bg-blue-600 text-white p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
-                  <p className="text-3xl font-black italic tracking-tighter uppercase leading-none">{item.kullanici_bas_harf}</p>
-                  <div className="mt-5 text-[12px] font-bold border-t border-white/20 pt-4 opacity-90 leading-relaxed">
-                    "{item.temiz_not || "Doğrulanmış fatura kaydıdır."}"
+                <div className="bg-blue-600 text-white p-8 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
+                  <p className="text-4xl font-black italic tracking-tighter uppercase leading-none">{item.bas_harfler}</p>
+                  <div className="mt-6 text-[12px] font-bold border-t border-white/20 pt-4 opacity-90 leading-relaxed">
+                    "{item.temiz_not || "Doğrulanmış veri paylaşımı."}"
                   </div>
                 </div>
               </div>
@@ -163,7 +178,18 @@ export default function Home() {
         ))}
       </section>
 
-      {/* VERİ PAYLAŞ FORMU VE DİĞER BÖLÜMLER... */}
+      {/* BLOG FOOTER */}
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
+        <div className="flex justify-between items-center mb-16 text-left">
+          <div className="flex items-center gap-4 text-left"><div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg text-left"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">GÜNCEL BLOG</h2></div>
+          <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2 text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+          {blogYazilari.map((blog) => (
+            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}><div className="absolute inset-0 bg-black/20"></div><div className="absolute bottom-8 left-10 text-left"><span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3></div></div><p className="text-slate-500 font-medium italic mb-6 px-4 line-clamp-2 text-left">{blog.ozet}</p></Link>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
