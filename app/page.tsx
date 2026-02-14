@@ -67,12 +67,12 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative">
-      <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
+      <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm text-left">
            <Link href="/" className="flex items-center gap-3">
               <div className="bg-[#0f172a] p-2.5 rounded-2xl text-white shadow-lg flex items-center justify-center">
                 <Car size={28} strokeWidth={2.5} className="text-blue-400" />
               </div>
-              <div className="flex flex-col leading-tight">
+              <div className="flex flex-col leading-tight text-left">
                 <span className="text-3xl font-black text-slate-800 italic uppercase tracking-tighter">bakımım<span className="text-blue-700">.com</span></span>
                 <span className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase">Şeffaf Servis Rehberi</span>
               </div>
@@ -83,6 +83,7 @@ export default function Home() {
            </div>
       </nav>
 
+      {/* HERO SECTION */}
       <div className="bg-[#0f172a] pt-24 pb-32 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
@@ -120,7 +121,7 @@ export default function Home() {
           {secilenMarka && (
              <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 opacity-40 hover:opacity-100 transition-all">
                 <div className="p-3 rounded-2xl bg-red-50 text-red-500 border-2 border-transparent"><X size={32}/></div>
-                <span className="text-[9px] font-black text-red-500 tracking-widest uppercase text-left">Sıfırla</span>
+                <span className="text-[9px] font-black text-red-500 tracking-widest uppercase">Kaldır</span>
              </button>
           )}
         </div>
@@ -128,14 +129,14 @@ export default function Home() {
 
       {/* İSTATİSTİK PANELLERİ */}
       {sonuclar.length > 0 && (
-        <div className="max-w-4xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div className="max-w-4xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 text-left">
             <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
                 <CheckCircle2 size={18} className="text-blue-600"/> Yetkili Servis Ortalaması
               </p>
               <p className="text-4xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
             </div>
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center text-left">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
                 <CheckCircle2 size={18} className="text-emerald-500"/> Özel Servis Ortalaması
               </p>
@@ -147,7 +148,7 @@ export default function Home() {
       {/* LİSTELEME */}
       <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16 text-left">
         {sonuclar.map((item) => (
-          <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all">
+          <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all text-left">
             <div className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>
                 <div className="md:w-64 mr-10 text-left">
                   <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi === 'Evet' ? 'YETKİLİ' : 'ÖZEL'}</span>
@@ -173,17 +174,17 @@ export default function Home() {
         <div className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-4 text-left">
             <div className="bg-blue-700 p-2 rounded-xl text-white shadow-lg"><BookOpen size={24} /></div>
-            <h2 className="text-3xl font-black italic text-slate-800 uppercase tracking-tighter">GÜNCEL BLOG</h2>
+            <h2 className="text-3xl font-black italic text-slate-800 uppercase tracking-tighter">REHBERLER</h2>
           </div>
           <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2">Tüm Yazılar <ArrowRight size={18}/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
-          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group">
+          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group text-left">
             <div className="bg-slate-200 aspect-video rounded-[3rem] mb-6 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
                <div className="absolute bottom-6 left-8 text-left uppercase">
                  <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full mb-3 inline-block">Bölgesel</span>
-                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase">İstanbul Honda Analizi</h3>
+                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase">İstanbul Honda Rehberi</h3>
                </div>
             </div>
           </Link>
@@ -191,8 +192,8 @@ export default function Home() {
             <div className="bg-slate-200 aspect-video rounded-[3rem] mb-6 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
                <div className="absolute bottom-6 left-8 text-left uppercase text-left">
-                 <span className="bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-full mb-3 inline-block tracking-widest text-left">Kıyaslama</span>
-                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Servis Fiyatları</h3>
+                 <span className="bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-full mb-3 inline-block tracking-widest text-left">Analiz</span>
+                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Fiyat Kıyaslaması</h3>
                </div>
             </div>
           </Link>
@@ -200,7 +201,7 @@ export default function Home() {
       </section>
 
       <footer className="bg-white border-t border-slate-200 py-16 px-8 text-left">
-        <div className="max-w-5xl mx-auto flex justify-between items-center">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 text-left">
           <span className="text-2xl font-black italic text-slate-800 tracking-tighter uppercase">bakımım<span className="text-blue-700">.com</span></span>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">© 2026</p>
         </div>
