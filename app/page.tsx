@@ -14,7 +14,6 @@ export default function Home() {
   const [sonuclar, setSonuclar] = useState<any[]>([]);
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
-  const [formAcik, setFormAcik] = useState(false);
   const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
 
   useEffect(() => {
@@ -80,15 +79,24 @@ export default function Home() {
            </Link>
            <div className="flex items-center gap-4">
               <Link href="/blog" className="text-[10px] font-black uppercase text-slate-500 hover:text-blue-700 tracking-widest hidden md:block">Bilgi Merkezi</Link>
-              <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md">Veri Paylaş</button>
+              <button className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md">Veri Paylaş</button>
            </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <div className="bg-[#0f172a] pt-24 pb-32 px-6 text-center">
-        <div className="max-w-4xl mx-auto">
+      {/* HERO SECTION - ARKA PLAN FOTOĞRAFLI */}
+      <div className="relative pt-24 pb-40 px-6 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2000&auto=format&fit=crop" 
+            alt="Bakım Arka Plan" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[#0f172a]/85 backdrop-blur-[2px]"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto relative z-10 text-center">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
-          <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 relative z-30">
+          <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
               <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
               <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
@@ -97,12 +105,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* RENKLİ MARKA LOGOLARI */}
-      <div className="max-w-5xl mx-auto px-6 -mt-10 relative z-40">
+      {/* RENKLİ VE DOĞRU MARKA LOGOLARI */}
+      <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-40">
         <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-6 md:gap-10">
           {[
             { n: 'TOYOTA', l: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Toyota_Logo.svg' },
-            { n: 'HONDA', l: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg' },
+            { n: 'HONDA', l: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Honda.svg/2560px-Honda.svg.png' },
             { n: 'FIAT', l: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Fiat_logo.svg' },
             { n: 'RENAULT', l: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Renault_2021_Logo.svg' },
             { n: 'CITROEN', l: 'https://upload.wikimedia.org/wikipedia/commons/a/af/Citro%C3%ABn_2022_logo.svg' },
@@ -112,16 +120,16 @@ export default function Home() {
             <button 
               key={m.n} 
               onClick={() => {setSecilenMarka(m.n); setSecilenModel("");}}
-              className={`flex flex-col items-center gap-2 group transition-all ${secilenMarka === m.n ? 'scale-110' : 'grayscale hover:grayscale-0 opacity-60 hover:opacity-100'}`}
+              className={`flex flex-col items-center gap-2 group transition-all ${secilenMarka === m.n ? 'scale-115' : 'hover:scale-105'}`}
             >
-              <div className={`p-4 rounded-3xl bg-white border-2 transition-all flex items-center justify-center w-16 h-16 ${secilenMarka === m.n ? 'border-blue-600 bg-blue-50 shadow-lg' : 'border-slate-50'}`}>
+              <div className={`p-4 rounded-3xl bg-white border-2 transition-all flex items-center justify-center w-16 h-16 ${secilenMarka === m.n ? 'border-blue-600 shadow-lg scale-110' : 'border-slate-50'}`}>
                 <img src={m.l} alt={m.n} className="w-10 h-10 object-contain" />
               </div>
               <span className={`text-[10px] font-black tracking-widest uppercase ${secilenMarka === m.n ? 'text-blue-700' : 'text-slate-400'}`}>{m.n}</span>
             </button>
           ))}
           {secilenMarka && (
-             <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 group opacity-60 hover:opacity-100 transition-all">
+             <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 group transition-all">
                 <div className="p-4 rounded-3xl bg-red-50 text-red-500 border-2 border-transparent group-hover:bg-red-100 transition-all w-16 h-16 flex items-center justify-center"><X size={32}/></div>
                 <span className="text-[10px] font-black text-red-500 tracking-widest uppercase">Kaldır</span>
              </button>
@@ -166,7 +174,6 @@ export default function Home() {
                   <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
                 </div>
             </div>
-            {/* KART DETAYI */}
             {acikKartId === item.id && (
               <div className="p-12 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
                 <div className="space-y-3 uppercase font-bold text-left"><p className="text-[11px] font-black text-slate-400 tracking-widest border-b pb-2 mb-4">Araç Özellikleri</p><p className="text-sm">Motor: <span className="text-slate-900">{item.motor || '-'}</span></p><p className="text-sm">Mesafe: <span className="text-slate-900">{item.km} KM</span></p></div>
@@ -185,12 +192,12 @@ export default function Home() {
         <div className="flex justify-between items-center mb-16">
           <div className="flex items-center gap-4 text-left">
             <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg"><BookOpen size={28} /></div>
-            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">GÜNCEL BLOG</h2>
+            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">GÜNCEL BLOG</h2>
           </div>
           <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2 group transition-all">Tümünü Gör <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform"/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
-          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group">
+          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group text-left">
             <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
                <div className="absolute bottom-8 left-10 text-left">
@@ -200,11 +207,11 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/blog/fiat-egea-periyodik-bakim-tablosu-2026" className="group text-left">
-            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300">
+            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300 text-left">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
                <div className="absolute bottom-8 left-10 text-left">
-                 <span className="bg-emerald-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">Model</span>
-                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Egea Bakım Tablosu</h3>
+                 <span className="bg-emerald-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">Model Analizi</span>
+                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">Egea Bakım Tablosu</h3>
                </div>
             </div>
           </Link>
@@ -214,8 +221,8 @@ export default function Home() {
       <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
           <div className="text-left">
-            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left">bakımım<span className="text-blue-700 text-left">.com</span></span>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">© 2026 Şeffaf Servis Platformu</p>
+            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2">bakımım<span className="text-blue-700">.com</span></span>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 Şeffaf Servis Platformu</p>
           </div>
           <div className="flex gap-10 items-center">
              <button className="text-[11px] font-black px-8 py-4 rounded-[1.5rem] bg-slate-50 text-slate-400 hover:bg-slate-100 uppercase tracking-widest flex items-center gap-3 transition-all italic"><Lock size={16}/> Yönetici</button>
