@@ -11,47 +11,70 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
 
-  // --- AKILLI VERİ DÜZELTME KATMANI ---
+  // --- GELİŞMİŞ AKILLI VERİ DÜZELTME KATMANI ---
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
-    const servisIsmi = item.servis_adi?.toLowerCase() || "";
+    const servisIsmi = (item.servis_adi || "").toLowerCase();
 
-    // 1. Yetkili Servis Otomatik Tanıma
-    const yetkiliServisAnahtarKelimeler = [
+    // 1. Yetkili Servis Otomatik Tanıma (Liste Genişletildi)
+    const yetkiliKeywords = [
       "arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "bakırcılar", 
-      "tanoto", "neos", "odak", "dumankaya", "görkem", "atmo", "mezcar"
+      "tanoto", "neos", "odak", "dumankaya", "görkem", "atmo", "mezcar", "herter",
+      "alj", "akbak", "akoto", "aksoy", "akten", "aktoy", "arden", "asal", "ata", 
+      "avek", "ayışığı", "banoto", "başaranlar", "efe toyota", "egem", "ermat", 
+      "ernaz", "evlüce", "gönye", "göral", "haldız", "hasan kavi", "honda bora", 
+      "honda park", "honda tekbaş", "mepa", "mıçı", "toyan", "yükseliş", "yüzbaşıoğlu",
+      "çavdarlı", "çetaş", "inciroğlu", "mais"
     ];
     
-    const isKnownYetkili = yetkiliServisAnahtarKelimeler.some(kw => servisIsmi.includes(kw));
-    if (isKnownYetkili) {
+    if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) {
       duzeltilmis.yetkili_mi = "Evet";
     }
 
-    // 2. Servis İsmi Üzerinden Şehir Tamamlama
-    const sehirEslesmeleri: { [key: string]: string } = {
+    // 2. Servis İsmi Üzerinden Şehir Tamamlama (Akıllı Eşleştirme)
+    const sehirMap: { [key: string]: string } = {
+      "herter": "Ankara",
+      "toyan": "Ankara",
+      "alj ankara": "Ankara",
+      "akbak": "Ankara",
+      "ata ankara": "Ankara",
+      "göral": "Ankara",
+      "honda bora": "Ankara",
       "arkas izmir": "İzmir",
       "arkas istanbul": "İstanbul",
       "otokoç taşdelen": "İstanbul",
+      "çekmeköy": "İstanbul",
+      "mengerler davutpaşa": "İstanbul",
+      "birmot": "İstanbul",
       "inallar": "Bursa",
-      "bakırcılar antalya": "Antalya",
-      "odak maslak": "İstanbul",
+      "çavdarlı": "Bursa",
+      "bakırcılar": "Antalya",
       "samsun blf": "Samsun",
-      "mepa": "İstanbul",
-      "inciroğlu": "Kayseri"
+      "inciroğlu": "Kayseri",
+      "mıçı": "Adana",
+      "hasan kavi": "Adana",
+      "tekbaş": "Adana"
     };
 
-    for (const [anahtar, sehir] of Object.entries(sehirEslesmeleri)) {
-      if (servisIsmi.includes(anahtar)) {
-        duzeltilmis.sehir = sehir;
+    if (duzeltilmis.sehir === "bilinmiyor") {
+      for (const [kw, sehir] of Object.entries(sehirMap)) {
+        if (servisIsmi.includes(kw)) {
+          duzeltilmis.sehir = sehir;
+          break;
+        }
       }
+    }
+
+    // 3. Fiyat Formatlama (Hata Giderme)
+    duzeltilmis.ekran_fiyat = item.fiyat_tl || item.fiyat || "Fiyat Alınız";
+    if (duzeltilmis.ekran_fiyat !== "Fiyat Alınız" && !duzeltilmis.ekran_fiyat.includes("TL")) {
+      duzeltilmis.ekran_fiyat += " TL";
     }
 
     return duzeltilmis;
   };
 
-  // Verileri düzeltilmiş halleriyle hazırla
   const duzeltilmisVeri = (bakimData as any[]).map(veriyiDüzelt);
-
   const tumMarkalar = Array.from(new Set(duzeltilmisVeri.map(item => item.marka))).sort();
   const tumSehirler = Array.from(new Set(duzeltilmisVeri.map(item => item.sehir))).filter(s => s && s !== "bilinmiyor").sort();
 
@@ -59,9 +82,7 @@ export default function Home() {
     if (secilenMarka) {
       const modeller = Array.from(new Set(duzeltilmisVeri.filter(item => item.marka === secilenMarka).map(item => item.model))).sort();
       setMusaitModeller(modeller);
-    } else {
-      setMusaitModeller([]);
-    }
+    } else { setMusaitModeller([]); }
     setSecilenModel(""); 
   }, [secilenMarka]);
 
@@ -77,7 +98,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900 text-left">
-      {/* Navbar ve Arama Alanı */}
+      {/* Navbar ve Header (Öncekiyle aynı) */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
           <div className="flex items-center gap-3">
@@ -117,10 +138,7 @@ export default function Home() {
         <div className="space-y-4">
           {sonuclar.map((item) => (
             <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
-              <div 
-                onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}
-                className="p-6 flex flex-col md:flex-row items-center cursor-pointer hover:bg-slate-50/50 transition-colors"
-              >
+              <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-6 flex flex-col md:flex-row items-center cursor-pointer hover:bg-slate-50/50 transition-colors">
                 <div className="md:w-56 text-left border-r border-slate-100 mr-6">
                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase mb-2 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
                     {item.yetkili_mi === 'Evet' ? 'Yetkili Servis' : 'Özel Servis'}
@@ -132,7 +150,7 @@ export default function Home() {
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6 text-left">
                   <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Bakım Türü</span><p className="text-sm font-bold text-slate-700">{item.bakim_turu}</p></div>
                   <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Servis Adı</span><p className="text-sm font-bold text-blue-600 truncate">{item.servis_adi}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.fiyat_tl ? `${item.fiyat_tl} TL` : item.fiyat}</p></div>
+                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.ekran_fiyat}</p></div>
                 </div>
 
                 <div className="ml-4 text-slate-300">
@@ -166,7 +184,7 @@ export default function Home() {
                          <div className="flex items-center gap-2 text-slate-500"><Calendar size={14}/> Tarih: <span className="text-slate-700">{item.tarih}</span></div>
                          <div className="flex items-center gap-2 text-slate-500"><ReceiptText size={14}/> Fatura: <span className="text-slate-700">{item.fatura || 'Belirtilmemiş'}</span></div>
                          <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-2 italic text-[10px] text-blue-700 font-medium leading-relaxed">
-                           "{item.not}"
+                           "{item.not || 'Açıklama bulunmuyor.'}"
                          </div>
                       </div>
                     </div>
