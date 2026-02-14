@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Car, Search, Calendar, ShieldCheck, BadgePercent, 
-  FileText, Zap, Settings, BookOpen, ArrowRight, CheckCircle2, Lock
+  FileText, Zap, Settings, BookOpen, ArrowRight, CheckCircle2, Lock, X 
 } from 'lucide-react';
 import bakimData from './data.json';
 
@@ -85,17 +85,17 @@ export default function Home() {
 
       <div className="bg-[#0f172a] pt-24 pb-32 px-6 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
+          <h1 className="text-6xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
           <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 relative z-30">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none"><option value="">Marka</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none"><option value="">Model</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none"><option value="">Şehir</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
               <button onClick={sorgula} className="bg-blue-700 text-white font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl hover:bg-blue-800 transition-all text-xl"><Search size={24} /> Sorgula</button>
           </div>
         </div>
       </div>
 
-      {/* MARKALAR - BEYAZ ALAN (ARAMA KUTUSUNUN HEMEN ALTI) */}
+      {/* MARKALAR - BEYAZ ALAN (ARAMA KUTUSUNUN ALTI) */}
       <div className="max-w-5xl mx-auto px-6 -mt-10 relative z-40">
         <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-6 md:gap-10">
           {[
@@ -120,7 +120,7 @@ export default function Home() {
           {secilenMarka && (
              <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 opacity-40 hover:opacity-100 transition-all">
                 <div className="p-3 rounded-2xl bg-red-50 text-red-500 border-2 border-transparent"><X size={32}/></div>
-                <span className="text-[9px] font-black text-red-500 tracking-widest uppercase">Kaldır</span>
+                <span className="text-[9px] font-black text-red-500 tracking-widest uppercase text-left">Sıfırla</span>
              </button>
           )}
         </div>
@@ -144,8 +144,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* LİSTELEME ALANI */}
-      <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16">
+      {/* LİSTELEME */}
+      <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16 text-left">
         {sonuclar.map((item) => (
           <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all">
             <div className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>
@@ -157,9 +157,9 @@ export default function Home() {
                   </div>
                   <h2 className="text-3xl font-black text-slate-800 uppercase italic tracking-tighter">{item.model_format}</h2>
                 </div>
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black uppercase italic">
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black uppercase italic text-left">
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Konum</span><p className="text-base text-slate-700">{item.sehir}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Şehir</span><p className="text-base text-slate-700">{item.sehir}</p></div>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 font-black">Zaman</span><p className="text-base text-slate-500">{item.tarih || "Şubat 2026"}</p></div>
                   <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2">Tutar</span><p className="text-3xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
                 </div>
@@ -171,39 +171,38 @@ export default function Home() {
       {/* BLOG ÖNİZLEME */}
       <section className="max-w-5xl mx-auto px-6 mt-28 mb-20 text-left pt-20 border-t border-slate-200">
         <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-left">
             <div className="bg-blue-700 p-2 rounded-xl text-white shadow-lg"><BookOpen size={24} /></div>
-            <h2 className="text-3xl font-black italic text-slate-800 uppercase tracking-tighter">HABERLER</h2>
+            <h2 className="text-3xl font-black italic text-slate-800 uppercase tracking-tighter">GÜNCEL BLOG</h2>
           </div>
           <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2">Tüm Yazılar <ArrowRight size={18}/></Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group text-left">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group">
             <div className="bg-slate-200 aspect-video rounded-[3rem] mb-6 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
                <div className="absolute bottom-6 left-8 text-left uppercase">
-                 <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full mb-3 inline-block tracking-widest">Bölgesel</span>
-                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase">İstanbul Honda Rehberi</h3>
+                 <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full mb-3 inline-block">Bölgesel</span>
+                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase">İstanbul Honda Analizi</h3>
                </div>
             </div>
           </Link>
-          <Link href="/blog/yetkili-vs-ozel-servis" className="group">
-            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-6 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all text-left">
+          <Link href="/blog/yetkili-vs-ozel-servis" className="group text-left">
+            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-6 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
-               <div className="absolute bottom-6 left-8 text-left uppercase">
-                 <span className="bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-full mb-3 inline-block tracking-widest">Analiz</span>
-                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase">Servis Karşılaştırma</h3>
+               <div className="absolute bottom-6 left-8 text-left uppercase text-left">
+                 <span className="bg-emerald-600 text-white text-[10px] font-black px-4 py-2 rounded-full mb-3 inline-block tracking-widest text-left">Kıyaslama</span>
+                 <h3 className="text-2xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Servis Fiyatları</h3>
                </div>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer className="bg-white border-t border-slate-200 py-16 px-8 text-left">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+        <div className="max-w-5xl mx-auto flex justify-between items-center">
           <span className="text-2xl font-black italic text-slate-800 tracking-tighter uppercase">bakımım<span className="text-blue-700">.com</span></span>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">© 2026 Tüm hakları saklıdır.</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">© 2026</p>
         </div>
       </footer>
     </main>
