@@ -74,16 +74,17 @@ export default function Home() {
                 <Car size={28} strokeWidth={2.5} className="text-blue-400" />
               </div>
               <div className="flex flex-col leading-tight text-left">
-                <span className="text-3xl font-black text-slate-800 italic uppercase tracking-tighter text-left">bakımım<span className="text-blue-700 text-left">.com</span></span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">Şeffaf Servis Rehberi</span>
+                <span className="text-3xl font-black text-slate-800 italic uppercase tracking-tighter">bakımım<span className="text-blue-700">.com</span></span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Şeffaf Servis Rehberi</span>
               </div>
            </Link>
            <div className="flex items-center gap-4">
               <Link href="/blog" className="text-[10px] font-black uppercase text-slate-500 hover:text-blue-700 tracking-widest hidden md:block">Bilgi Merkezi</Link>
-              <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md hover:scale-105 transition-transform">Veri Paylaş</button>
+              <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md">Veri Paylaş</button>
            </div>
       </nav>
 
+      {/* HERO SECTION */}
       <div className="bg-[#0f172a] pt-24 pb-32 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
@@ -96,39 +97,39 @@ export default function Home() {
         </div>
       </div>
 
-      {/* RENKLİ MARKA LOGOLARI - ARTIK DAHA ŞIK */}
+      {/* RENKLİ MARKA LOGOLARI */}
       <div className="max-w-5xl mx-auto px-6 -mt-10 relative z-40">
         <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-6 md:gap-10">
           {[
-            { n: 'TOYOTA', l: 'https://www.google.com/s2/favicons?sz=64&domain=toyota.com.tr' },
-            { n: 'HONDA', l: 'https://www.google.com/s2/favicons?sz=64&domain=honda.com.tr' },
-            { n: 'FIAT', l: 'https://www.google.com/s2/favicons?sz=64&domain=fiat.com.tr' },
-            { n: 'RENAULT', l: 'https://www.google.com/s2/favicons?sz=64&domain=renault.com.tr' },
-            { n: 'CITROEN', l: 'https://www.google.com/s2/favicons?sz=64&domain=citroen.com.tr' },
-            { n: 'OPEL', l: 'https://www.google.com/s2/favicons?sz=64&domain=opel.com.tr' },
-            { n: 'VOLKSWAGEN', l: 'https://www.google.com/s2/favicons?sz=64&domain=vw.com.tr' }
+            { n: 'TOYOTA', l: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Toyota_Logo.svg' },
+            { n: 'HONDA', l: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Honda_Logo.svg' },
+            { n: 'FIAT', l: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Fiat_logo.svg' },
+            { n: 'RENAULT', l: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Renault_2021_Logo.svg' },
+            { n: 'CITROEN', l: 'https://upload.wikimedia.org/wikipedia/commons/a/af/Citro%C3%ABn_2022_logo.svg' },
+            { n: 'OPEL', l: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Opel_logo_2023.svg' },
+            { n: 'VOLKSWAGEN', l: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Volkswagen_logo_2019.svg' }
           ].map((m) => (
             <button 
               key={m.n} 
               onClick={() => {setSecilenMarka(m.n); setSecilenModel("");}}
               className={`flex flex-col items-center gap-2 group transition-all ${secilenMarka === m.n ? 'scale-110' : 'grayscale hover:grayscale-0 opacity-60 hover:opacity-100'}`}
             >
-              <div className={`p-4 rounded-3xl bg-slate-50 border-2 transition-all ${secilenMarka === m.n ? 'border-blue-600 bg-blue-50 shadow-lg' : 'border-transparent'}`}>
-                <img src={m.l} alt={m.n} className="w-8 h-8 object-contain" />
+              <div className={`p-4 rounded-3xl bg-white border-2 transition-all flex items-center justify-center w-16 h-16 ${secilenMarka === m.n ? 'border-blue-600 bg-blue-50 shadow-lg' : 'border-slate-50'}`}>
+                <img src={m.l} alt={m.n} className="w-10 h-10 object-contain" />
               </div>
               <span className={`text-[10px] font-black tracking-widest uppercase ${secilenMarka === m.n ? 'text-blue-700' : 'text-slate-400'}`}>{m.n}</span>
             </button>
           ))}
           {secilenMarka && (
              <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 group opacity-60 hover:opacity-100 transition-all">
-                <div className="p-4 rounded-3xl bg-red-50 text-red-500 border-2 border-transparent group-hover:bg-red-100 transition-all"><X size={32}/></div>
+                <div className="p-4 rounded-3xl bg-red-50 text-red-500 border-2 border-transparent group-hover:bg-red-100 transition-all w-16 h-16 flex items-center justify-center"><X size={32}/></div>
                 <span className="text-[10px] font-black text-red-500 tracking-widest uppercase">Kaldır</span>
              </button>
           )}
         </div>
       </div>
 
-      {/* İSTATİSTİK PANELLERİ */}
+      {/* İSTATİSTİKLER */}
       {sonuclar.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 text-left">
             <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
@@ -146,7 +147,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* LİSTELEME VE KARTLAR */}
+      {/* SONUÇ LİSTESİ */}
       <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16 text-left">
         {sonuclar.map((item) => (
           <div key={item.id} className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all">
@@ -156,23 +157,22 @@ export default function Home() {
                   <div className="flex items-center gap-2 text-slate-400 font-bold mb-1 uppercase tracking-widest italic text-xs">
                     <Settings size={18} className="text-slate-300" /> {item.marka_format}
                   </div>
-                  <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter text-left">{item.model_format}</h2>
+                  <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">{item.model_format}</h2>
                 </div>
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black uppercase italic text-left">
-                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 tracking-widest text-left">Bakım Tipi</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
-                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 tracking-widest text-left">Şehir</span><p className="text-base text-slate-700">{item.sehir}</p></div>
-                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 tracking-widest text-left">Zaman</span><p className="text-base text-slate-500">{item.tarih || "Şubat 2026"}</p></div>
-                  <div className="flex flex-col items-end md:items-start text-left"><span className="text-[11px] text-slate-300 mb-2 text-left">Toplam Fiyat</span><p className="text-4xl font-black text-blue-700 tracking-tighter text-left">{item.ekran_fiyat}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Şehir</span><p className="text-base text-slate-700">{item.sehir}</p></div>
+                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase font-black">Zaman</span><p className="text-base text-slate-500">{item.tarih || "Şubat 2026"}</p></div>
+                  <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
                 </div>
             </div>
-            
-            {/* KART DETAYI - ONARILDI */}
+            {/* KART DETAYI */}
             {acikKartId === item.id && (
               <div className="p-12 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
-                <div className="space-y-3 uppercase font-bold text-left"><p className="text-[11px] font-black text-slate-400 tracking-widest border-b pb-2 mb-4 text-left">Detaylı Bilgi</p><p className="text-sm">Motor: <span className="text-slate-900">{item.motor || '-'}</span></p><p className="text-sm">Kilometre: <span className="text-slate-900">{item.km} KM</span></p></div>
-                <div className="space-y-3 uppercase font-bold text-left"><p className="text-[11px] font-black text-slate-400 tracking-widest border-b pb-2 mb-4 text-left">Servis Bilgisi</p><p className="text-sm">Servis Adı: <span className="text-slate-900">{item.servis_adi}</span></p></div>
-                <div className="bg-[#0f172a] text-white p-8 rounded-[2.5rem] shadow-xl text-left italic leading-relaxed">
-                  <p className="text-left font-medium">"{item.not || "Bakım kayıtları sitemiz üzerinden doğrulanmış, gerçek kullanıcı faturasıdır."}"</p>
+                <div className="space-y-3 uppercase font-bold text-left"><p className="text-[11px] font-black text-slate-400 tracking-widest border-b pb-2 mb-4">Araç Özellikleri</p><p className="text-sm">Motor: <span className="text-slate-900">{item.motor || '-'}</span></p><p className="text-sm">Mesafe: <span className="text-slate-900">{item.km} KM</span></p></div>
+                <div className="space-y-3 uppercase font-bold text-left"><p className="text-[11px] font-black text-slate-400 tracking-widest border-b pb-2 mb-4">Servis Bilgisi</p><p className="text-sm">Servis: <span className="text-slate-900">{item.servis_adi}</span></p></div>
+                <div className="bg-[#0f172a] text-white p-8 rounded-[2.5rem] shadow-xl text-left italic leading-relaxed relative overflow-hidden">
+                  <p className="relative z-10 font-medium">"{item.not || "Bu bakım faturası bakimim.com topluluğu tarafından paylaşılan gerçek bir veridir."}"</p>
                 </div>
               </div>
             )}
@@ -180,15 +180,45 @@ export default function Home() {
         ))}
       </section>
 
-      {/* FOOTER */}
+      {/* BLOG ÖNİZLEME */}
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 text-left pt-20 border-t border-slate-200">
+        <div className="flex justify-between items-center mb-16">
+          <div className="flex items-center gap-4 text-left">
+            <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg"><BookOpen size={28} /></div>
+            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">GÜNCEL BLOG</h2>
+          </div>
+          <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2 group transition-all">Tümünü Gör <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform"/></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+          <Link href="/blog/istanbul-honda-bakim-fiyatlari-2026" className="group">
+            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300">
+               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
+               <div className="absolute bottom-8 left-10 text-left">
+                 <span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İstanbul</span>
+                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">Honda Bakım Rehberi</h3>
+               </div>
+            </div>
+          </Link>
+          <Link href="/blog/fiat-egea-periyodik-bakim-tablosu-2026" className="group text-left">
+            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300">
+               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
+               <div className="absolute bottom-8 left-10 text-left">
+                 <span className="bg-emerald-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">Model</span>
+                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Egea Bakım Tablosu</h3>
+               </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
           <div className="text-left">
             <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left">bakımım<span className="text-blue-700 text-left">.com</span></span>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">© 2026 Tüm Hakları Saklıdır.</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">© 2026 Şeffaf Servis Platformu</p>
           </div>
           <div className="flex gap-10 items-center">
-             <button className="text-[11px] font-black px-8 py-4 rounded-[1.5rem] bg-slate-50 text-slate-400 hover:bg-slate-100 uppercase tracking-widest flex items-center gap-3 transition-all italic"><Lock size={16}/> Yönetici Girişi</button>
+             <button className="text-[11px] font-black px-8 py-4 rounded-[1.5rem] bg-slate-50 text-slate-400 hover:bg-slate-100 uppercase tracking-widest flex items-center gap-3 transition-all italic"><Lock size={16}/> Yönetici</button>
           </div>
         </div>
       </footer>
