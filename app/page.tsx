@@ -5,14 +5,18 @@ import { Car, MapPin, Wrench, Search, ShieldCheck, LayoutGrid, CheckCircle2, Ale
 export default function Home() {
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
+  const [secilenSehir, setSecilenSehir] = useState("İstanbul"); // Varsayılan şehir
   const [sonucGoster, setSonucGoster] = useState(false);
 
-  // Marka Listeleri
+  // Türkiye'nin tüm illeri (Senin listen baz alınarak alfabetik dizildi)
+  const sehirler = [
+    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
+  ].sort((a, b) => a.localeCompare(b, 'tr')); // Türkçe karakterlere göre sıralar
+
   const otomobilMarkalar = ["Alfa Romeo", "Aston Martin", "Audi", "BMW", "Cupra", "Dacia", "Fiat", "Ford", "Honda", "Hyundai", "Mercedes-Benz", "Nissan", "Opel", "Peugeot", "Renault", "Seat", "Skoda", "Tesla", "Tofaş", "Toyota", "Volkswagen", "Volvo"];
   const araziSuvMarkalar = ["Dacia", "Hyundai", "Jeep", "Land Rover", "Nissan"];
   const minivanVanMarkalar = ["Fiat", "Ford", "Renault", "Volkswagen"];
 
-  // Logolar ve Veriler
   const popülerMarkalar = [
     { name: "Hyundai", logo: "https://www.carlogos.org/car-logos/hyundai-logo.png" },
     { name: "Nissan", logo: "https://www.carlogos.org/car-logos/nissan-logo.png" },
@@ -36,7 +40,7 @@ export default function Home() {
         body { font-family: 'Inter', sans-serif; }
       `}</style>
 
-      {/* Navbar - Prestijli ve Net */}
+      {/* Navbar */}
       <nav className="flex items-center justify-between px-10 py-5 bg-white/90 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50">
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="bg-[#1E293B] p-2 rounded-xl text-white shadow-lg transition-transform group-hover:scale-105">
@@ -44,7 +48,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col text-left">
             <span className="text-xl font-extrabold tracking-tight text-[#1E293B]">bakimim<span className="text-blue-600">.com</span></span>
-            <span className="text-[9px] font-bold text-slate-500 tracking-[0.3em] uppercase leading-none">Şen Kardeşler</span>
+            <span className="text-[9px] font-bold text-slate-500 tracking-[0.2em] uppercase leading-none">Şen Kardeşler</span>
           </div>
         </div>
         <div className="hidden md:flex gap-10 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
@@ -53,7 +57,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section - Kontrast Sorunu Çözülmüş Arka Plan */}
+      {/* Hero Section */}
       <section className="relative min-h-[850px] flex flex-col items-center justify-center text-center py-20 px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[#0F172A] z-0">
           <div className="absolute inset-0 bg-cover bg-center opacity-25 grayscale mix-blend-overlay scale-110" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2000')" }} />
@@ -66,24 +70,23 @@ export default function Home() {
             <span className="text-blue-400 italic">Şeffafça Görün!</span>
           </h1>
           
-          {/* Arama Kutusu - Koyu Metinlerle Netleştirildi */}
+          {/* Arama Kutusu - Şehir Listesi Entegre Edildi */}
           <div className="bg-white p-2 rounded-[2.5rem] shadow-2xl max-w-6xl mx-auto mb-12 border border-slate-200">
             <div className="bg-slate-50 p-6 rounded-[2rem] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
               
-              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2">
+              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2 font-sans">
                 <LayoutGrid size={18} className="text-blue-600 mr-3" />
                 <div className="flex flex-col w-full">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori & Marka</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Marka</label>
                   <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="bg-transparent text-slate-900 font-bold outline-none cursor-pointer appearance-none w-full">
                     <option value="">Seçiniz</option>
                     <optgroup label="Otomobil">{otomobilMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</optgroup>
                     <optgroup label="SUV & Pickup">{araziSuvMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</optgroup>
-                    <optgroup label="Minivan & Van">{minivanVanMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</optgroup>
                   </select>
                 </div>
               </div>
 
-              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2">
+              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2 font-sans">
                 <Car size={18} className="text-blue-600 mr-3" />
                 <div className="flex flex-col w-full">
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Model</label>
@@ -91,15 +94,25 @@ export default function Home() {
                     <option value="">Seçiniz</option>
                     <option value="Tucson">Tucson</option>
                     <option value="Qashqai">Qashqai</option>
+                    <option value="Duster">Duster</option>
                   </select>
                 </div>
               </div>
 
-              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2">
+              {/* Şehir Seçimi (Tüm İller Buraya Geldi) */}
+              <div className="flex items-center group relative border-r border-slate-200 last:border-0 px-2 font-sans">
                 <MapPin size={18} className="text-blue-600 mr-3" />
                 <div className="flex flex-col w-full">
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Şehir</label>
-                  <select className="bg-transparent text-slate-900 font-bold outline-none cursor-pointer appearance-none w-full"><option>İstanbul</option><option>Antalya</option></select>
+                  <select 
+                    value={secilenSehir}
+                    onChange={(e) => setSecilenSehir(e.target.value)}
+                    className="bg-transparent text-slate-900 font-bold outline-none cursor-pointer appearance-none w-full"
+                  >
+                    {sehirler.map(sehir => (
+                      <option key={sehir} value={sehir}>{sehir}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -109,7 +122,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Büyük ve Belirgin Logo Bölümü */}
+          {/* Logo Bölümü */}
           <div className="flex flex-wrap justify-center gap-8 md:gap-10 max-w-6xl mx-auto py-10 bg-slate-900/40 backdrop-blur-md rounded-[3rem] border border-white/20 px-12 shadow-2xl">
             {popülerMarkalar.map((marka) => (
               <div key={marka.name} onClick={() => setSecilenMarka(marka.name)} className="group cursor-pointer flex flex-col items-center gap-4">
@@ -132,15 +145,20 @@ export default function Home() {
             <div className="bg-[#1E293B] p-10 text-white flex justify-between items-center">
               <div>
                 <h2 className="text-4xl font-black uppercase tracking-tight mb-2 leading-none">{secilenMarka} {secilenModel}</h2>
-                <span className="bg-blue-500/20 text-blue-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border border-blue-500/30">
-                  {bakimVerileri[secilenModel].km}
-                </span>
+                <div className="flex gap-2 items-center">
+                  <span className="bg-blue-500/20 text-blue-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border border-blue-500/30">
+                    {bakimVerileri[secilenModel].km}
+                  </span>
+                  <span className="bg-slate-500/20 text-slate-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border border-slate-500/30">
+                    {secilenSehir} Verisi
+                  </span>
+                </div>
               </div>
               <CheckCircle2 size={60} className="opacity-10 hidden md:block" />
             </div>
-            <div className="p-12">
+            <div className="p-12 text-left">
               <div className="flex flex-col md:flex-row gap-10 items-center justify-between mb-12 border-b border-slate-100 pb-12">
-                <div className="text-center md:text-left">
+                <div>
                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Güncel Bakım Ücreti</p>
                   <p className="text-6xl font-[900] text-[#1E293B] tracking-tighter">{bakimVerileri[secilenModel].fiyat}</p>
                 </div>
@@ -148,18 +166,18 @@ export default function Home() {
                   <ShieldCheck size={22} /> Şen Kardeşler Onaylı
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div>
-                  <h3 className="text-sm font-black text-slate-800 mb-6 flex items-center gap-3 uppercase tracking-widest">Değişen Parçalar</h3>
-                  <p className="text-slate-600 font-medium leading-relaxed italic bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-inner">
+                  <h3 className="text-sm font-black text-slate-800 mb-6 uppercase tracking-widest">Değişen Parçalar</h3>
+                  <p className="text-slate-600 font-medium leading-relaxed italic bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
                     "{bakimVerileri[secilenModel].icerik}"
                   </p>
                 </div>
                 <div className="bg-indigo-50/50 p-10 rounded-[2.5rem] border border-indigo-100/50">
                   <h3 className="text-indigo-900 font-black mb-3 text-xs uppercase tracking-widest flex items-center gap-3">
-                    <AlertTriangle size={18} className="text-indigo-500" /> Önemli Bilgi
+                    <AlertTriangle size={18} className="text-indigo-500" /> Şen Kardeşler Notu
                   </h3>
-                  <p className="text-indigo-700/80 text-sm font-semibold leading-relaxed leading-relaxed">
+                  <p className="text-indigo-700/80 text-sm font-semibold leading-relaxed">
                     {bakimVerileri[secilenModel].not} [cite: 2026-02-10]
                   </p>
                 </div>
