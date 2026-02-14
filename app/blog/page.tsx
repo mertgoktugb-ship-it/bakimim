@@ -1,69 +1,89 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { Car, ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
+import { Car, BookOpen, ArrowRight, Home, TrendingUp } from 'lucide-react';
 
-const blogIcerikleri: any = {
-  "yetkili-vs-ozel-servis": {
+// Buradaki slug'lar, klasör içindeki slug sayfasıyla eşleşmeli
+const blogYazilari = [
+  {
+    slug: "yetkili-vs-ozel-servis",
     kategori: "Analiz",
     baslik: "Yetkili Servis mi Özel Servis mi? 2026 Fiyat Karşılaştırması",
-    tarih: "14 Şubat 2026",
-    yazar: "Mert Şen",
-    icerik: [
-      "Araç sahiplerinin en büyük ikilemi: Garantiyi bozmamak için fahiş fiyatlar ödemek mi, yoksa güvenilir bir özel serviste tasarruf etmek mi? bakımım.com verilerine göre, bir Toyota C-HR periyodik bakımı yetkili serviste 45.390 TL'ye kadar çıkarken, özel servislerde aynı işlem 9.496 TL bandında yapılabiliyor.",
-      "Tavsiyemiz: Eğer aracınızın garantisi devam ediyorsa yetkili servisten vazgeçmeyin. Ancak garantisi bitmiş araçlar için TSE onaylı özel servisler, bütçenizi korumanın en akıllı yoludur."
-    ]
+    ozet: "2026 bakım masraflarında %70 tasarruf etmek mümkün mü? Verilerle servis fiyatlarını mercek altına aldık.",
   },
-  "bakim-faturasi-dusurme": {
+  {
+    slug: "2026-toyota-c-hr-bakim-maliyeti",
+    kategori: "Model Analizi",
+    baslik: "Toyota C-HR Periyodik Bakım Fiyatları 2026: Güncel Rehber",
+    ozet: "Toyota C-HR kullanıcıları için yetkili ve özel servis arasındaki makas açılmaya devam ediyor. Güncel fiyatlar ve tavsiyeler.",
+  },
+  {
+    slug: "bakim-faturasi-dusurme",
     kategori: "İpucu",
     baslik: "Bakım Faturasını Düşürmenin 5 Yolu: Servise Gitmeden Önce Okuyun!",
-    tarih: "13 Şubat 2026",
-    yazar: "Mert Şen",
-    icerik: [
-      "Servis faturanızdaki 'gereksiz' kalemleri nasıl elersiniz? İşte tasarruf tüyoları:",
-      "1. Silecek suyunuzu gitmeden önce kendiniz doldurun.",
-      "2. Filtreleri kontrol edin.",
-      "3. Sadece gerekli görülen işlemlere onay verin."
-    ]
+    ozet: "Servis faturanızdaki 'gereksiz' kalemleri nasıl elersiniz? Yağ değişimi ve periyodik bakımda tasarruf tüyoları.",
+  },
+  {
+    slug: "periyodik-bakim-neleri-kapsar",
+    kategori: "Rehber",
+    baslik: "Standart Periyodik Bakımda Neler Değişir? Faturadaki Kalemlerin Anlamı",
+    ozet: "Motor yağı, filtreler ve işçilik... Servis faturasındaki karmaşık terimlerin ne anlama geldiğini açıklıyoruz.",
   }
-};
+];
 
-export default function BlogDetay() {
-  const params = useParams();
-  const slug = params?.slug as string;
-  const yazi = blogIcerikleri[slug];
-
-  if (!yazi) {
-    return (
-      <div className="p-20 text-center uppercase font-black">
-        <h1 className="text-4xl mb-4">Yazı Bulunamadı</h1>
-        <Link href="/blog" className="text-blue-700 underline text-sm">Blog Listesine Dön</Link>
-      </div>
-    );
-  }
-
+export default function BlogListeleme() {
   return (
-    <main className="min-h-screen bg-white pb-20 text-left">
-      <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center">
-           <Link href="/" className="flex items-center gap-3">
-              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-white shadow-lg"><Car size={28} className="text-blue-400" /></div>
-              <span className="text-3xl font-black text-slate-800 italic uppercase tracking-tighter">bakımım<span className="text-blue-700">.com</span></span>
+    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left">
+      {/* NAVBAR */}
+      <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
+           <Link href="/" className="flex items-center gap-3 group">
+              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-white shadow-lg flex items-center justify-center transition-transform group-hover:scale-105">
+                <Car size={28} strokeWidth={2.5} className="text-blue-400" />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-blue-700">.com</span></span>
+                <span className="text-[10px] font-bold text-slate-400 tracking-[0.3em] uppercase">Bilgi Kütüphanesi</span>
+              </div>
            </Link>
-           <Link href="/blog" className="flex items-center gap-2 text-xs font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest">
-             <ArrowLeft size={16}/> Geri Dön
+           <Link href="/" className="flex items-center gap-2 text-xs font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest transition-all">
+             <Home size={16}/> Ana Sayfa
            </Link>
       </nav>
 
-      <article className="max-w-3xl mx-auto px-6 py-20">
-        <span className="bg-blue-100 text-blue-700 text-[11px] font-black px-4 py-2 rounded-xl uppercase tracking-widest mb-6 inline-block">{yazi.kategori}</span>
-        <h1 className="text-4xl md:text-6xl font-black italic text-slate-900 uppercase tracking-tighter leading-tight mb-10 text-left">{yazi.baslik}</h1>
-        
-        <div className="flex items-center gap-6 mb-16 border-y border-slate-100 py-6">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest"><Calendar size={16}/> {yazi.tarih}</div>
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest"><User size={16}/> {yazi.yazar}</div>
+      {/* HEADER */}
+      <section className="max-w-5xl mx-auto px-6 py-20 text-left">
+        <div className="flex items-center gap-4 mb-16">
+          <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-xl"><BookOpen size={32} /></div>
+          <div>
+            <h1 className="text-4xl md:text-6xl font-black italic text-slate-800 uppercase tracking-tighter">Servis Rehberi</h1>
+            <p className="text-slate-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Güncel Analizler & Tasarruf Tüyoları</p>
+          </div>
         </div>
 
-        <div className="space-y-8 text-left">
-          {yazi.icerik.map((p: string, i: number) => (
-            <p key={i} className="text-xl text-slate-600 leading-relaxed font-medium italic">{
+        {/* LİSTE */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {blogYazilari.map((blog) => (
+            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group cursor-pointer">
+              <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner transition-transform group-hover:-translate-y-2 duration-300">
+                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-transparent to-transparent"></div>
+                 <div className="absolute bottom-8 left-10 text-left">
+                   <span className="bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] mb-3 inline-block">{blog.kategori}</span>
+                   <h2 className="text-2xl md:text-3xl font-black text-white leading-tight uppercase italic tracking-tight text-left">{blog.baslik}</h2>
+                 </div>
+              </div>
+              <p className="text-slate-500 font-medium leading-relaxed italic mb-6 px-4 text-left text-lg line-clamp-2">{blog.ozet}</p>
+              <div className="flex items-center gap-2 text-blue-700 font-black text-xs uppercase tracking-widest px-4 group-hover:gap-6 transition-all">
+                Makaleyi Oku <ArrowRight size={20} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="mt-20 py-10 border-t border-slate-200 text-center">
+         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">bakımım.com Bilgi Paylaşım Platformu</p>
+      </footer>
+    </main>
+  );
+}
