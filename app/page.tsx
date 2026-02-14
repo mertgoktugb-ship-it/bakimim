@@ -105,32 +105,32 @@ export default function Home() {
         </div>
       </div>
 
-      {/* RENKLİ VE DOĞRU MARKA LOGOLARI */}
+      {/* RENKLİ VE GARANTİ LOGOLAR */}
       <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-40">
         <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-wrap justify-center gap-6 md:gap-10">
           {[
-            { n: 'TOYOTA', l: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Toyota_Logo.svg' },
-            { n: 'HONDA', l: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Honda.svg/2560px-Honda.svg.png' },
-            { n: 'FIAT', l: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Fiat_logo.svg' },
-            { n: 'RENAULT', l: 'https://upload.wikimedia.org/wikipedia/commons/b/b7/Renault_2021_Logo.svg' },
-            { n: 'CITROEN', l: 'https://upload.wikimedia.org/wikipedia/commons/a/af/Citro%C3%ABn_2022_logo.svg' },
-            { n: 'OPEL', l: 'https://upload.wikimedia.org/wikipedia/commons/0/07/Opel_logo_2023.svg' },
-            { n: 'VOLKSWAGEN', l: 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Volkswagen_logo_2019.svg' }
+            { n: 'TOYOTA', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/toyota.png' },
+            { n: 'HONDA', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/honda.png' },
+            { n: 'FIAT', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/fiat.png' },
+            { n: 'RENAULT', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/renault.png' },
+            { n: 'CITROEN', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/citroen.png' },
+            { n: 'OPEL', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/opel.png' },
+            { n: 'VOLKSWAGEN', l: 'https://www.car-logos.org/wp-content/uploads/2011/09/volkswagen.png' }
           ].map((m) => (
             <button 
               key={m.n} 
               onClick={() => {setSecilenMarka(m.n); setSecilenModel("");}}
               className={`flex flex-col items-center gap-2 group transition-all ${secilenMarka === m.n ? 'scale-115' : 'hover:scale-105'}`}
             >
-              <div className={`p-4 rounded-3xl bg-white border-2 transition-all flex items-center justify-center w-16 h-16 ${secilenMarka === m.n ? 'border-blue-600 shadow-lg scale-110' : 'border-slate-50'}`}>
-                <img src={m.l} alt={m.n} className="w-10 h-10 object-contain" />
+              <div className={`p-4 rounded-3xl bg-white border-2 transition-all flex items-center justify-center w-20 h-20 ${secilenMarka === m.n ? 'border-blue-600 shadow-lg scale-110' : 'border-slate-50'}`}>
+                <img src={m.l} alt={m.n} className="w-12 h-12 object-contain" />
               </div>
               <span className={`text-[10px] font-black tracking-widest uppercase ${secilenMarka === m.n ? 'text-blue-700' : 'text-slate-400'}`}>{m.n}</span>
             </button>
           ))}
           {secilenMarka && (
              <button onClick={() => {setSecilenMarka(""); setSecilenModel("");}} className="flex flex-col items-center gap-2 group transition-all">
-                <div className="p-4 rounded-3xl bg-red-50 text-red-500 border-2 border-transparent group-hover:bg-red-100 transition-all w-16 h-16 flex items-center justify-center"><X size={32}/></div>
+                <div className="p-4 rounded-3xl bg-red-50 text-red-500 border-2 border-transparent group-hover:bg-red-100 transition-all w-20 h-20 flex items-center justify-center"><X size={32}/></div>
                 <span className="text-[10px] font-black text-red-500 tracking-widest uppercase">Kaldır</span>
              </button>
           )}
@@ -146,7 +146,7 @@ export default function Home() {
               </p>
               <p className="text-5xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
             </div>
-            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-slate-100 text-center text-left">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
                 <CheckCircle2 size={18} className="text-emerald-500"/> Özel Servis Ortalaması
               </p>
@@ -165,13 +165,13 @@ export default function Home() {
                   <div className="flex items-center gap-2 text-slate-400 font-bold mb-1 uppercase tracking-widest italic text-xs">
                     <Settings size={18} className="text-slate-300" /> {item.marka_format}
                   </div>
-                  <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter">{item.model_format}</h2>
+                  <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter text-left">{item.model_format}</h2>
                 </div>
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black uppercase italic text-left">
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Şehir</span><p className="text-base text-slate-700">{item.sehir}</p></div>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase font-black">Zaman</span><p className="text-base text-slate-500">{item.tarih || "Şubat 2026"}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
+                  <div className="flex flex-col items-end md:items-start text-left"><span className="text-[11px] text-slate-300 mb-2 tracking-widest uppercase text-left">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter text-left">{item.ekran_fiyat}</p></div>
                 </div>
             </div>
             {acikKartId === item.id && (
@@ -202,16 +202,16 @@ export default function Home() {
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
                <div className="absolute bottom-8 left-10 text-left">
                  <span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İstanbul</span>
-                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">Honda Bakım Rehberi</h3>
+                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Honda Bakım Rehberi</h3>
                </div>
             </div>
           </Link>
           <Link href="/blog/fiat-egea-periyodik-bakim-tablosu-2026" className="group text-left">
-            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300 text-left">
+            <div className="bg-slate-200 aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-inner group-hover:-translate-y-2 transition-all duration-300">
                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent"></div>
                <div className="absolute bottom-8 left-10 text-left">
-                 <span className="bg-emerald-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">Model Analizi</span>
-                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">Egea Bakım Tablosu</h3>
+                 <span className="bg-emerald-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">Model Analizi</span>
+                 <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">Egea Bakım Tablosu</h3>
                </div>
             </div>
           </Link>
@@ -221,8 +221,8 @@ export default function Home() {
       <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
           <div className="text-left">
-            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2">bakımım<span className="text-blue-700">.com</span></span>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 Şeffaf Servis Platformu</p>
+            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left">bakımım<span className="text-blue-700">.com</span></span>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left">© 2026 Şeffaf Servis Platformu</p>
           </div>
           <div className="flex gap-10 items-center">
              <button className="text-[11px] font-black px-8 py-4 rounded-[1.5rem] bg-slate-50 text-slate-400 hover:bg-slate-100 uppercase tracking-widest flex items-center gap-3 transition-all italic"><Lock size={16}/> Yönetici</button>
