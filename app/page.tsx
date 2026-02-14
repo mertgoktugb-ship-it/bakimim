@@ -54,31 +54,24 @@ export default function Home() {
     duzeltilmis.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
     duzeltilmis.ekran_fiyat = duzeltilmis.fiyat_sayi > 0 ? duzeltilmis.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     
-    // --- İSİM AYARLAMASI (HİÇBİR ŞEY EKLEME) ---
-    // 1. Önce veride isim ara
+    // --- Y.K. SORUNU KESİN ÇÖZÜM ---
     let hamIsim = item.ad_soyad || item.isim || "";
     
-    // 2. İsim yoksa, Not kısmının başına bak
     if (!hamIsim && item.not) {
         const notIsimMatch = item.not.match(/^([A-ZİĞÜŞÖÇ][a-zığüşöç\.]+(\s+[A-ZİĞÜŞÖÇ][a-zığüşöç\.]+)*)/);
-        if (notIsimMatch) {
-            hamIsim = notIsimMatch[0];
-        }
+        if (notIsimMatch) hamIsim = notIsimMatch[0];
     }
 
-    // 3. Baş harfleri oluştur veya BOŞ BIRAK
     if (hamIsim) {
-        // Eğer zaten kısaltmaysa (M. Ö.) direkt kullan
         if (hamIsim.includes('.')) {
             duzeltilmis.bas_harfler = hamIsim;
         } else {
             duzeltilmis.bas_harfler = hamIsim.trim().split(/\s+/).map((p: any) => p.charAt(0).toUpperCase() + ".").join(" ");
         }
     } else {
-        duzeltilmis.bas_harfler = ""; // BURASI ARTIK BOŞ, KAFASINA GÖRE BİR ŞEY YAZMAYACAK
+        duzeltilmis.bas_harfler = ""; 
     }
 
-    // Notun içini gizle
     duzeltilmis.temiz_not = (item.not || "").replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\b/g, "$1. $2.");
     
     duzeltilmis.marka_format = formatYazi(item.marka);
@@ -120,6 +113,8 @@ export default function Home() {
               <div className="flex flex-col leading-tight"><span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-blue-700">.com</span></span><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-left">Şeffaf Servis Rehberi</span></div>
            </Link>
            <div className="flex items-center gap-4">
+              {/* BLOG BUTONU EKLENDİ */}
+              <Link href="/blog" className="text-[10px] font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest flex items-center gap-2 mr-2"><BookOpen size={16}/> BLOG</Link>
               <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-800 shadow-md flex items-center gap-2 transition-all"><FileText size={14}/> Veri Paylaş</button>
               <button onClick={() => setAdminModu(!adminModu)} className="text-slate-200 hover:text-slate-400 ml-2 transition-colors"><Lock size={16}/></button>
            </div>
@@ -171,9 +166,7 @@ export default function Home() {
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
                 <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
-                <div className="space-y-2 uppercase text-left text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic text-left text-left">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
-                
-                {/* MAVİ KUTU - EĞER İSİM YOKSA HİÇBİR ŞEY YAZMAZ */}
+                <div className="space-y-2 uppercase text-left text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic text-left">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
                 <div className="bg-blue-600 text-white p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
                   <p className="text-3xl font-black italic tracking-tighter uppercase leading-none">{item.bas_harfler}</p>
                   <div className="mt-5 text-[12px] font-bold border-t border-white/20 pt-4 opacity-90 leading-relaxed text-left text-left text-left">"{item.temiz_not || "Doğrulanmış kullanıcı paylaşımı."}"</div>
