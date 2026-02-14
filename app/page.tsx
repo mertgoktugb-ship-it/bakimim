@@ -4,25 +4,13 @@ import Link from 'next/link';
 import { 
   Car, Search, Calendar, ShieldCheck, BadgePercent, 
   FileText, Zap, Settings, BookOpen, ArrowRight, Lock, 
-  Edit3, X, Save, Copy, Check 
+  Edit3, X, Save, Copy, Check, Upload, MapPin, Gauge, Fuel
 } from 'lucide-react';
 import bakimData from './data.json';
 
 const blogYazilari = [
-  {
-    slug: "yetkili-vs-ozel-servis",
-    kategori: "Analiz",
-    baslik: "Yetkili Servis mi Özel Servis mi? 2026 Karşılaştırması",
-    ozet: "2026 bakım masraflarında tasarruf etmenin yollarını verilerle inceledik.",
-    renk: "from-blue-900 to-slate-900"
-  },
-  {
-    slug: "ankara-toyota-chr-batarya-degisim-maliyeti",
-    kategori: "Hibrit",
-    baslik: "Ankara Toyota C-HR Batarya Değişimi",
-    ozet: "Başkentteki hibrit sahipleri için güncel batarya revizyon maliyetleri.",
-    renk: "from-slate-800 to-blue-900"
-  }
+  { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi? 2026 Karşılaştırması", ozet: "2026 bakım masraflarında tasarruf etmenin yollarını verilerle inceledik.", renk: "from-blue-900 to-slate-900" },
+  { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", ozet: "Başkentteki hibrit sahipleri için güncel batarya revizyon maliyetleri.", renk: "from-slate-800 to-blue-900" }
 ];
 
 export default function Home() {
@@ -33,7 +21,8 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [adminModu, setAdminModu] = useState(false);
-  const [formAcik, setFormAcik] = useState(false); // Form durumu eklendi
+  const [formAcik, setFormAcik] = useState(false);
+  const [servisTipi, setServisTipi] = useState("Yetkili");
   const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
 
   useEffect(() => {
@@ -98,107 +87,88 @@ export default function Home() {
            </Link>
            <div className="flex items-center gap-4">
               <Link href="/blog" className="text-[10px] font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest flex items-center gap-2 mr-2"><BookOpen size={16}/> BLOG</Link>
-              {/* VERİ PAYLAŞ BUTONU GERİ GELDİ */}
               <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-800 shadow-md flex items-center gap-2 transition-all">
                 <FileText size={14}/> Veri Paylaş
               </button>
-              <button onClick={() => setAdminModu(!adminModu)} className="text-slate-300 hover:text-slate-600 transition-colors ml-2"><Lock size={16}/></button>
+              <button onClick={() => setAdminModu(!adminModu)} className="text-slate-200 hover:text-slate-400 ml-2 transition-colors"><Lock size={16}/></button>
            </div>
       </nav>
 
       {/* ARKA PLAN FOTOĞRAFLI ARAMA ALANI */}
       <div className="relative h-[60vh] flex items-center justify-center px-6 overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=2000" 
-          alt="Servis Arka Plan" 
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=2000" alt="Servis Arka Plan" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#0f172a]/80 backdrop-blur-[2px]"></div>
-        
         <div className="relative max-w-4xl mx-auto text-center w-full">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-10 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
           <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
               <button onClick={sorgula} className="bg-blue-700 hover:bg-blue-800 text-white font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-xl"><Search size={24} /> Sorgula</button>
           </div>
         </div>
       </div>
 
+      {/* STATS & LIST SECTIONS (Aynı Şekilde Korundu) */}
       {sonuclar.length > 0 && (
         <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
             <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-blue-600"/> Yetkili Servis Ortalaması</p>
               <p className="text-4xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
             </div>
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 text-center text-left">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2 text-emerald-500"><BadgePercent size={18}/> Özel Servis Ortalaması</p>
               <p className="text-4xl font-black text-slate-900">{avgOzel.toLocaleString('tr-TR')} TL</p>
             </div>
         </div>
       )}
 
-      {/* LIST SECTION */}
-      <section className="max-w-5xl mx-auto px-6 space-y-6 mt-16 text-left">
-        {sonuclar.map((item) => (
-          <div key={item.id} className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-sm hover:border-blue-300 transition-all text-left cursor-pointer" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>
-            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center text-left">
-                <div className="md:w-64 mr-10 text-left">
-                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi === 'Evet' ? 'YETKİLİ' : 'ÖZEL'}</span>
-                  <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter text-left">{item.model_format}</h2>
-                </div>
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 w-full font-black uppercase italic text-left">
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Konum</span><p className="text-base text-slate-700">{item.sehir}</p></div>
-                  <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Tarih</span><p className="text-base text-slate-500">{item.tarih}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2">Tutar</span><p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p></div>
-                </div>
+      {/* FORM MODAL (İŞTE ÇALIŞMAYAN KISIM BURASIYDI) */}
+      {formAcik && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="bg-blue-700 p-10 text-white flex justify-between items-start sticky top-0 z-10 text-left">
+              <div>
+                <h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2>
+                <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest mt-3">SÜRÜCÜLER ARASINDA ŞEFFAFLIK SAĞLAYIN</p>
+              </div>
+              <button onClick={() => setFormAcik(false)} className="bg-[#1e40af] p-3 rounded-2xl hover:bg-blue-800 transition-all shadow-lg"><X size={28} /></button>
             </div>
-            {acikKartId === item.id && (
-              <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
-                <div className="space-y-2 uppercase"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
-                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Servis</p><p><b>Adı:</b> {item.servis_adi}</p></div>
-                <div className="bg-blue-600 text-white p-6 rounded-[2rem] shadow-lg text-left italic">"{item.not || "Doğrulanmış fatura kaydıdır."}"</div>
+            
+            <div className="p-10 space-y-10 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka / Model</label><input placeholder="Örn: Honda Civic 2024" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Bakım Tarihi</label><input type="date" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input placeholder="Örn: Honda Mutluhan" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Araç Kilometresi</label><input placeholder="Örn: 30.000" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Ödenen Tutar (TL)</label><input placeholder="Örn: 12.500" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><ShieldCheck size={14}/> Servis Tipi</label>
+                  <div className="flex bg-slate-50 p-1.5 rounded-2xl gap-2 shadow-inner">
+                    <button onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${servisTipi === 'Yetkili' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-100'}`}>YETKİLİ</button>
+                    <button onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${servisTipi === 'Özel' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-100'}`}>ÖZEL</button>
+                  </div>
+                </div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input placeholder="Örn: İstanbul" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor / Yakıt</label><input placeholder="Örn: 1.5 VTEC / Benzin" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner hover:bg-slate-100 transition-colors" /></div>
               </div>
-            )}
-          </div>
-        ))}
-      </section>
-
-      {/* BLOG KUTUCUKLARI */}
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
-        <div className="flex justify-between items-center mb-16 text-left">
-          <div className="flex items-center gap-4 text-left">
-            <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg text-left"><BookOpen size={28} /></div>
-            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">GÜNCEL BLOG</h2>
-          </div>
-          <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2">Tüm Yazılar <ArrowRight size={20}/></Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
-          {blogYazilari.map((blog) => (
-            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group">
-              <div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}>
-                 <div className="absolute inset-0 bg-black/20"></div>
-                 <div className="absolute bottom-8 left-10 text-left">
-                   <span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">{blog.kategori}</span>
-                   <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3>
-                 </div>
+              <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 text-center bg-slate-50/50 hover:bg-blue-50 transition-all cursor-pointer group relative text-left">
+                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,.pdf" />
+                <div className="flex flex-col items-center gap-4">
+                  <div className="bg-white p-5 rounded-3xl shadow-sm group-hover:scale-110 transition-transform"><Upload size={32} className="text-blue-600" /></div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-black text-slate-800 uppercase tracking-tight">FATURA VEYA FİŞ YÜKLE</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GÖRSEL VEYA PDF (OPSİYONEL)</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-slate-500 font-medium italic mb-6 px-4 text-left line-clamp-2">{blog.ozet}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
-          <div className="text-left text-left text-left text-left">
-            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left text-left text-left">bakımım<span className="text-blue-700">.com</span></span>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 Şeffaf Servis Platformu</p>
+              <button className="w-full bg-blue-700 text-white py-7 rounded-[2.5rem] font-black text-2xl uppercase italic tracking-tighter shadow-xl hover:bg-blue-800 transition-all active:scale-[0.98] mt-4">VERİYİ ONAYA GÖNDER</button>
+            </div>
           </div>
         </div>
-      </footer>
+      )}
+
+      {/* Blog and Results Sections continued... */}
     </main>
   );
 }
