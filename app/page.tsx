@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Car, MapPin, Wrench, Search, Building2, Calendar, Gauge, AlertTriangle, ChevronDown, ChevronUp, Fuel, Settings2, ReceiptText } from 'lucide-react';
+import { Car, MapPin, Wrench, Search, Building2, Calendar, Gauge, AlertTriangle, ChevronDown, ChevronUp, ReceiptText } from 'lucide-react';
 import bakimData from './data.json';
 
 export default function Home() {
@@ -11,12 +11,53 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
 
-  const tumMarkalar = Array.from(new Set((bakimData as any[]).map(item => item.marka))).sort();
-  const tumSehirler = Array.from(new Set((bakimData as any[]).map(item => item.sehir))).filter(s => s !== "bilinmiyor").sort();
+  // --- AKILLI VERİ DÜZELTME KATMANI ---
+  const veriyiDüzelt = (item: any) => {
+    let duzeltilmis = { ...item };
+    const servisIsmi = item.servis_adi?.toLowerCase() || "";
+
+    // 1. Yetkili Servis Otomatik Tanıma
+    const yetkiliServisAnahtarKelimeler = [
+      "arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "bakırcılar", 
+      "tanoto", "neos", "odak", "dumankaya", "görkem", "atmo", "mezcar"
+    ];
+    
+    const isKnownYetkili = yetkiliServisAnahtarKelimeler.some(kw => servisIsmi.includes(kw));
+    if (isKnownYetkili) {
+      duzeltilmis.yetkili_mi = "Evet";
+    }
+
+    // 2. Servis İsmi Üzerinden Şehir Tamamlama
+    const sehirEslesmeleri: { [key: string]: string } = {
+      "arkas izmir": "İzmir",
+      "arkas istanbul": "İstanbul",
+      "otokoç taşdelen": "İstanbul",
+      "inallar": "Bursa",
+      "bakırcılar antalya": "Antalya",
+      "odak maslak": "İstanbul",
+      "samsun blf": "Samsun",
+      "mepa": "İstanbul",
+      "inciroğlu": "Kayseri"
+    };
+
+    for (const [anahtar, sehir] of Object.entries(sehirEslesmeleri)) {
+      if (servisIsmi.includes(anahtar)) {
+        duzeltilmis.sehir = sehir;
+      }
+    }
+
+    return duzeltilmis;
+  };
+
+  // Verileri düzeltilmiş halleriyle hazırla
+  const duzeltilmisVeri = (bakimData as any[]).map(veriyiDüzelt);
+
+  const tumMarkalar = Array.from(new Set(duzeltilmisVeri.map(item => item.marka))).sort();
+  const tumSehirler = Array.from(new Set(duzeltilmisVeri.map(item => item.sehir))).filter(s => s && s !== "bilinmiyor").sort();
 
   useEffect(() => {
     if (secilenMarka) {
-      const modeller = Array.from(new Set((bakimData as any[]).filter(item => item.marka === secilenMarka).map(item => item.model))).sort();
+      const modeller = Array.from(new Set(duzeltilmisVeri.filter(item => item.marka === secilenMarka).map(item => item.model))).sort();
       setMusaitModeller(modeller);
     } else {
       setMusaitModeller([]);
@@ -25,7 +66,7 @@ export default function Home() {
   }, [secilenMarka]);
 
   const sorgula = () => {
-    const filtrelenmis = (bakimData as any[]).filter(item => {
+    const filtrelenmis = duzeltilmisVeri.filter(item => {
       const markaUygun = !secilenMarka || item.marka === secilenMarka;
       const modelUygun = !secilenModel || item.model === secilenModel;
       const sehirUygun = !secilenSehir || item.sehir === secilenSehir;
@@ -36,9 +77,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900 text-left">
-      {/* Navbar & Hero (Aynı kalıyor) */}
+      {/* Navbar ve Arama Alanı */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
           <div className="flex items-center gap-3">
              <div className="bg-[#1E293B] p-2 rounded-lg text-white shadow-lg"><Car size={22} /></div>
              <div className="flex flex-col leading-none">
@@ -49,36 +90,33 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Arama Alanı */}
       <div className="bg-[#1E293B] py-16 px-6 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Kıyaslayın</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Akıllı Sorgula</span></h1>
           <div className="bg-white p-2 rounded-2xl shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-3">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-sm outline-none">
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-3 bg-slate-50 border rounded-xl font-bold text-sm outline-none">
                   <option value="">Tüm Markalar</option>
                   {tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-sm outline-none">
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-3 bg-slate-50 border rounded-xl font-bold text-sm outline-none">
                   <option value="">Tüm Modeller</option>
                   {musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-sm outline-none">
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-3 bg-slate-50 border rounded-xl font-bold text-sm outline-none">
                   <option value="">Tüm Şehirler</option>
                   {tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl py-3 transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
+              <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl py-3 transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg">
                   <Search size={18} /> Sorgula
               </button>
           </div>
         </div>
       </div>
 
-      {/* Liste */}
       <section className="max-w-5xl mx-auto py-12 px-6">
         <div className="space-y-4">
           {sonuclar.map((item) => (
             <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
-              {/* ÜST BİLGİ (Kısa Kart) */}
               <div 
                 onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}
                 className="p-6 flex flex-col md:flex-row items-center cursor-pointer hover:bg-slate-50/50 transition-colors"
@@ -94,7 +132,7 @@ export default function Home() {
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6 text-left">
                   <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Bakım Türü</span><p className="text-sm font-bold text-slate-700">{item.bakim_turu}</p></div>
                   <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Servis Adı</span><p className="text-sm font-bold text-blue-600 truncate">{item.servis_adi}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.fiyat_tl} TL</p></div>
+                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.fiyat_tl ? `${item.fiyat_tl} TL` : item.fiyat}</p></div>
                 </div>
 
                 <div className="ml-4 text-slate-300">
@@ -102,11 +140,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* ALT DETAY (Açılan Kısım) */}
               {acikKartId === item.id && (
                 <div className="px-8 pb-8 pt-2 bg-slate-50/50 animate-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-6">
-                    {/* Teknik Detaylar */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-6 text-left">
                     <div className="space-y-4">
                       <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Araç Detayları</h4>
                       <div className="grid grid-cols-2 gap-4 text-xs font-bold">
@@ -116,8 +152,6 @@ export default function Home() {
                         <div className="text-slate-400 uppercase">Şanzıman: <span className="text-slate-700">{item.sanziman || '-'}</span></div>
                       </div>
                     </div>
-
-                    {/* Yapılan İşlemler */}
                     <div className="space-y-4">
                       <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Yapılan İşlemler</h4>
                       <div className="flex flex-wrap gap-2">
@@ -126,14 +160,12 @@ export default function Home() {
                         )) || <span className="text-slate-400 italic text-xs">İşlem detayı belirtilmemiş.</span>}
                       </div>
                     </div>
-
-                    {/* Fatura ve Tarih */}
                     <div className="space-y-4">
                       <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Servis Bilgisi</h4>
                       <div className="space-y-2 text-xs font-bold">
                          <div className="flex items-center gap-2 text-slate-500"><Calendar size={14}/> Tarih: <span className="text-slate-700">{item.tarih}</span></div>
-                         <div className="flex items-center gap-2 text-slate-500"><ReceiptText size={14}/> Fatura: <span className="text-slate-700">{item.fatura}</span></div>
-                         <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-2 italic text-[10px] text-blue-700 font-medium">
+                         <div className="flex items-center gap-2 text-slate-500"><ReceiptText size={14}/> Fatura: <span className="text-slate-700">{item.fatura || 'Belirtilmemiş'}</span></div>
+                         <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-2 italic text-[10px] text-blue-700 font-medium leading-relaxed">
                            "{item.not}"
                          </div>
                       </div>
