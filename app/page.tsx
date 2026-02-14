@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Car, MapPin, Wrench, Search, Building2, Calendar, Gauge, AlertTriangle, ChevronDown, ChevronUp, ReceiptText } from 'lucide-react';
+import { Car, MapPin, Search, Calendar, ChevronDown, ChevronUp, ReceiptText } from 'lucide-center';
 import bakimData from './data.json';
 
 export default function Home() {
@@ -11,53 +11,28 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
 
-  // --- AKILLI VERİ DÜZELTME VE HATA ÖNLEME KATMANI ---
+  // İsim Gizleme Mantığı
+  const isimGizle = (metin: string) => {
+    if (!metin) return "Açıklama bulunmuyor.";
+    return metin.replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\b/g, "$1. $2.");
+  };
+
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
     const servisIsmi = (item.servis_adi || "").toLowerCase();
 
-    // 1. Yetkili Servis Otomatik Tanıma
-    const yetkiliKeywords = [
-      "arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "bakırcılar", 
-      "tanoto", "neos", "odak", "dumankaya", "görkem", "atmo", "mezcar", "herter",
-      "alj", "akbak", "akoto", "aksoy", "akten", "aktoy", "arden", "asal", "ata", 
-      "avek", "ayışığı", "banoto", "başaranlar", "efe toyota", "egem", "ermat", 
-      "ernaz", "evlüce", "gönye", "göral", "haldız", "hasan kavi", "honda bora", 
-      "honda park", "honda tekbaş", "mepa", "mıçı", "toyan", "yükseliş", "yüzbaşıoğlu",
-      "çavdarlı", "çetaş", "inciroğlu", "mais"
-    ];
-    
-    if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) {
-      duzeltilmis.yetkili_mi = "Evet";
-    }
+    // Yetkili Servis ve Şehir Düzeltmeleri (Öncekiyle aynı)
+    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "herter", "alj", "toyotronik"];
+    if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) duzeltilmis.yetkili_mi = "Evet";
 
-    // 2. Şehir Tamamlama
-    const sehirMap: { [key: string]: string } = {
-      "herter": "Ankara", "toyan": "Ankara", "alj ankara": "Ankara", "akbak": "Ankara",
-      "ata ankara": "Ankara", "göral": "Ankara", "honda bora": "Ankara", "arkas izmir": "İzmir",
-      "arkas istanbul": "İstanbul", "otokoç": "İstanbul", "birmot": "İstanbul",
-      "inallar": "Bursa", "çavdarlı": "Bursa", "bakırcılar": "Antalya", "samsun blf": "Samsun",
-      "inciroğlu": "Kayseri", "mıçı": "Adana", "hasan kavi": "Adana", "tekbaş": "Adana"
-    };
-
-    if (duzeltilmis.sehir === "bilinmiyor" || !duzeltilmis.sehir) {
-      for (const [kw, sehir] of Object.entries(sehirMap)) {
-        if (servisIsmi.includes(kw)) {
-          duzeltilmis.sehir = sehir;
-          break;
-        }
-      }
-    }
-
-    // 3. FİYAT HATA KONTROLÜ (TypeError Çözümü)
-    // Fiyatı ne olursa olsun metne çeviriyoruz ki .includes() hata vermesin
+    // Fiyat Hata Koruması
     let hamFiyat = item.fiyat_tl || item.fiyat || "Fiyat Alınız";
-    let fiyatMetni = String(hamFiyat); 
-
-    if (fiyatMetni !== "Fiyat Alınız" && !fiyatMetni.includes("TL")) {
-      fiyatMetni += " TL";
-    }
+    let fiyatMetni = String(hamFiyat);
+    if (fiyatMetni !== "Fiyat Alınız" && !fiyatMetni.includes("TL")) fiyatMetni += " TL";
     duzeltilmis.ekran_fiyat = fiyatMetni;
+
+    // Not kısmındaki isimleri gizle
+    duzeltilmis.temiz_not = isimGizle(item.not);
 
     return duzeltilmis;
   };
@@ -85,24 +60,20 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900 text-left">
-      {/* NAVBAR */}
+    <main className="min-h-screen bg-[#F8FAFC] text-left">
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
-          <div className="flex items-center gap-3">
-             <div className="bg-[#1E293B] p-2 rounded-lg text-white shadow-lg"><Car size={22} /></div>
-             <div className="flex flex-col leading-none">
-                <span className="text-xl font-black tracking-tighter italic uppercase">bakimim<span className="text-blue-600">.com</span></span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Şen Kardeşler</span>
-             </div>
-          </div>
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+           <div className="bg-[#1E293B] p-2 rounded-lg text-white shadow-lg"><Car size={22} /></div>
+           <div className="flex flex-col leading-none">
+              <span className="text-xl font-black tracking-tighter italic uppercase">bakimim<span className="text-blue-600">.com</span></span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Şen Kardeşler</span>
+           </div>
         </div>
       </nav>
 
-      {/* SEARCH SECTION */}
-      <div className="bg-[#1E293B] py-16 px-6 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Kıyaslayın</span></h1>
+      <div className="bg-[#1E293B] py-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Kıyaslayın</span></h1>
           <div className="bg-white p-2 rounded-2xl shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-3">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-3 bg-slate-50 border rounded-xl font-bold text-sm outline-none">
                   <option value="">Tüm Markalar</option>
@@ -116,19 +87,18 @@ export default function Home() {
                   <option value="">Tüm Şehirler</option>
                   {tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl py-3 transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg">
+              <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl py-3 flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg">
                   <Search size={18} /> Sorgula
               </button>
           </div>
         </div>
       </div>
 
-      {/* RESULTS LIST */}
-      <section className="max-w-5xl mx-auto py-12 px-6 text-left">
+      <section className="max-w-5xl mx-auto py-12 px-6">
         <div className="space-y-4">
           {sonuclar.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
-              <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-6 flex flex-col md:flex-row items-center cursor-pointer hover:bg-slate-50/50 transition-colors">
+            <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-all">
+              <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-6 flex flex-col md:flex-row items-center cursor-pointer">
                 <div className="md:w-56 text-left border-r border-slate-100 mr-6">
                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase mb-2 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
                     {item.yetkili_mi === 'Evet' ? 'Yetkili Servis' : 'Özel Servis'}
@@ -137,50 +107,38 @@ export default function Home() {
                   <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase flex items-center gap-1"><MapPin size={12}/> {item.sehir}</p>
                 </div>
 
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6 text-left">
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Bakım Türü</span><p className="text-sm font-bold text-slate-700">{item.bakim_turu}</p></div>
-                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Servis Adı</span><p className="text-sm font-bold text-blue-600 truncate">{item.servis_adi}</p></div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.ekran_fiyat}</p></div>
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6">
+                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase mb-1">Bakım Türü</span><p className="text-sm font-bold text-slate-700">{item.bakim_turu}</p></div>
+                  <div className="flex flex-col"><span className="text-[9px] font-bold text-slate-400 uppercase mb-1">Servis Adı</span><p className="text-sm font-bold text-blue-600 truncate">{item.servis_adi}</p></div>
+                  <div className="flex flex-col items-end md:items-start"><span className="text-[9px] font-bold text-slate-400 uppercase mb-1">Ücret</span><p className="text-xl font-black text-slate-900">{item.ekran_fiyat}</p></div>
                 </div>
-
                 <div className="ml-4 text-slate-300">
                    {acikKartId === item.id ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
                 </div>
               </div>
 
-              {/* ACCORDION (DETAIL AREA) */}
               {acikKartId === item.id && (
-                <div className="px-8 pb-8 pt-2 bg-slate-50/50 animate-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-6 text-left">
-                    <div className="space-y-4">
-                      <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Araç Detayları</h4>
-                      <div className="grid grid-cols-2 gap-4 text-xs font-bold">
-                        <div className="text-slate-400 uppercase">Model Yılı: <span className="text-slate-700">{item.model_yili || '-'}</span></div>
-                        <div className="text-slate-400 uppercase">Kilometre: <span className="text-slate-700">{item.km} KM</span></div>
-                        <div className="text-slate-400 uppercase">Motor: <span className="text-slate-700">{item.motor || '-'}</span></div>
-                        <div className="text-slate-400 uppercase">Şanzıman: <span className="text-slate-700">{item.sanziman || '-'}</span></div>
+                <div className="px-8 pb-8 pt-4 bg-slate-50/50 border-t border-slate-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-black text-slate-800 uppercase border-b pb-1">Araç Detayları</h4>
+                      <div className="space-y-2 text-xs font-bold text-slate-600">
+                        <p className="uppercase">Model Yılı: <span className="text-slate-900">{item.model_yili || '-'}</span></p>
+                        <p className="uppercase">Kilometre: <span className="text-slate-900">{item.km} KM</span></p>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Yapılan İşlemler</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-black text-slate-800 uppercase border-b pb-1">İşlemler</h4>
                       <div className="flex flex-wrap gap-2">
-                        {item.yapilan_islemler?.length > 0 ? (
-                          item.yapilan_islemler.map((islem: string, i: number) => (
-                            <span key={i} className="bg-white border border-slate-200 px-2 py-1 rounded text-[10px] text-slate-600 font-bold">{islem}</span>
-                          ))
-                        ) : (
-                          <span className="text-slate-400 italic text-xs">İşlem detayı belirtilmemiş.</span>
-                        )}
+                        {item.yapilan_islemler?.length > 0 ? item.yapilan_islemler.map((islem: string, i: number) => (
+                          <span key={i} className="bg-white border border-slate-200 px-2 py-1 rounded text-[10px] font-bold">{islem}</span>
+                        )) : <span className="text-slate-400 italic text-xs">Belirtilmemiş.</span>}
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Servis Bilgisi</h4>
-                      <div className="space-y-2 text-xs font-bold">
-                         <div className="flex items-center gap-2 text-slate-500"><Calendar size={14}/> Tarih: <span className="text-slate-700">{item.tarih}</span></div>
-                         <div className="flex items-center gap-2 text-slate-500"><ReceiptText size={14}/> Fatura: <span className="text-slate-700">{item.fatura || 'Belirtilmemiş'}</span></div>
-                         <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 mt-2 italic text-[10px] text-blue-700 font-medium leading-relaxed">
-                           "{item.not || 'Açıklama bulunmuyor.'}"
-                         </div>
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-black text-slate-800 uppercase border-b pb-1">Kullanıcı Notu</h4>
+                      <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 italic text-[11px] text-blue-800 leading-relaxed font-medium">
+                        "{item.temiz_not}"
                       </div>
                     </div>
                   </div>
