@@ -22,6 +22,7 @@ export default function Home() {
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [adminModu, setAdminModu] = useState(false);
   const [formAcik, setFormAcik] = useState(false);
+  const [servisTipi, setServisTipi] = useState("Yetkili");
   const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
   const [duzenlemeId, setDuzenlemeId] = useState<number | null>(null);
 
@@ -94,9 +95,9 @@ export default function Home() {
               <div className="bg-[#0f172a] p-2.5 rounded-2xl text-white shadow-lg flex items-center justify-center">
                 <Car size={28} strokeWidth={2.5} className="text-blue-400" />
               </div>
-              <div className="flex flex-col leading-tight text-left">
+              <div className="flex flex-col leading-tight">
                 <span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-blue-700">.com</span></span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Şeffaf Servis Rehberi</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-left">Şeffaf Servis Rehberi</span>
               </div>
            </Link>
            <div className="flex items-center gap-4">
@@ -109,13 +110,22 @@ export default function Home() {
            </div>
       </nav>
 
+      {adminModu && (
+        <div className="bg-orange-50 border-b border-orange-200 p-4 sticky top-[82px] z-40 flex justify-center gap-4 animate-in slide-in-from-top-4">
+           <p className="text-xs font-bold text-orange-700 flex items-center gap-2"><Edit3 size={16}/> Yönetici Modu: Verileri düzenleyip yeni dosyayı kopyalayın.</p>
+           <button onClick={jsonIndir} className="bg-orange-600 text-white px-5 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-orange-700 flex items-center gap-2 transition-colors">
+             <Save size={14}/> DATA.JSON KOPYALA
+           </button>
+        </div>
+      )}
+
       <div className="bg-[#0f172a] py-24 px-6 text-left">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-6xl md:text-8xl font-black text-white mb-10 uppercase italic tracking-tighter leading-none">FİYAT <span className="text-blue-500 font-black">KIYASLA</span></h1>
           <div className="bg-white p-5 rounded-[3rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer text-left"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
               <button onClick={sorgula} className="bg-blue-700 hover:bg-blue-800 text-white font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-xl"><Search size={24} /> Sorgula</button>
           </div>
         </div>
@@ -149,43 +159,43 @@ export default function Home() {
                 <div className="md:w-64 mr-10 text-left">
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi === 'Evet' ? 'YETKİLİ' : 'ÖZEL'}</span>
                   {duzenlemeId === item.id ? (
-                    <input className="text-2xl font-black bg-slate-100 p-2 rounded-xl w-full" value={item.model} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'model', e.target.value)} />
+                    <input className="text-2xl font-black bg-slate-100 p-2 rounded-xl w-full outline-none" value={item.model} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'model', e.target.value)} />
                   ) : (
                     <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tighter cursor-pointer" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>{item.model_format}</h2>
                   )}
                 </div>
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 w-full font-black uppercase italic text-left cursor-pointer" onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Bakım</span>
-                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded" value={item.bakim_turu} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'bakim_turu', e.target.value)} /> : <p className="text-base text-slate-700">{item.bakim_turu}</p>}
+                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded outline-none" value={item.bakim_turu} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'bakim_turu', e.target.value)} /> : <p className="text-base text-slate-700">{item.bakim_turu}</p>}
                   </div>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Konum</span>
-                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded" value={item.sehir} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'sehir', e.target.value)} /> : <p className="text-base text-slate-700">{item.sehir}</p>}
+                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded outline-none" value={item.sehir} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'sehir', e.target.value)} /> : <p className="text-base text-slate-700">{item.sehir}</p>}
                   </div>
                   <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2">Tarih</span>
-                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded" value={item.tarih} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'tarih', e.target.value)} /> : <p className="text-base text-slate-500">{item.tarih}</p>}
+                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded outline-none" value={item.tarih} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'tarih', e.target.value)} /> : <p className="text-base text-slate-500">{item.tarih}</p>}
                   </div>
-                  <div className="flex flex-col items-end md:items-start"><span className="text-[11px] text-slate-300 mb-2">Tutar</span>
-                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded text-left" value={item.fiyat} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'fiyat', e.target.value)} /> : <p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p>}
+                  <div className="flex flex-col items-end md:items-start text-left"><span className="text-[11px] text-slate-300 mb-2 text-left">Tutar</span>
+                    {duzenlemeId === item.id ? <input className="bg-slate-100 p-1 rounded text-left outline-none" value={item.fiyat} onClick={(e) => e.stopPropagation()} onChange={(e) => hucreGuncelle(item.id, 'fiyat', e.target.value)} /> : <p className="text-4xl font-black text-blue-700 tracking-tighter">{item.ekran_fiyat}</p>}
                   </div>
                 </div>
             </div>
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left">
-                <div className="space-y-2 uppercase"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 text-left">Detaylar</p>
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 text-left">Detaylar</p>
                   <p><b>Motor:</b> {item.motor || '-'}</p>
                   <p><b>KM:</b> {item.km}</p>
                 </div>
-                <div className="space-y-2 uppercase"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 text-left">Servis</p>
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 text-left">Servis</p>
                   <p><b>Adı:</b> {item.servis_adi}</p>
                 </div>
-                <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white p-6 rounded-[2rem] shadow-lg">"{item.not || "Doğrulanmış fatura kaydıdır."}"</div>
+                <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white p-6 rounded-[2rem] shadow-lg text-left">"{item.not || "Doğrulanmış fatura kaydıdır."}"</div>
               </div>
             )}
           </div>
         ))}
       </section>
 
-      {/* VERİ PAYLAŞ FORMU (TÜM ALANLAR EKLENDİ) */}
+      {/* VERİ PAYLAŞ FORMU */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-[3rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95">
@@ -199,41 +209,20 @@ export default function Home() {
             
             <div className="p-10 space-y-8 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka / Model</label><input placeholder="Örn: Honda Civic 2024" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Bakım Tarihi</label><input type="date" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input placeholder="Örn: Honda Mutluhan" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Araç Kilometresi</label><input placeholder="Örn: 30.000" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Ödenen Tutar (TL)</label><input placeholder="Örn: 12.500" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
                 <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka / Model</label>
-                  <input placeholder="Örn: Honda Civic 2024" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><ShieldCheck size={14}/> Servis Tipi</label>
+                  <div className="flex bg-slate-50 p-1.5 rounded-2xl gap-2 shadow-inner">
+                    <button onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${servisTipi === 'Yetkili' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-100'}`}>YETKİLİ</button>
+                    <button onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${servisTipi === 'Özel' ? 'bg-blue-700 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-100'}`}>ÖZEL</button>
+                  </div>
                 </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor / Yakıt</label>
-                  <input placeholder="Örn: 1.5 VTEC Turbo / Benzin" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Bakım Tarihi</label>
-                  <input type="date" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Ödenen Tutar (TL)</label>
-                  <input placeholder="Örn: 12.500" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-left text-left"><Settings size={14}/> Servis Adı</label>
-                  <input placeholder="Örn: Honda Mutluhan" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Araç Kilometresi</label>
-                  <input placeholder="Örn: 30.000" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label>
-                  <input placeholder="Örn: İstanbul" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left" />
-                </div>
-                <div className="space-y-2 text-left">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Servis Tipi</label>
-                  <select className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left">
-                    <option>Yetkili Servis</option>
-                    <option>Özel Servis</option>
-                  </select>
-                </div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input placeholder="Örn: İstanbul" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor / Yakıt</label><input placeholder="Örn: 1.5 VTEC / Benzin" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner" /></div>
               </div>
 
               <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-10 text-center bg-slate-50/50 hover:bg-blue-50 transition-all cursor-pointer group relative">
@@ -241,41 +230,39 @@ export default function Home() {
                 <div className="flex flex-col items-center gap-4">
                   <div className="bg-white p-5 rounded-3xl shadow-sm group-hover:scale-110 transition-transform"><Upload size={32} className="text-blue-600" /></div>
                   <div className="space-y-1">
-                    <p className="text-sm font-black text-slate-800 uppercase tracking-tight">FATURA VEYA FİŞ EKLE</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">DOSYA SEÇİN VEYA BURAYA BIRAKIN</p>
+                    <p className="text-sm font-black text-slate-800 uppercase tracking-tight">FATURA VEYA FİŞ YÜKLE</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GÖRSEL VEYA PDF (OPSİYONEL)</p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 text-left text-left text-left">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">YAPILAN İŞLEMLER VE NOTLAR</label>
-                <textarea placeholder="Örn: 20.000 km bakımı, polen filtresi değişti..." className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none min-h-[120px] text-left"></textarea>
+                <textarea placeholder="Örn: 20.000 km bakımı, polen filtresi değişti..." className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none min-h-[120px] text-left shadow-inner"></textarea>
               </div>
 
-              <button className="w-full bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl uppercase italic tracking-tighter shadow-xl hover:bg-blue-800 transition-all active:scale-[0.98]">
-                VERİYİ ONAYA GÖNDER
-              </button>
+              <button className="w-full bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl uppercase italic tracking-tighter shadow-xl hover:bg-blue-800 transition-all active:scale-[0.98]">VERİYİ ONAYA GÖNDER</button>
             </div>
           </div>
         </div>
       )}
 
       {/* BLOG ÖNİZLEME */}
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
-        <div className="flex justify-between items-center mb-16">
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left text-left">
+        <div className="flex justify-between items-center mb-16 text-left">
           <div className="flex items-center gap-4 text-left">
-            <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg"><BookOpen size={28} /></div>
-            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">GÜNCEL BLOG</h2>
+            <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg text-left text-left"><BookOpen size={28} /></div>
+            <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left text-left">GÜNCEL BLOG</h2>
           </div>
           <Link href="/blog" className="text-xs font-black text-blue-700 uppercase tracking-widest flex items-center gap-2">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
           {blogYazilari.map((blog) => (
-            <Link key={blog.id} href={`/blog/${blog.id}`} className="group">
-              <div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}>
+            <Link key={blog.id} href={`/blog/${blog.id}`} className="group text-left text-left text-left">
+              <div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}>
                  <div className="absolute bottom-8 left-10 text-left">
-                   <span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">{blog.kategori}</span>
-                   <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3>
+                   <span className="bg-blue-600 text-white text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">İçerik</span>
+                   <h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">{blog.baslik}</h3>
                  </div>
               </div>
             </Link>
@@ -283,11 +270,11 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
+      <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left text-left">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
-          <div className="text-left text-left">
-            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2">bakımım<span className="text-blue-700">.com</span></span>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 Şeffaf Servis Platformu</p>
+          <div className="text-left text-left text-left">
+            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2">bakımım<span className="text-blue-700 text-left">.com</span></span>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-left text-left">© 2026 Şeffaf Servis Platformu</p>
           </div>
         </div>
       </footer>
