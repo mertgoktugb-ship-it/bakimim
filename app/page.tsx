@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Car, MapPin, Search, Calendar, ChevronDown, ChevronUp, TrendingUp, ShieldCheck, BadgePercent } from 'lucide-react';
+import { Car, MapPin, Search, Calendar, ChevronDown, ChevronUp, TrendingUp, ShieldCheck, BadgePercent, Database } from 'lucide-react';
 import bakimData from './data.json';
 
 export default function Home() {
@@ -11,11 +11,13 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
 
+  // Yazım Düzenleme (HEPSİ BÜYÜK -> Baş Harfi Büyük)
   const formatYazi = (str: string) => {
     if (!str) return "";
     return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
   };
 
+  // İsim Gizleme (M. B. formatı)
   const isimGizle = (metin: string) => {
     if (!metin) return "Açıklama bulunmuyor.";
     return metin.replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\b/g, "$1. $2.");
@@ -26,7 +28,7 @@ export default function Home() {
     const servisIsmi = (item.servis_adi || "").toLowerCase();
     
     // Yetkili Servis Tespiti
-    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "herter", "alj", "toyotronik", "mais", "toyan", "efe", "akten", "kardelen", "çekmeköy"];
+    const yetkiliKeywords = ["arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "herter", "alj", "toyotronik", "mais", "toyan", "efe", "akten", "kardelen", "çekmeköy", "mıçı", "tekbaş", "asal"];
     if (yetkiliKeywords.some(kw => servisIsmi.includes(kw))) duzeltilmis.yetkili_mi = "Evet";
 
     // Fiyat ve Tarih Onarımı
@@ -37,9 +39,9 @@ export default function Home() {
     duzeltilmis.ekran_fiyat = fiyatSayi > 0 ? fiyatSayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     duzeltilmis.temiz_not = isimGizle(item.not);
     
-    // Tarih "belirtilmemiş" hatasını onar (Eğer notta veya veride varsa)
+    // Tarih Boşsa Onar
     if (duzeltilmis.tarih === "tarih belirtilmemiş" || !duzeltilmis.tarih) {
-        duzeltilmis.tarih = "Şubat 2026"; // En güncel post tarihi
+        duzeltilmis.tarih = "Şubat 2026"; 
     }
 
     duzeltilmis.marka_format = formatYazi(item.marka);
@@ -94,19 +96,19 @@ export default function Home() {
       {/* SEARCH AREA */}
       <div className="bg-[#1E293B] py-16 px-6 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter">FİYAT <span className="text-blue-400">KIYASLA</span></h1>
-          <p className="text-slate-400 font-medium mb-10 text-sm md:text-base tracking-widest uppercase">GÜNCEL YETKİLİ VE ÖZEL SERVİS VERİ BANKASI</p>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter uppercase">FİYAT <span className="text-blue-400">KIYASLA</span></h1>
+          <p className="text-slate-400 font-medium mb-10 text-sm md:text-base tracking-widest uppercase italic">GÜNCEL YETKİLİ VE ÖZEL SERVİS ARŞİVİ</p>
           <div className="bg-white p-3 rounded-3xl shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-3">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-sm outline-none focus:ring-2 ring-blue-500">
-                  <option value="">Marka</option>
+                  <option value="">Marka Seçin</option>
                   {tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
               <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-sm outline-none focus:ring-2 ring-blue-500">
-                  <option value="">Model</option>
+                  <option value="">Model Seçin</option>
                   {musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
               <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold text-sm outline-none focus:ring-2 ring-blue-500">
-                  <option value="">Şehir</option>
+                  <option value="">Şehir Seçin</option>
                   {tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               <button onClick={sorgula} className="bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl py-4 flex items-center justify-center gap-2 uppercase tracking-widest shadow-xl transition-all active:scale-95">
@@ -124,21 +126,21 @@ export default function Home() {
                 <ShieldCheck size={14} className="text-blue-500"/> Yetkili Servis Ort.
               </p>
               <p className="text-2xl font-black text-slate-900">{avgYetkili > 0 ? avgYetkili.toLocaleString('tr-TR') + " TL" : "Veri Yok"}</p>
-              <p className="text-[10px] font-bold text-blue-400 mt-1 uppercase italic">Son 6 ay verisidir</p>
+              <p className="text-[10px] font-bold text-blue-400 mt-1 uppercase italic tracking-tighter">Son 6 ay verisidir</p>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                 <BadgePercent size={14} className="text-emerald-500"/> Özel Servis Ort.
               </p>
               <p className="text-2xl font-black text-slate-900">{avgOzel > 0 ? avgOzel.toLocaleString('tr-TR') + " TL" : "Veri Yok"}</p>
-              <p className="text-[10px] font-bold text-emerald-400 mt-1 uppercase italic">Son 6 ay verisidir</p>
+              <p className="text-[10px] font-bold text-emerald-400 mt-1 uppercase italic tracking-tighter">Son 6 ay verisidir</p>
             </div>
             <div className="bg-blue-600 p-6 rounded-3xl shadow-xl text-white">
               <p className="text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                 <Database size={14}/> Toplam Örneklem
               </p>
               <p className="text-2xl font-black">{sonuclar.length} Kayıt</p>
-              <p className="text-[10px] font-bold text-blue-200 mt-1 uppercase italic">Doğrulanmış veri seti</p>
+              <p className="text-[10px] font-bold text-blue-200 mt-1 uppercase italic tracking-tighter">Doğrulanmış veri seti</p>
             </div>
         </div>
       )}
@@ -153,13 +155,13 @@ export default function Home() {
                   <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase mb-3 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-50 text-slate-500 border border-slate-200'}`}>
                     {item.yetkili_mi === 'Evet' ? 'YETKİLİ SERVİS' : 'ÖZEL SERVİS'}
                   </span>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-semibold text-slate-400 tracking-wide">{item.marka_format}</span>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span className="text-xs font-semibold text-slate-400 tracking-wide">{item.marka_format}</span>
                     <span className="text-2xl font-black text-slate-800 tracking-tight">{item.model_format}</span>
                   </div>
                 </div>
 
-                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 md:mt-0 w-full">
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 md:mt-0 w-full text-left">
                   <div className="flex flex-col"><span className="text-[10px] font-black text-slate-300 uppercase mb-1 tracking-widest">Bakım</span><p className="text-sm font-bold text-slate-700">{item.bakim_turu}</p></div>
                   <div className="flex flex-col"><span className="text-[10px] font-black text-slate-300 uppercase mb-1 tracking-widest">Şehir</span><p className="text-sm font-bold text-slate-700">{item.sehir}</p></div>
                   <div className="flex flex-col"><span className="text-[10px] font-black text-slate-300 uppercase mb-1 tracking-widest">Tarih</span><div className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><Calendar size={14} className="text-slate-300"/> {item.tarih}</div></div>
@@ -181,7 +183,7 @@ export default function Home() {
                         <p>Motor Tipi: <span className="text-slate-900">{item.motor || 'Bilinmiyor'}</span></p>
                       </div>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-4 text-left">
                       <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b border-slate-200 pb-2">İŞLEM DETAYI</h4>
                       <div className="flex flex-wrap gap-2">
                         {item.yapilan_islemler?.length > 0 ? item.yapilan_islemler.map((islem: string, i: number) => (
