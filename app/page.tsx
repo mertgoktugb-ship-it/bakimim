@@ -33,6 +33,7 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [adminModu, setAdminModu] = useState(false);
+  const [formAcik, setFormAcik] = useState(false); // Form durumu eklendi
   const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
 
   useEffect(() => {
@@ -96,8 +97,12 @@ export default function Home() {
               </div>
            </Link>
            <div className="flex items-center gap-4">
-              <Link href="/blog" className="text-[10px] font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest flex items-center gap-2"><BookOpen size={16}/> BLOG</Link>
-              <button onClick={() => setAdminModu(!adminModu)} className="text-slate-300 hover:text-slate-600 transition-colors"><Lock size={16}/></button>
+              <Link href="/blog" className="text-[10px] font-black text-slate-500 hover:text-blue-700 uppercase tracking-widest flex items-center gap-2 mr-2"><BookOpen size={16}/> BLOG</Link>
+              {/* VERİ PAYLAŞ BUTONU GERİ GELDİ */}
+              <button onClick={() => setFormAcik(true)} className="bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-800 shadow-md flex items-center gap-2 transition-all">
+                <FileText size={14}/> Veri Paylaş
+              </button>
+              <button onClick={() => setAdminModu(!adminModu)} className="text-slate-300 hover:text-slate-600 transition-colors ml-2"><Lock size={16}/></button>
            </div>
       </nav>
 
@@ -163,7 +168,7 @@ export default function Home() {
 
       {/* BLOG KUTUCUKLARI */}
       <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
-        <div className="flex justify-between items-center mb-16 text-left text-left">
+        <div className="flex justify-between items-center mb-16 text-left">
           <div className="flex items-center gap-4 text-left">
             <div className="bg-blue-700 p-3 rounded-2xl text-white shadow-lg text-left"><BookOpen size={28} /></div>
             <h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">GÜNCEL BLOG</h2>
@@ -189,7 +194,7 @@ export default function Home() {
       <footer className="bg-white border-t border-slate-200 py-20 px-8 text-left">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-left">
           <div className="text-left text-left text-left text-left">
-            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left">bakımım<span className="text-blue-700">.com</span></span>
+            <span className="text-3xl font-black italic text-slate-800 tracking-tighter uppercase block mb-2 text-left text-left text-left">bakımım<span className="text-blue-700">.com</span></span>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">© 2026 Şeffaf Servis Platformu</p>
           </div>
         </div>
