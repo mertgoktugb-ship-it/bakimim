@@ -11,12 +11,12 @@ export default function Home() {
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
 
-  // --- GELİŞMİŞ AKILLI VERİ DÜZELTME KATMANI ---
+  // --- AKILLI VERİ DÜZELTME VE HATA ÖNLEME KATMANI ---
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
     const servisIsmi = (item.servis_adi || "").toLowerCase();
 
-    // 1. Yetkili Servis Otomatik Tanıma (Liste Genişletildi)
+    // 1. Yetkili Servis Otomatik Tanıma
     const yetkiliKeywords = [
       "arkas", "otokoç", "birmot", "doğuş", "mengerler", "inallar", "bakırcılar", 
       "tanoto", "neos", "odak", "dumankaya", "görkem", "atmo", "mezcar", "herter",
@@ -31,32 +31,16 @@ export default function Home() {
       duzeltilmis.yetkili_mi = "Evet";
     }
 
-    // 2. Servis İsmi Üzerinden Şehir Tamamlama (Akıllı Eşleştirme)
+    // 2. Şehir Tamamlama
     const sehirMap: { [key: string]: string } = {
-      "herter": "Ankara",
-      "toyan": "Ankara",
-      "alj ankara": "Ankara",
-      "akbak": "Ankara",
-      "ata ankara": "Ankara",
-      "göral": "Ankara",
-      "honda bora": "Ankara",
-      "arkas izmir": "İzmir",
-      "arkas istanbul": "İstanbul",
-      "otokoç taşdelen": "İstanbul",
-      "çekmeköy": "İstanbul",
-      "mengerler davutpaşa": "İstanbul",
-      "birmot": "İstanbul",
-      "inallar": "Bursa",
-      "çavdarlı": "Bursa",
-      "bakırcılar": "Antalya",
-      "samsun blf": "Samsun",
-      "inciroğlu": "Kayseri",
-      "mıçı": "Adana",
-      "hasan kavi": "Adana",
-      "tekbaş": "Adana"
+      "herter": "Ankara", "toyan": "Ankara", "alj ankara": "Ankara", "akbak": "Ankara",
+      "ata ankara": "Ankara", "göral": "Ankara", "honda bora": "Ankara", "arkas izmir": "İzmir",
+      "arkas istanbul": "İstanbul", "otokoç": "İstanbul", "birmot": "İstanbul",
+      "inallar": "Bursa", "çavdarlı": "Bursa", "bakırcılar": "Antalya", "samsun blf": "Samsun",
+      "inciroğlu": "Kayseri", "mıçı": "Adana", "hasan kavi": "Adana", "tekbaş": "Adana"
     };
 
-    if (duzeltilmis.sehir === "bilinmiyor") {
+    if (duzeltilmis.sehir === "bilinmiyor" || !duzeltilmis.sehir) {
       for (const [kw, sehir] of Object.entries(sehirMap)) {
         if (servisIsmi.includes(kw)) {
           duzeltilmis.sehir = sehir;
@@ -65,11 +49,15 @@ export default function Home() {
       }
     }
 
-    // 3. Fiyat Formatlama (Hata Giderme)
-    duzeltilmis.ekran_fiyat = item.fiyat_tl || item.fiyat || "Fiyat Alınız";
-    if (duzeltilmis.ekran_fiyat !== "Fiyat Alınız" && !duzeltilmis.ekran_fiyat.includes("TL")) {
-      duzeltilmis.ekran_fiyat += " TL";
+    // 3. FİYAT HATA KONTROLÜ (TypeError Çözümü)
+    // Fiyatı ne olursa olsun metne çeviriyoruz ki .includes() hata vermesin
+    let hamFiyat = item.fiyat_tl || item.fiyat || "Fiyat Alınız";
+    let fiyatMetni = String(hamFiyat); 
+
+    if (fiyatMetni !== "Fiyat Alınız" && !fiyatMetni.includes("TL")) {
+      fiyatMetni += " TL";
     }
+    duzeltilmis.ekran_fiyat = fiyatMetni;
 
     return duzeltilmis;
   };
@@ -98,22 +86,23 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900 text-left">
-      {/* Navbar ve Header (Öncekiyle aynı) */}
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center text-left">
           <div className="flex items-center gap-3">
              <div className="bg-[#1E293B] p-2 rounded-lg text-white shadow-lg"><Car size={22} /></div>
              <div className="flex flex-col leading-none">
-                <span className="text-xl font-black tracking-tighter italic">bakimim<span className="text-blue-600">.com</span></span>
+                <span className="text-xl font-black tracking-tighter italic uppercase">bakimim<span className="text-blue-600">.com</span></span>
                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Şen Kardeşler</span>
              </div>
           </div>
         </div>
       </nav>
 
+      {/* SEARCH SECTION */}
       <div className="bg-[#1E293B] py-16 px-6 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Akıllı Sorgula</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight uppercase">Bakım Fiyatlarını <span className="text-blue-400 italic">Kıyaslayın</span></h1>
           <div className="bg-white p-2 rounded-2xl shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-3">
               <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-3 bg-slate-50 border rounded-xl font-bold text-sm outline-none">
                   <option value="">Tüm Markalar</option>
@@ -134,7 +123,8 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="max-w-5xl mx-auto py-12 px-6">
+      {/* RESULTS LIST */}
+      <section className="max-w-5xl mx-auto py-12 px-6 text-left">
         <div className="space-y-4">
           {sonuclar.map((item) => (
             <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
@@ -158,6 +148,7 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* ACCORDION (DETAIL AREA) */}
               {acikKartId === item.id && (
                 <div className="px-8 pb-8 pt-2 bg-slate-50/50 animate-in slide-in-from-top-2 duration-300">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-slate-100 pt-6 text-left">
@@ -173,9 +164,13 @@ export default function Home() {
                     <div className="space-y-4">
                       <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-widest border-b pb-2">Yapılan İşlemler</h4>
                       <div className="flex flex-wrap gap-2">
-                        {item.yapilan_islemler?.map((islem: string, i: number) => (
-                          <span key={i} className="bg-white border border-slate-200 px-2 py-1 rounded text-[10px] text-slate-600 font-bold">{islem}</span>
-                        )) || <span className="text-slate-400 italic text-xs">İşlem detayı belirtilmemiş.</span>}
+                        {item.yapilan_islemler?.length > 0 ? (
+                          item.yapilan_islemler.map((islem: string, i: number) => (
+                            <span key={i} className="bg-white border border-slate-200 px-2 py-1 rounded text-[10px] text-slate-600 font-bold">{islem}</span>
+                          ))
+                        ) : (
+                          <span className="text-slate-400 italic text-xs">İşlem detayı belirtilmemiş.</span>
+                        )}
                       </div>
                     </div>
                     <div className="space-y-4">
