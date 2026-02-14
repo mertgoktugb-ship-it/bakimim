@@ -1,10 +1,11 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { Car, BookOpen, ArrowRight, Calendar, User, Tag } from 'lucide-react';
+import { Car, BookOpen, ArrowRight, Calendar, User, ArrowLeft } from 'lucide-react';
 
-// --- BLOG VERİLERİ (Sarı & Siyah Konsept) ---
+// --- BLOG LİSTE VERİTABANI (15 YAZI) ---
 const tumBlogYazilari = [
+  // 1
   {
     slug: "yetkili-vs-ozel-servis",
     baslik: "YETKİLİ SERVİS Mİ ÖZEL SERVİS Mİ? 2026 KARŞILAŞTIRMASI",
@@ -14,6 +15,7 @@ const tumBlogYazilari = [
     kategori: "ANALİZ",
     renk: "from-slate-900 to-black"
   },
+  // 2
   {
     slug: "ankara-toyota-chr-batarya-degisim-maliyeti",
     baslik: "ANKARA TOYOTA C-HR BATARYA DEĞİŞİM MALİYETLERİ",
@@ -21,8 +23,9 @@ const tumBlogYazilari = [
     tarih: "10 Şubat 2026",
     yazar: "Editör",
     kategori: "HİBRİT",
-    renk: "from-slate-800 to-slate-900"
+    renk: "from-emerald-900 to-slate-900"
   },
+  // 3
   {
     slug: "istanbul-clio-triger-seti-degisim-ucreti",
     baslik: "İSTANBUL RENAULT CLIO TRİGER SETİ DEĞİŞİMİ 2026",
@@ -30,8 +33,9 @@ const tumBlogYazilari = [
     tarih: "08 Şubat 2026",
     yazar: "Mert Şen",
     kategori: "AĞIR BAKIM",
-    renk: "from-[#0f172a] to-[#1e293b]"
+    renk: "from-yellow-600 to-slate-900"
   },
+  // 4
   {
     slug: "izmir-vw-golf-bakim-ucretleri",
     baslik: "İZMİR VW GOLF PERİYODİK BAKIM ÜCRETLERİ",
@@ -39,8 +43,9 @@ const tumBlogYazilari = [
     tarih: "05 Şubat 2026",
     yazar: "Editör",
     kategori: "MODEL ANALİZİ",
-    renk: "from-black to-slate-900"
+    renk: "from-blue-900 to-slate-900"
   },
+  // 5
   {
     slug: "adana-egea-servis-maliyetleri",
     baslik: "ADANA FIAT EGEA SERVİS MALİYETLERİ",
@@ -48,14 +53,114 @@ const tumBlogYazilari = [
     tarih: "01 Şubat 2026",
     yazar: "Mert Şen",
     kategori: "BÖLGESEL",
-    renk: "from-slate-900 to-slate-800"
+    renk: "from-slate-800 to-slate-900"
+  },
+  // 6
+  {
+    slug: "chery-tiggo-bakim-araliklari-fiyatlari",
+    baslik: "CHERY TIGGO 7 VE 8 BAKIM ARALIKLARI",
+    ozet: "Chery sahiplerinin en çok sorduğu soru: 5.000 km bakımı zorunlu mu? Garanti bozulur mu?",
+    tarih: "14 Şubat 2026",
+    yazar: "Editör",
+    kategori: "POPÜLER",
+    renk: "from-red-900 to-black"
+  },
+  // 7
+  {
+    slug: "honda-civic-cvt-sanziman-yagi-degisimi",
+    baslik: "HONDA CIVIC CVT ŞANZIMAN YAĞI DEĞİŞİMİ",
+    ozet: "FC5 ve FE1 kasa Civic'lerde şanzıman ömrünü uzatmak için hangi yağ kullanılmalı? Orijinal vs Yan Sanayi.",
+    tarih: "13 Şubat 2026",
+    yazar: "Mert Şen",
+    kategori: "ŞANZIMAN",
+    renk: "from-red-800 to-slate-900"
+  },
+  // 8
+  {
+    slug: "ford-focus-dpf-iptali-temizligi",
+    baslik: "FORD FOCUS DİZEL PARTİKÜL FİLTRESİ SORUNLARI",
+    ozet: "Tıkanan DPF için iptal mi temizlik mi? Muayeneden geçme garantili çözümler.",
+    tarih: "11 Şubat 2026",
+    yazar: "Editör",
+    kategori: "DİZEL",
+    renk: "from-blue-800 to-black"
+  },
+  // 9
+  {
+    slug: "bmw-320i-g20-fren-balata-maliyetleri",
+    baslik: "BMW 3 SERİSİ (G20) FREN BALATA MALİYETLERİ",
+    ozet: "Borusan servis fiyatları ile Textar/Brembo özel servis fiyatlarını kıyasladık.",
+    tarih: "09 Şubat 2026",
+    yazar: "Mert Şen",
+    kategori: "PREMIUM",
+    renk: "from-blue-900 to-slate-800"
+  },
+  // 10
+  {
+    slug: "peugeot-3008-adblue-arizasi-cozumu",
+    baslik: "PEUGEOT 3008 ADBLUE DEPOSU ARIZASI",
+    ozet: "Kronikleşen AdBlue pompa arızası için değişim maliyetleri ve iptal yöntemleri.",
+    tarih: "07 Şubat 2026",
+    yazar: "Editör",
+    kategori: "KRONİK",
+    renk: "from-indigo-900 to-black"
+  },
+  // 11
+  {
+    slug: "hyundai-i20-vs-bayon-bakim-karsilastirmasi",
+    baslik: "HYUNDAI i20 VS BAYON: BAKIM MALİYETLERİ",
+    ozet: "Aynı motora sahip iki aracın servis fiyatları neden farklı? SUV tarifesi gerçek mi?",
+    tarih: "06 Şubat 2026",
+    yazar: "Editör",
+    kategori: "KARŞILAŞTIRMA",
+    renk: "from-sky-800 to-slate-900"
+  },
+  // 12
+  {
+    slug: "mercedes-c200-periyodik-bakim-a-ve-b",
+    baslik: "MERCEDES SERVİS A VE SERVİS B FARKI",
+    ozet: "Gösterge panelindeki Servis A ve Servis B uyarıları ne anlama geliyor? Fiyat farkı ne kadar?",
+    tarih: "04 Şubat 2026",
+    yazar: "Mert Şen",
+    kategori: "REHBER",
+    renk: "from-slate-600 to-black"
+  },
+  // 13
+  {
+    slug: "lpg-bakimi-fiyatlari-2026",
+    baslik: "2026 LPG SİSTEMİ FİLTRE DEĞİŞİM FİYATLARI",
+    ozet: "Prins, BRC ve Atiker sistemlerinin 10.000 km filtre bakım ücretleri.",
+    tarih: "03 Şubat 2026",
+    yazar: "Editör",
+    kategori: "LPG",
+    renk: "from-orange-800 to-slate-900"
+  },
+  // 14
+  {
+    slug: "kis-lastigi-degisim-balans-ucretleri",
+    baslik: "2026 KIŞ LASTİĞİ DEĞİŞİM VE BALANS ÜCRETLERİ",
+    ozet: "Lastikçiler odası tarifesi ve piyasadaki gerçek sökme takma fiyatları.",
+    tarih: "02 Şubat 2026",
+    yazar: "Editör",
+    kategori: "MEVSİMSEL",
+    renk: "from-slate-700 to-slate-900"
+  },
+  // 15
+  {
+    slug: "oto-ekspertiz-dolandiriciligi",
+    baslik: "OTO EKSPERTİZ RAPORLARINDAKİ HİLELER",
+    ozet: "İkinci el araç alırken dikkat! Ucuz ekspertiz paketlerinde bakılmayan hayati noktalar.",
+    tarih: "30 Ocak 2026",
+    yazar: "Mert Şen",
+    kategori: "UYARI",
+    renk: "from-red-900 to-slate-900"
   }
 ];
 
 export default function BlogPage() {
   return (
     <main className="min-h-screen bg-[#F8FAFC]">
-      {/* NAVBAR (Ana Sayfa ile Uyumlu) */}
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
            <Link href="/" className="flex items-center gap-3">
               <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105">
@@ -72,12 +177,12 @@ export default function BlogPage() {
            </Link>
            <div className="flex items-center gap-4">
               <Link href="/" className="text-[10px] font-black text-slate-500 hover:text-yellow-600 uppercase tracking-widest flex items-center gap-2">
-                <ArrowRight size={16} className="rotate-180"/> ANA SAYFAYA DÖN
+                <ArrowLeft size={16}/> ANA SAYFAYA DÖN
               </Link>
            </div>
       </nav>
 
-      {/* HERO HEADER - SİYAH & SARI */}
+      {/* HERO HEADER */}
       <div className="bg-[#0f172a] py-24 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
@@ -95,7 +200,7 @@ export default function BlogPage() {
 
       {/* BLOG LISTESI */}
       <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {tumBlogYazilari.map((blog) => (
             <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group">
               <article className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-200 shadow-sm hover:shadow-2xl hover:border-yellow-400 transition-all duration-300 h-full flex flex-col">
@@ -110,18 +215,16 @@ export default function BlogPage() {
                 </div>
                 
                 {/* İÇERİK ALANI */}
-                <div className="p-10 flex flex-col flex-1">
+                <div className="p-8 flex flex-col flex-1">
                     <div className="flex items-center gap-4 text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
                         <span className="flex items-center gap-1"><Calendar size={14} className="text-yellow-500"/> {blog.tarih}</span>
-                        <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                        <span className="flex items-center gap-1"><User size={14} className="text-yellow-500"/> {blog.yazar}</span>
                     </div>
                     
-                    <h2 className="text-3xl font-black text-slate-800 mb-4 uppercase italic tracking-tight leading-none group-hover:text-yellow-600 transition-colors">
+                    <h2 className="text-2xl font-black text-slate-800 mb-4 uppercase italic tracking-tight leading-none group-hover:text-yellow-600 transition-colors">
                         {blog.baslik}
                     </h2>
                     
-                    <p className="text-slate-500 font-medium mb-8 line-clamp-3">
+                    <p className="text-slate-500 text-sm font-medium mb-8 line-clamp-3">
                         {blog.ozet}
                     </p>
                     
