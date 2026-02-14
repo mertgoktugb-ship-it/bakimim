@@ -39,7 +39,7 @@ export default function Home() {
 
   const getMarkaIcon = (marka: string) => {
     const m = (marka || "").toLowerCase();
-    // Marka ikonları artık SARI
+    // Marka ikonları SARI vurgulu
     if (m.includes('toyota') || m.includes('honda')) return <Zap size={20} className="text-yellow-500" />;
     if (m.includes('mercedes') || m.includes('bmw') || m.includes('audi')) return <ShieldCheck size={20} className="text-slate-700" />;
     return <Car size={20} className="text-yellow-600" />;
@@ -56,14 +56,14 @@ export default function Home() {
     duzeltilmis.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
     duzeltilmis.ekran_fiyat = duzeltilmis.fiyat_sayi > 0 ? duzeltilmis.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     
-    // --- İSİM GİZLEME (BOŞ BIRAKMA MANTIĞI) ---
+    // --- İSİM GİZLEME (Y.K. veya Sürücü YAZMAZ - BOŞ KALIR) ---
     let hamIsim = item.ad_soyad || item.isim || "";
     // İsim yoksa nottan çekmeyi dene
     if (!hamIsim && item.not) {
         const notIsimMatch = item.not.match(/^([A-ZİĞÜŞÖÇ][a-zığüşöç\.]+(\s+[A-ZİĞÜŞÖÇ][a-zığüşöç\.]+)*)/);
         if (notIsimMatch) hamIsim = notIsimMatch[0];
     }
-    // Hâlâ yoksa BOŞ kalsın (Y.K. yok, Sürücü yok)
+    
     if (hamIsim) {
         if (hamIsim.includes('.')) {
             duzeltilmis.bas_harfler = hamIsim;
@@ -71,7 +71,7 @@ export default function Home() {
             duzeltilmis.bas_harfler = hamIsim.trim().split(/\s+/).map((p: any) => p.charAt(0).toUpperCase() + ".").join(" ");
         }
     } else {
-        duzeltilmis.bas_harfler = ""; 
+        duzeltilmis.bas_harfler = ""; // İsim yoksa boş bırak
     }
 
     duzeltilmis.temiz_not = (item.not || "").replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\b/g, "$1. $2.");
@@ -174,7 +174,7 @@ export default function Home() {
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
                 <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
                 <div className="space-y-2 uppercase text-left text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic text-left text-left">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
-                {/* İSİM KUTUSU: Sarı Zemin, Siyah Yazı */}
+                {/* İSİM KUTUSU: Sarı Zemin, Siyah Yazı - İSİM YOKSA BOŞ */}
                 <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
                   <p className="text-3xl font-black italic tracking-tighter uppercase leading-none">{item.bas_harfler}</p>
                   <div className="mt-5 text-[12px] font-bold border-t border-slate-900/20 pt-4 opacity-90 leading-relaxed text-left text-left text-left">"{item.temiz_not || "Doğrulanmış kullanıcı paylaşımı."}"</div>
@@ -185,7 +185,7 @@ export default function Home() {
         ))}
       </section>
 
-      {/* BLOG BÖLÜMÜ */}
+      {/* --- BLOG BÖLÜMÜ (EKLENDİ) --- */}
       <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left text-left">
         <div className="flex justify-between items-center mb-12 text-left">
           <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-left"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">Servis Rehberi</h2></div>
@@ -197,6 +197,18 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <footer className="bg-white border-t border-slate-200 py-16 px-8 text-left mt-20">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 text-left">
+          <div className="flex flex-col gap-2 text-left">
+            <span className="text-2xl font-black italic text-slate-800 uppercase text-left">bakımım<span className="text-yellow-500">.com</span></span>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">© 2026 Şeffaf Servis Rehberi</p>
+          </div>
+          <div className="flex gap-8 items-center text-left">
+             <button onClick={() => setAdminModu(!adminModu)} className={`flex items-center gap-2 text-[10px] font-black px-5 py-2.5 rounded-2xl transition-all shadow-sm ${adminModu ? 'bg-orange-500 text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}><Lock size={14}/> {adminModu ? 'KAPAT' : 'GİRİŞ'}</button>
+          </div>
+        </div>
+      </footer>
 
       {/* FORM MODAL: Sarı Başlık */}
       {formAcik && (
