@@ -39,6 +39,7 @@ export default function Home() {
   useEffect(() => {
     const veriCek = async () => {
         setVeriYukleniyor(true);
+        // Sadece 'onayli_mi' true olanları çekiyoruz
         let { data, error } = await supabase
             .from('bakim_kayitlari')
             .select('*')
@@ -107,7 +108,7 @@ export default function Home() {
     setSonuclar(filtrelenmis);
   };
 
-  // --- GELİŞMİŞ GÖNDERİM (RESİM YÜKLEMELİ) ---
+  // --- GELİŞMİŞ GÖNDERİM (YENİ TABLO YAPISINA UYGUN) ---
   const veriyiGonder = async (e: React.FormEvent) => {
     e.preventDefault();
     setYukleniyor(true);
@@ -121,7 +122,7 @@ export default function Home() {
     if (resimSecildi) {
       const dosyaAdi = `${Date.now()}_${resimSecildi.name.replace(/\s+/g, '_')}`;
       const { data: resimData, error: resimHata } = await supabase.storage
-        .from('faturalar') // Bucket adı
+        .from('faturalar')
         .upload(dosyaAdi, resimSecildi);
 
       if (!resimHata && resimData) {
@@ -130,22 +131,34 @@ export default function Home() {
       }
     }
 
-    // 2. Veriyi Hazırla
+    // 2. Veriyi Hazırla (GRAND MASTER YAPISINA UYGUN)
     const yeniKayit = {
+        // Kişisel
         ad_soyad: (inputs[0] as HTMLInputElement).value,
+        
+        // Araç
         marka: (inputs[1] as HTMLInputElement).value,
         model: (inputs[2] as HTMLInputElement).value,
         yil: parseInt((inputs[3] as HTMLInputElement).value) || null,
-        tari: (inputs[4] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
-        servis_adi: (inputs[5] as HTMLInputElement).value,
+        yakit_motor: (inputs[10] as HTMLInputElement).value,
         km: parseInt((inputs[6] as HTMLInputElement).value),
-        fiyat: parseFloat((inputs[7] as HTMLInputElement).value),
+
+        // Servis & Konum
+        tarih: (inputs[4] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
+        servis_adi: (inputs[5] as HTMLInputElement).value,
         sehir: (inputs[8] as HTMLInputElement).value,
         ilce: (inputs[9] as HTMLInputElement).value,
-        yakit_motor: (inputs[10] as HTMLInputElement).value,
         
+        // Analitik Alanları (Otomatik Dolduruyoruz)
         yetkili_mi: servisTipi === "Yetkili",
+        servis_tipi: servisTipi === "Yetkili" ? "yetkili" : "ozel", // Yeni alan
+        kaynak: "site_formu", // Yeni alan: Bu veri siteden geldi
+        
+        // Finansal & Kanıt
+        fiyat: parseFloat((inputs[7] as HTMLInputElement).value),
         fatura_url: resimUrl,
+        
+        // Yönetim
         onayli_mi: false
     };
 
@@ -169,7 +182,7 @@ export default function Home() {
   const avgOzel = ozelKayitlar.length > 0 ? Math.round(ozelKayitlar.reduce((a, b) => a + (b.fiyat || 0), 0) / ozelKayitlar.length) : 0;
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans">
+    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative">
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
            <Link href="/" className="flex items-center gap-3">
               <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} strokeWidth={2.5} /></div>
