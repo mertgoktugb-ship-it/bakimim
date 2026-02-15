@@ -30,11 +30,17 @@ export default function Home() {
   const [veriYukleniyor, setVeriYukleniyor] = useState(true);
   const [resimSecildi, setResimSecildi] = useState<File | null>(null);
 
-  // --- KRİTİK: VERİ ÇEKME FONKSİYONU ---
+  // --- ŞEHİR VE METİN NORMALLEŞTİRME FONKSİYONU ---
+  const normalizeMetin = (str: string) => {
+    if (!str) return "";
+    const temiz = str.trim();
+    // Türkçe karakterlere duyarlı ilk harf büyütme
+    return temiz.charAt(0).toLocaleUpperCase('tr-TR') + temiz.slice(1).toLocaleLowerCase('tr-TR');
+  };
+
   const veriCek = useCallback(async () => {
     setVeriYukleniyor(true);
     try {
-      // Önbelleği (cache) devre dışı bırakmak için timestamp ekliyoruz
       const { data, error } = await supabase
         .from('bakim_kayitlari')
         .select('*')
@@ -44,16 +50,17 @@ export default function Home() {
       if (error) throw error;
 
       if (data) {
-        // Kartların boş görünmesine sebep olan kirli verileri (Marka/Model boş olanlar) burada ayıklıyoruz
+        // Marka, Model ve Şehir bilgilerini burada tek tipleştiriyoruz
         const valideEdilmisData = data.filter(item => 
           item.marka && item.marka.trim() !== "" && 
-          item.model && item.model.trim() !== ""
+          item.model && item.model.trim() !== "" &&
+          item.sehir && item.sehir.trim() !== ""
         ).map(item => ({
           ...item,
-          marka: item.marka.trim(),
-          model: item.model.trim(),
-          marka_format: item.marka.trim().charAt(0).toUpperCase() + item.marka.trim().slice(1).toLowerCase(),
-          model_format: item.model.trim().charAt(0).toUpperCase() + item.model.trim().slice(1).toLowerCase(),
+          // Veritabanındaki "istanbul" veya "İSTANBUL" u "İstanbul" yapar
+          sehir: normalizeMetin(item.sehir), 
+          marka_format: normalizeMetin(item.marka),
+          model_format: normalizeMetin(item.model),
           ekran_fiyat: item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız",
           bas_harfler: item.ad_soyad ? item.ad_soyad.trim().split(/\s+/).map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ") : ""
         }));
@@ -63,7 +70,7 @@ export default function Home() {
         setIstatistikVerisi(valideEdilmisData);
       }
     } catch (err) {
-      console.error("Veri senkronizasyon hatası:", err);
+      console.error("Senkronizasyon hatası:", err);
     } finally {
       setVeriYukleniyor(false);
     }
@@ -73,8 +80,9 @@ export default function Home() {
     veriCek();
   }, [veriCek]);
 
+  // Set kullanarak her şehri ve markayı sadece 1 kez listeye ekliyoruz
   const tumMarkalar = Array.from(new Set(duzenlenenVeri.map(item => item.marka_format))).sort();
-  const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).filter(Boolean).sort();
+  const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).sort();
 
   useEffect(() => {
     if (secilenMarka) {
@@ -198,7 +206,7 @@ export default function Home() {
       </div>
 
       {veriYukleniyor ? (
-        <div className="text-center py-20 font-bold text-slate-400 animate-pulse text-2xl uppercase tracking-tighter italic">Veritabanı Senkronize Ediliyor...</div>
+        <div className="text-center py-20 font-bold text-slate-400 animate-pulse text-2xl uppercase tracking-tighter italic">Veriler Senkronize Ediliyor...</div>
       ) : (
         <>
           <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
@@ -279,10 +287,10 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><User size={14}/> Ad Soyad</label><input required placeholder="Örn: Mert Şen" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka</label><input required placeholder="Örn: Honda" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Info size={14}/> Model</label><input required placeholder="Örn: Civic" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Info size={14}/> Model</label><input required placeholder="Örn: Accord" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Model Yılı</label><input type="number" placeholder="2024" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Tarih</label><input required type="date" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Wrench size={14}/> Bakım Türü</label><input required placeholder="10.000 Bakımı" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Wrench size={14}/> Bakım Türü</label><input required placeholder="Periyodik Bakım" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input required placeholder="Honda Plaza" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Kilometre</label><input required type="number" placeholder="15000" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Tutar (TL)</label><input required type="number" placeholder="12500" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
