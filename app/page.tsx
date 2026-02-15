@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
-  Settings, X, Info, FileText, Upload, User, 
+  Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck 
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -135,13 +135,13 @@ export default function Home() {
         ad_soyad: (inputs[0] as HTMLInputElement).value,
         marka: (inputs[1] as HTMLInputElement).value,
         model: (inputs[2] as HTMLInputElement).value,
-        yil: parseInt((inputs[3] as HTMLInputElement).value) || null, // Yeni
-        tarih: (inputs[4] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
+        yil: parseInt((inputs[3] as HTMLInputElement).value) || null,
+        tari: (inputs[4] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
         servis_adi: (inputs[5] as HTMLInputElement).value,
         km: parseInt((inputs[6] as HTMLInputElement).value),
         fiyat: parseFloat((inputs[7] as HTMLInputElement).value),
         sehir: (inputs[8] as HTMLInputElement).value,
-        ilce: (inputs[9] as HTMLInputElement).value, // Yeni (SEO için)
+        ilce: (inputs[9] as HTMLInputElement).value,
         yakit_motor: (inputs[10] as HTMLInputElement).value,
         
         yetkili_mi: servisTipi === "Yetkili",
@@ -169,10 +169,10 @@ export default function Home() {
   const avgOzel = ozelKayitlar.length > 0 ? Math.round(ozelKayitlar.reduce((a, b) => a + (b.fiyat || 0), 0) / ozelKayitlar.length) : 0;
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative">
+    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans">
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
            <Link href="/" className="flex items-center gap-3">
-              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center"><Car size={28} strokeWidth={2.5} /></div>
+              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} strokeWidth={2.5} /></div>
               <div className="flex flex-col leading-tight"><span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-yellow-500">.com</span></span><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-left">Şeffaf Servis Rehberi</span></div>
            </Link>
            <div className="flex items-center gap-4">
