@@ -157,4 +157,42 @@ export default function Home() {
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic animate-in slide-in-from-top-4">
                 <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
-                <div className="space-y-2 uppercase text-left"><p
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
+                {/* GİZLENMİŞ İSİM KUTUSU */}
+                <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
+                  <p className="text-3xl font-black italic tracking-tighter uppercase leading-none">{item.bas_harfler}</p>
+                  <div className="mt-5 text-[12px] font-bold border-t border-slate-900/20 pt-4 opacity-90 leading-relaxed text-left">"{item.not || "Doğrulanmış kullanıcı paylaşımı."}"</div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
+
+      {/* FORM MODAL */}
+      {formAcik && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <form onSubmit={veriyiGonder} className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 text-left">
+              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <button type="button" onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
+            </div>
+            <div className="p-10 space-y-8 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left text-left">
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-left"><User size={14}/> Ad Soyad</label><input required value={formData.ad_soyad} onChange={(e)=>setFormData({...formData, ad_soyad: e.target.value})} placeholder="Örn: Mert Şen" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka / Model</label><input required value={formData.marka_model} onChange={(e)=>setFormData({...formData, marka_model: e.target.value})} placeholder="Örn: Honda Civic 2024" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input required value={formData.servis_adi} onChange={(e)=>setFormData({...formData, servis_adi: e.target.value})} placeholder="Örn: Honda Mutluhan" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Kilometre</label><input required value={formData.km} onChange={(e)=>setFormData({...formData, km: e.target.value})} placeholder="Örn: 15.000" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-left text-left"><BadgePercent size={14}/> Tutar (TL)</label><input required value={formData.fiyat} onChange={(e)=>setFormData({...formData, fiyat: e.target.value})} placeholder="Örn: 9.500" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner text-left text-left" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input required value={formData.sehir} onChange={(e)=>setFormData({...formData, sehir: e.target.value})} placeholder="Örn: İstanbul" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+              </div>
+              <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-7 rounded-[2.5rem] font-black text-2xl uppercase italic tracking-tighter shadow-xl hover:bg-yellow-400 disabled:opacity-50">
+                {yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </main>
+  );
+}
