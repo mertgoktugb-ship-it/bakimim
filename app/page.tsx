@@ -15,13 +15,11 @@ const blogYazilari = [
 ];
 
 export default function Home() {
-  // Filtreleme State'leri
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
   const [secilenSehir, setSecilenSehir] = useState("");
   const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez");
 
-  // Veri State'leri
   const [sonuclar, setSonuclar] = useState<any[]>([]);
   const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]);
   
@@ -45,8 +43,14 @@ export default function Home() {
                 .order('id', { ascending: false });
 
             if (data) {
-                // GÜVENLİK FİLTRESİ: Boş veya hatalı verileri arayüze sokma
-                const temizData = data.filter(item => item.marka && item.model && item.fiyat);
+                // GELİŞMİŞ GÜVENLİK FİLTRESİ: 
+                // Marka, Model veya Fiyatı olmayan (null veya boş string) kayıtları temizle.
+                const temizData = data.filter(item => 
+                    item.marka && item.marka.trim() !== "" &&
+                    item.model && item.model.trim() !== "" &&
+                    item.fiyat !== null && item.fiyat !== undefined
+                );
+                
                 setDuzenlenenVeri(temizData);
                 setSonuclar(temizData);
                 setIstatistikVerisi(temizData);
@@ -60,9 +64,13 @@ export default function Home() {
     veriCek();
   }, []);
 
+  // --- AKILLI FORMATLAMA (TRIM EKLENDİ) ---
   const formatYazi = (str: string) => {
     if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    // .trim() fonksiyonu baştaki ve sondaki görünmez boşlukları siler.
+    // Böylece "Accord " ile "Accord" aynı şey olur.
+    const temizStr = str.trim(); 
+    return temizStr.charAt(0).toUpperCase() + temizStr.slice(1).toLowerCase();
   };
 
   const formatTarih = (tarihStr: string) => {
@@ -98,6 +106,7 @@ export default function Home() {
   };
 
   const islenmisVeri = duzenlenenVeri.map(veriyiDüzelt);
+  // Set yapısı artık "trim"lenmiş verilerle çalıştığı için kopyaları otomatik eler.
   const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).filter(Boolean).sort();
   const tumSehirler = Array.from(new Set(islenmisVeri.map(item => item.sehir))).filter(Boolean).sort();
 
@@ -208,7 +217,6 @@ export default function Home() {
           
           <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4 text-left">
               
-              {/* ÖZEL SELECT BİLEŞENLERİ (Çerçevesiz ve Özel Ok Tuşu ile) */}
               <div className="relative">
                   <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none appearance-none cursor-pointer text-slate-700"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><ChevronDown size={20} /></div>
@@ -260,6 +268,7 @@ export default function Home() {
           <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left">
             <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
                 <div className="md:w-64 mr-10 text-left">
+                  
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${
                       item.yetkili_mi 
                       ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' 
