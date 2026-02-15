@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, Filter
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -15,10 +15,16 @@ const blogYazilari = [
 ];
 
 export default function Home() {
+  // Filtreleme State'leri
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
   const [secilenSehir, setSecilenSehir] = useState("");
-  const [sonuclar, setSonuclar] = useState<any[]>([]);
+  const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez"); // YENİ: Servis Tipi Filtresi
+
+  // Veri State'leri
+  const [sonuclar, setSonuclar] = useState<any[]>([]); // Ekranda listelenenler
+  const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]); // Ortalamalar için kullanılan veri
+  
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [formAcik, setFormAcik] = useState(false);
@@ -41,6 +47,7 @@ export default function Home() {
             if (data) {
                 setDuzenlenenVeri(data);
                 setSonuclar(data);
+                setIstatistikVerisi(data); // Başlangıçta istatistik hepsi
             }
         } catch (error) {
             console.error("Veri çekme hatası:", error);
@@ -74,8 +81,6 @@ export default function Home() {
 
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
-    
-    // GÜVENLİK KONTROLÜ: Veri eksikse varsayılan değer ata
     duzeltilmis.ekran_fiyat = item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     
     if (item.ad_soyad) {
@@ -84,7 +89,6 @@ export default function Home() {
         duzeltilmis.bas_harfler = "";
     }
 
-    // Marka ve Model boşsa "Belirtilmemiş" yazmasın diye kontrol
     duzeltilmis.marka_format = item.marka ? formatYazi(item.marka) : "Marka?";
     duzeltilmis.model_format = item.model ? formatYazi(item.model) : "Model?";
     
@@ -102,14 +106,25 @@ export default function Home() {
     } else { setMusaitModeller([]); }
   }, [secilenMarka, duzenlenenVeri]);
 
+  // --- SORGULA (AKILLI FİLTRELEME) ---
   const sorgula = () => {
-    const filtrelenmis = islenmisVeri.filter(item => {
+    // 1. Temel Filtre (Marka, Model, Şehir) -> İstatistikler buna göre hesaplanır
+    const temelFiltre = islenmisVeri.filter(item => {
       const markaUygun = !secilenMarka || item.marka_format === secilenMarka;
       const modelUygun = !secilenModel || item.model_format === secilenModel;
       const sehirUygun = !secilenSehir || item.sehir === secilenSehir;
       return markaUygun && modelUygun && sehirUygun;
     });
-    setSonuclar(filtrelenmis);
+
+    // 2. Liste Filtresi (Temel + Servis Tipi) -> Aşağıdaki liste buna göre daralır
+    const listeFiltresi = temelFiltre.filter(item => {
+        if (filtreServisTipi === "Yetkili") return item.yetkili_mi === true;
+        if (filtreServisTipi === "Özel") return item.yetkili_mi === false;
+        return true; // Farketmez
+    });
+
+    setIstatistikVerisi(temelFiltre); // Ortalamalar için geniş veri
+    setSonuclar(listeFiltresi);       // Liste için daraltılmış veri
   };
 
   const veriyiGonder = async (e: React.FormEvent) => {
@@ -169,10 +184,12 @@ export default function Home() {
     }
   };
 
-  const yetkiliKayitlar = sonuclar.filter(i => i.yetkili_mi === true);
-  const ozelKayitlar = sonuclar.filter(i => i.yetkili_mi !== true);
-  const avgYetkili = yetkiliKayitlar.length > 0 ? Math.round(yetkiliKayitlar.reduce((a, b) => a + (b.fiyat || 0), 0) / yetkiliKayitlar.length) : 0;
-  const avgOzel = ozelKayitlar.length > 0 ? Math.round(ozelKayitlar.reduce((a, b) => a + (b.fiyat || 0), 0) / ozelKayitlar.length) : 0;
+  // İstatistikler (istatistikVerisi üzerinden hesaplanır - Filtreden bağımsız)
+  const yetkiliKayitlar = istatistikVerisi.filter(i => i.yetkili_mi === true);
+  const ozelKayitlar = istatistikVerisi.filter(i => i.yetkili_mi !== true);
+  
+  const avgYetkili = yetkiliKayitlar.length > 0 ? Math.round(yetkiliKayitlar.reduce((a:number, b:any) => a + (b.fiyat || 0), 0) / yetkiliKayitlar.length) : 0;
+  const avgOzel = ozelKayitlar.length > 0 ? Math.round(ozelKayitlar.reduce((a:number, b:any) => a + (b.fiyat || 0), 0) / ozelKayitlar.length) : 0;
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans">
@@ -188,12 +205,23 @@ export default function Home() {
       </nav>
 
       <div className="bg-[#0f172a] py-20 px-6 text-left">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 uppercase italic tracking-tighter text-center text-left">FİYAT <span className="text-yellow-500 text-left">KIYASLA</span></h1>
-          <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map((s:any) => <option key={s} value={s}>{s}</option>)}</select>
+          
+          {/* FİLTRE KUTUSU - DÜZENLENDİ */}
+          <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4 text-left">
+              {/* focus:ring-0 ve focus:outline-none ile mavi çerçeveyi kaldırdık */}
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Model Seçin</option>{musaitModeller.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Şehir Seçin</option>{tumSehirler.map((s:any) => <option key={s} value={s}>{s}</option>)}</select>
+              
+              {/* YENİ: SERVİS TİPİ FİLTRESİ */}
+              <select value={filtreServisTipi} onChange={(e) => setFiltreServisTipi(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none text-slate-700">
+                  <option value="Farketmez">Farketmez</option>
+                  <option value="Yetkili">Yetkili Servis</option>
+                  <option value="Özel">Özel Servis</option>
+              </select>
+
               <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg"><Search size={24} /> Sorgula</button>
           </div>
         </div>
@@ -213,7 +241,7 @@ export default function Home() {
             </div>
         </div>
       ) : (
-        <div className="text-center py-20 text-slate-400 font-bold">Kayıt bulunamadı.</div>
+        <div className="text-center py-20 text-slate-400 font-bold">Kriterlere uygun kayıt bulunamadı.</div>
       )}
 
       <section className="max-w-5xl mx-auto px-6 space-y-5 mt-10 text-left">
@@ -221,8 +249,6 @@ export default function Home() {
           <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left">
             <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
                 <div className="md:w-64 mr-10 text-left">
-                  
-                  {/* --- GÜNCELLENEN ETİKETLER --- */}
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${
                       item.yetkili_mi 
                       ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' 
@@ -290,6 +316,18 @@ export default function Home() {
             )}
           </div>
         ))}
+      </section>
+
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200">
+        <div className="flex justify-between items-center mb-12 text-left">
+          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">Servis Rehberi</h2></div>
+          <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
+          {blogYazilari.map((blog) => (
+            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3></div></div></Link>
+          ))}
+        </div>
       </section>
 
       {formAcik && (
