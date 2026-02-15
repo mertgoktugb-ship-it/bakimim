@@ -93,21 +93,22 @@ export default function Home() {
     duzeltilmis.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
     duzeltilmis.ekran_fiyat = duzeltilmis.fiyat_sayi > 0 ? duzeltilmis.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     
-    // --- İSİM GİZLEME KODUNUZ (Aynen Korundu) ---
-    let hamIsim = item.ad_soyad || item.isim || "";
-    if (!hamIsim && item.not) {
-        const notIsimMatch = item.not.match(/^([A-ZİĞÜŞÖÇ][a-zığüşöç\.]+(\s+[A-ZİĞÜŞÖÇ][a-zığüşöç\.]+)*)/);
-        if (notIsimMatch) hamIsim = notIsimMatch[0];
-    }
-    if (hamIsim) {
-        if (hamIsim.includes('.')) {
-            duzeltilmis.bas_harfler = hamIsim;
-        } else {
-            duzeltilmis.bas_harfler = hamIsim.trim().split(/\s+/).map((p: any) => p.charAt(0).toUpperCase() + ".").join(" ");
-        }
-    } else {
-        duzeltilmis.bas_harfler = ""; 
-    }
+    // --- İSİM GİZLEME KODUNUZ (A harfini kaldırıyoruz) ---
+    // let hamIsim = item.ad_soyad || item.isim || "";
+    // if (!hamIsim && item.not) {
+    //     const notIsimMatch = item.not.match(/^([A-ZİĞÜŞÖÇ][a-zığüşöç\.]+(\s+[A-ZİĞÜŞÖÇ][a-zığüşöç\.]+)*)/);
+    //     if (notIsimMatch) hamIsim = notIsimMatch[0];
+    // }
+    // if (hamIsim) {
+    //     if (hamIsim.includes('.')) {
+    //         duzeltilmis.bas_harfler = hamIsim;
+    //     } else {
+    //         duzeltilmis.bas_harfler = hamIsim.trim().split(/\s+/).map((p: any) => p.charAt(0).toUpperCase() + ".").join(" ");
+    //     }
+    // } else {
+    //     duzeltilmis.bas_harfler = ""; 
+    // }
+    duzeltilmis.bas_harfler = ""; // 'A.' veya herhangi bir baş harf görünmemesi için boş bırakıldı.
     // ---------------------------------------------
 
     duzeltilmis.temiz_not = (item.not || "").replace(/\b([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\s+([A-ZÇĞİÖŞÜ])[a-zçğıöşü]+\b/g, "$1. $2.");
@@ -200,9 +201,9 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 uppercase italic tracking-tighter text-center text-left">FİYAT <span className="text-yellow-500 text-left">KIYASLA</span></h1>
           <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map((s:any) => <option key={s} value={s}>{s}</option>)}</select>
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
               <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg"><Search size={24} /> Sorgula</button>
           </div>
         </div>
