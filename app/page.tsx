@@ -1,213 +1,236 @@
 "use client";
-import React, { useState } from 'react';
-import { Car, Search, ShieldCheck, PenTool, Share2, ChevronRight, CheckCircle, AlertCircle, BookOpen, User, Settings, Gauge, Wrench, Fuel, Calendar, MapPin, CreditCard, ClipboardCheck, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { 
+  Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
+  X, Check, Info, FileText, Upload, User,
+  Zap, Settings, BookOpen, ArrowRight, Gauge, Fuel 
+} from 'lucide-react';
+// Supabase bağlantısını ekledik
 import { supabase } from '../lib/supabase';
+import bakimData from './data.json';
 
-export default function AnaSayfa() {
-  const [formData, setFormData] = useState({
-    ad_soyad: '',
-    marka: '',
-    servis: '',
-    fiyat: '',
-    km: '',
-    sehir: ''
-  });
+const blogYazilari = [
+  { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
+  { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
+];
 
-  const [durum, setDurum] = useState({ mesaj: '', tip: '' });
+export default function Home() {
+  const [secilenMarka, setSecilenMarka] = useState("");
+  const [secilenModel, setSecilenModel] = useState("");
+  const [secilenSehir, setSecilenSehir] = useState("");
+  const [sonuclar, setSonuclar] = useState<any[]>([]);
+  const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
+  const [acikKartId, setAcikKartId] = useState<number | null>(null);
+  const [formAcik, setFormAcik] = useState(false);
+  const [servisTipi, setServisTipi] = useState("Yetkili");
+  const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
 
+  // FORM STATE - AD SOYAD DAHİL
+  const [formData, setFormData] = useState({
+    ad_soyad: '',
+    marka_model: '',
+    tarih: '',
+    servis_adi: '',
+    km: '',
+    fiyat: '',
+    sehir: '',
+    motor: ''
+  });
+
+  useEffect(() => {
+    setDuzenlenenVeri(bakimData);
+  }, []);
+
+  const formatYazi = (str: string) => {
+    if (!str || str.toLowerCase() === "bilinmiyor") return "";
+    return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+  };
+
+  const getMarkaIcon = (marka: string) => {
+    const m = (marka || "").toLowerCase();
+    if (m.includes('toyota') || m.includes('honda')) return <Zap size={20} className="text-yellow-500" />;
+    return <Car size={20} className="text-yellow-600" />;
+  };
+
+  const veriyiDüzelt = (item: any) => {
+    let duzeltilmis = { ...item };
+    let hamFiyat = item.fiyat_tl || item.fiyat || 0;
+    let fiyatSayi = typeof hamFiyat === 'string' ? parseFloat(hamFiyat.replace(/[^\d]/g, '')) : hamFiyat;
+    duzeltilmis.fiyat_sayi = isNaN(fiyatSayi) ? 0 : fiyatSayi;
+    duzeltilmis.ekran_fiyat = duzeltilmis.fiyat_sayi > 0 ? duzeltilmis.fiyat_sayi.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
+    
+    let hamIsim = item.ad_soyad || item.isim || "";
+    duzeltilmis.bas_harfler = hamIsim ? hamIsim.trim().split(/\s+/).map((p: any) => p.charAt(0).toUpperCase() + ".").join(" ") : "";
+    
+    duzeltilmis.marka_format = formatYazi(item.marka);
+    duzeltilmis.model_format = formatYazi(item.model);
+    return duzeltilmis;
+  };
+
+  const islenmisVeri = duzenlenenVeri.map(veriyiDüzelt);
+  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka))).sort();
+  const tumSehirler = Array.from(new Set(islenmisVeri.map(item => item.sehir))).filter(s => s && s !== "bilinmiyor").sort();
+
+  useEffect(() => {
+    if (secilenMarka) {
+      const modeller = Array.from(new Set(islenmisVeri.filter(item => item.marka === secilenMarka).map(item => item.model))).sort();
+      setMusaitModeller(modeller);
+    } else { setMusaitModeller([]); }
+  }, [secilenMarka]);
+
+  const sorgula = () => {
+    const filtrelenmis = islenmisVeri.filter(item => {
+      const markaUygun = !secilenMarka || item.marka === secilenMarka;
+      const modelUygun = !secilenModel || item.model === secilenModel;
+      const sehirUygun = !secilenSehir || item.sehir === secilenSehir;
+      return markaUygun && modelUygun && sehirUygun;
+    });
+    setSonuclar(filtrelenmis);
+  };
+
+  // SUPABASE GÖNDERİM FONKSİYONU
   const veriyiGonder = async (e: React.FormEvent) => {
     e.preventDefault();
     setYukleniyor(true);
-    setDurum({ mesaj: '', tip: '' });
 
-    try {
-      const { error } = await supabase
-        .from('bakim_kayitlari')
-        .insert([{
-          ad_soyad: formData.ad_soyad,
-          marka_model: formData.marka,
-          servis_adi: formData.servis,
-          fiyat: parseFloat(formData.fiyat),
-          km: parseInt(formData.km),
-          sehir: formData.sehir,
-          onayli_mi: false
-        }]);
+    const { error } = await supabase
+      .from('bakim_kayitlari')
+      .insert([{
+        ad_soyad: formData.ad_soyad,
+        marka_model: formData.marka_model,
+        servis_adi: formData.servis_adi,
+        fiyat: parseFloat(formData.fiyat),
+        km: parseInt(formData.km),
+        sehir: formData.sehir,
+        bakim_turu: formData.motor,
+        onayli_mi: false
+      }]);
 
-      if (error) throw error;
-      setDurum({ mesaj: 'Veri başarıyla onaya gönderildi!', tip: 'basari' });
-      setFormData({ ad_soyad: '', marka: '', servis: '', fiyat: '', km: '', sehir: '' });
-    } catch (error) {
-      setDurum({ mesaj: 'Bir hata oluştu, lütfen tekrar deneyin.', tip: 'hata' });
-    } finally {
-      setYukleniyor(false);
+    setYukleniyor(false);
+    if (!error) {
+      alert("Veri başarıyla onaya gönderildi!");
+      setFormAcik(false);
+      setFormData({ ad_soyad: '', marka_model: '', tarih: '', servis_adi: '', km: '', fiyat: '', sehir: '', motor: '' });
+    } else {
+      alert("Hata oluştu: " + error.message);
     }
   };
 
+  const yetkiliKayitlar = sonuclar.filter(i => i.yetkili_mi === "Evet");
+  const ozelKayitlar = sonuclar.filter(i => i.yetkili_mi !== "Evet");
+  const avgYetkili = yetkiliKayitlar.length > 0 ? Math.round(yetkiliKayitlar.reduce((a, b) => a + (b.fiyat_sayi || 0), 0) / yetkiliKayitlar.length) : 0;
+  const avgOzel = ozelKayitlar.length > 0 ? Math.round(ozelKayitlar.reduce((a, b) => a + (b.fiyat_sayi || 0), 0) / ozelKayitlar.length) : 0;
+
   return (
-    <main className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-yellow-200">
-      {/* NAVBAR */}
+    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative">
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
-           <div className="flex items-center gap-3">
-              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105 text-yellow-400">
-                <Car size={28} strokeWidth={2.5} />
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-3xl font-black text-slate-800 italic uppercase tracking-tighter">
-                  bakımım<span className="text-yellow-500">.com</span>
-                </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-                  Şeffaf Servis Rehberi
-                </span>
-              </div>
-           </div>
-           <div className="hidden md:flex items-center gap-8">
-              <Link href="/blog" className="text-xs font-black text-slate-500 hover:text-yellow-600 uppercase tracking-widest transition-colors flex items-center gap-2">
-                <BookOpen size={16}/> Servis Rehberi
-              </Link>
-              <button className="bg-[#0f172a] text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-md">Giriş Yap</button>
-           </div>
+           <Link href="/" className="flex items-center gap-3">
+              <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} strokeWidth={2.5} /></div>
+              <div className="flex flex-col leading-tight"><span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-yellow-500">.com</span></span><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic text-left text-left text-left">Şeffaf Servis Rehberi</span></div>
+           </Link>
+           <button onClick={() => setFormAcik(true)} className="bg-yellow-500 text-slate-900 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-yellow-400 shadow-md flex items-center gap-2 transition-all"><FileText size={14}/> Veri Paylaş</button>
       </nav>
 
-      {/* HERO SECTION */}
-      <section className="bg-[#0f172a] pt-24 pb-32 px-6 relative overflow-hidden text-center">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-        <div className="max-w-5xl mx-auto relative z-10">
-          <h1 className="text-5xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-[0.9]">
-            Hangi Servis <br/> <span className="text-yellow-500">Kaç Para?</span>
-          </h1>
-          <p className="text-slate-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-12">
-            2026 model araç bakımları, yetkili servis faturaları ve kullanıcı yorumları. <span className="text-white underline decoration-yellow-500 decoration-2">Sürpriz faturalara son.</span>
-          </p>
-          <div className="max-w-3xl mx-auto relative group">
-            <div className="absolute inset-y-0 left-6 flex items-center text-slate-400 group-focus-within:text-yellow-500 transition-colors">
-              <Search size={24} />
-            </div>
-            <input type="text" placeholder="Araç marka, model veya şehir yazın..." className="w-full bg-white/5 border-2 border-white/10 text-white pl-16 pr-8 py-7 rounded-[2.5rem] text-lg font-semibold focus:outline-none focus:border-yellow-500 focus:bg-white/10 transition-all shadow-2xl backdrop-blur-md" />
+      <div className="bg-[#0f172a] py-20 px-6 text-left text-left">
+        <div className="max-w-4xl mx-auto text-center text-left text-left">
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 uppercase italic tracking-tighter text-center">FİYAT <span className="text-yellow-500 text-left">KIYASLA</span></h1>
+          <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
+              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Marka Seçin</option>{tumMarkalar.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Model Seçin</option>{musaitModeller.map(m => <option key={m} value={m}>{m}</option>)}</select>
+              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer"><option value="">Şehir Seçin</option>{tumSehirler.map(s => <option key={s} value={s}>{s}</option>)}</select>
+              <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg"><Search size={24} /> Sorgula</button>
           </div>
+        </div>
+      </div>
+
+      {sonuclar.length > 0 && (
+        <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center text-left text-left">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2 text-left text-left text-left text-left"><ShieldCheck size={18} className="text-yellow-600"/> Yetkili Ortalaması</p>
+              <p className="text-4xl font-black text-slate-900">{avgYetkili.toLocaleString('tr-TR')} TL</p>
+            </div>
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2 text-emerald-600"><BadgePercent size={18}/> Özel Ortalaması</p>
+              <p className="text-4xl font-black text-slate-900">{avgOzel.toLocaleString('tr-TR')} TL</p>
+            </div>
+        </div>
+      )}
+
+      {/* SONUÇLAR */}
+      <section className="max-w-5xl mx-auto px-6 space-y-5 mt-10">
+        {sonuclar.map((item) => (
+          <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left">
+            <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer">
+                <div className="md:w-64 mr-10 text-left">
+                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi === 'Evet' ? 'bg-yellow-500 text-slate-900' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi === 'Evet' ? 'YETKİLİ' : 'ÖZEL'}</span>
+                  <div className="flex flex-col gap-1 text-left">
+                    <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">{item.marka_format}</span>
+                    <span className="text-3xl font-black text-slate-800 italic leading-none">{item.model_format}</span>
+                  </div>
+                </div>
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black text-left">
+                  <div className="flex flex-col text-left text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu}</p></div>
+                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase">Konum</span><p className="text-base text-slate-700">{item.sehir}</p></div>
+                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase">Tarih</span><div className="text-base text-slate-500">{item.tarih}</div></div>
+                  <div className="flex flex-col items-end md:items-start text-left text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase">Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
+                </div>
+            </div>
+            {acikKartId === item.id && (
+              <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic animate-in slide-in-from-top-4 text-left">
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Detaylar</p><p><b>Motor:</b> {item.motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
+                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
+                <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
+                  <p className="text-3xl font-black italic tracking-tighter uppercase leading-none">{item.bas_harfler}</p>
+                  <div className="mt-5 text-[12px] font-bold border-t border-slate-900/20 pt-4 opacity-90 leading-relaxed text-left">"{item.not || "Doğrulanmış kullanıcı paylaşımı."}"</div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
+
+      {/* BLOG */}
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200">
+        <div className="flex justify-between items-center mb-12 text-left text-left">
+          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Servis Rehberi</h2></div>
+          <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2">Tüm Yazılar <ArrowRight size={20}/></Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left text-left">
+          {blogYazilari.map((blog) => (
+            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group text-left text-left text-left"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">{blog.baslik}</h3></div></div></Link>
+          ))}
         </div>
       </section>
 
-      {/* VERİ PAYLAŞIM FORMU */}
-      <section className="max-w-6xl mx-auto px-6 -mt-16 relative z-20 pb-20">
-        <div className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 border border-slate-100">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
-            <div>
-              <div className="flex items-center gap-3 text-yellow-600 font-black text-sm uppercase tracking-widest mb-2">
-                <Share2 size={20}/> VERİ TABANINA KATKI SAĞLA
+      {/* FORM MODAL - AD SOYAD ENTEGRELİ */}
+      {formAcik && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <form onSubmit={veriyiGonder} className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left">
+            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 text-left text-left">
+              <div className="text-left text-left"><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <button type="button" onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
+            </div>
+            <div className="p-10 space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left text-left">
+                {/* AD SOYAD */}
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><User size={14}/> Ad Soyad</label><input required value={formData.ad_soyad} onChange={(e)=>setFormData({...formData, ad_soyad: e.target.value})} placeholder="Örn: Mert Şen" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka / Model</label><input required value={formData.marka_model} onChange={(e)=>setFormData({...formData, marka_model: e.target.value})} placeholder="Örn: Honda Civic 2024" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input required value={formData.servis_adi} onChange={(e)=>setFormData({...formData, servis_adi: e.target.value})} placeholder="Örn: Honda Mutluhan" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left text-left text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Kilometre</label><input required value={formData.km} onChange={(e)=>setFormData({...formData, km: e.target.value})} placeholder="Örn: 15.000" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Tutar (TL)</label><input required value={formData.fiyat} onChange={(e)=>setFormData({...formData, fiyat: e.target.value})} placeholder="Örn: 9.500" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input required value={formData.sehir} onChange={(e)=>setFormData({...formData, sehir: e.target.value})} placeholder="Örn: İstanbul" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2 text-left md:col-span-2 text-left text-left text-left"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor / Yakıt Tipi</label><input required value={formData.motor} onChange={(e)=>setFormData({...formData, motor: e.target.value})} placeholder="Örn: 1.5 VTEC Benzin" className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
               </div>
-              <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tight text-slate-800">Servis Fiyatı Paylaş</h2>
-            </div>
-            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <ShieldCheck className="text-green-500" size={32} />
-              <p className="text-[11px] font-bold text-slate-500 uppercase leading-tight">Verileriniz Güvenle <br/> İncelenir</p>
-            </div>
-          </div>
-
-          <form onSubmit={veriyiGonder} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Ad Soyad</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                <input required value={formData.ad_soyad} onChange={(e)=>setFormData({...formData, ad_soyad: e.target.value})} type="text" placeholder="Örn: Mert Şen" className="w-full bg-slate-50 border-2 border-slate-100 p-5 pl-12 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 text-slate-400">Araç Marka / Model</label>
-              <input required value={formData.marka} onChange={(e)=>setFormData({...formData, marka: e.target.value})} type="text" placeholder="Örn: Clio 1.0 TCe" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 text-slate-400">Servis Adı</label>
-              <input required value={formData.servis} onChange={(e)=>setFormData({...formData, servis: e.target.value})} type="text" placeholder="Örn: Ankara Mais" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 text-slate-400">Bakım Ücreti (TL)</label>
-              <input required value={formData.fiyat} onChange={(e)=>setFormData({...formData, fiyat: e.target.value})} type="number" placeholder="Örn: 8500" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 text-slate-400">Şehir</label>
-              <input required value={formData.sehir} onChange={(e)=>setFormData({...formData, sehir: e.target.value})} type="text" placeholder="Örn: İstanbul" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-            </div>
-            <div className="flex items-end">
-              <button disabled={yukleniyor} className="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50">
+              <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-7 rounded-[2.5rem] font-black text-2xl uppercase italic tracking-tighter shadow-xl hover:bg-yellow-400 transition-all active:scale-[0.98] disabled:opacity-50 text-left text-left">
                 {yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}
-                {!yukleniyor && <ChevronRight size={20} />}
               </button>
             </div>
           </form>
-
-          {durum.mesaj && (
-            <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 font-bold text-xs uppercase tracking-wider ${durum.tip === 'basari' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {durum.tip === 'basari' ? <CheckCircle size={18}/> : <AlertCircle size={18}/>}
-              {durum.mesaj}
-            </div>
-          )}
         </div>
-      </section>
-
-      {/* DEV REHBER BÖLÜMÜ (İŞTE BURASI O ASIL KOD!) */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="bg-[#0f172a] rounded-[3rem] p-8 md:p-16 text-white overflow-hidden relative">
-          <div className="flex flex-col md:flex-row gap-12 items-center mb-20 relative z-10">
-            <div className="bg-yellow-500 p-6 rounded-[2.5rem] shadow-2xl shadow-yellow-500/20 text-slate-900">
-              <PenTool size={48} strokeWidth={2.5} />
-            </div>
-            <div>
-              <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none mb-4">
-                2026 Periyodik <br/> <span className="text-yellow-500 text-3xl md:text-5xl">Bakım Rehberi</span>
-              </h2>
-              <p className="text-slate-400 font-medium max-w-xl italic border-l-4 border-yellow-500 pl-4 uppercase text-xs tracking-widest">
-                Her 15.000 KM'de bir yapılması gereken kritik işlemler listesi.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-            {[
-              { t: "Motor Yağı Değişimi", d: "0W-20 veya 5W-30 tam sentetik yağ.", i: <Fuel size={20}/> },
-              { t: "Yağ Filtresi", d: "Motor ömrü için orijinal filtre kullanımı.", i: <Settings size={20}/> },
-              { t: "Hava Filtresi", d: "Performans ve yakıt ekonomisi için kritik.", i: <Gauge size={20}/> },
-              { t: "Polen Filtresi", d: "Kabin içi hava kalitesi ve klima verimi.", i: <Wrench size={20}/> },
-              { t: "Fren Hidroliği", d: "Her 2 yılda bir nem kontrolü ve değişim.", i: <ShieldCheck size={20}/> },
-              { t: "Soğutma Sıvısı", d: "Antifriz derecesi ve sızıntı kontrolü.", i: <Info size={20}/> },
-              { t: "Buji Kontrolü", d: "Ateşleme sistemi verimlilik testi.", i: <PenTool size={20}/> },
-              { t: "Fren Balataları", d: "Aşınma sensörü ve kalınlık ölçümü.", i: <ClipboardCheck size={20}/> },
-              { t: "Lastik Basınçları", d: "Mevsimsel ayar ve rotasyon işlemi.", i: <MapPin size={20}/> },
-              { t: "Silecek Suyu", d: "Konsantre silecek sıvısı tamamlaması.", i: <Calendar size={20}/> },
-              { t: "Akü Testi", d: "Amper değeri ve voltaj ölçümü.", i: <CreditCard size={20}/> },
-              { t: "Alt Takım Kontrolü", d: "Salıncak, rot başı ve körük incelemesi.", i: <BookOpen size={20}/> },
-              { t: "Kayış Kontrolü", d: "V-Kayışı gerginlik ve çatlak kontrolü.", i: <Settings size={20}/> },
-              { t: "Yazılım Güncelleme", d: "ECU ve multimedya sistemi kontrolü.", i: <Gauge size={20}/> },
-              { t: "Far Ayarları", d: "Gece görüşü için açısal kalibrasyon.", i: <Wrench size={20}/> }
-            ].map((item, idx) => (
-              <div key={idx} className="bg-white/5 border border-white/10 p-6 rounded-[2rem] hover:bg-white/10 transition-all group">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="text-yellow-500 bg-yellow-500/10 p-3 rounded-xl group-hover:scale-110 transition-transform">
-                    {item.i}
-                  </div>
-                  <h3 className="font-black uppercase italic tracking-tight text-sm text-yellow-500 leading-tight">
-                    {item.t}
-                  </h3>
-                </div>
-                <p className="text-slate-400 text-[11px] font-bold uppercase tracking-wider pl-12">{item.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="bg-white border-t border-slate-200 py-16 px-8 text-center">
-          <div className="flex flex-col gap-2 justify-center items-center">
-            <span className="text-2xl font-black italic text-slate-800 uppercase leading-none">
-              bakımım<span className="text-yellow-500">.com</span>
-            </span>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-              © 2026 Şeffaf Servis Rehberi - Tüm Hakları Saklıdır.
-            </p>
-          </div>
-      </footer>
+      )}
     </main>
   );
 }
