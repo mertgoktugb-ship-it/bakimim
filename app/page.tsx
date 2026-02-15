@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -51,12 +51,11 @@ export default function Home() {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  // TARİH FORMATLAYICI (YYYY-MM-DD -> DD/MM/YYYY)
   const formatTarih = (tarihStr: string) => {
     if (!tarihStr) return "";
     const parts = tarihStr.split('-');
     if (parts.length === 3) {
-        return `${parts[2]}.${parts[1]}.${parts[0]}`; // TR formatı (.) ile
+        return `${parts[2]}.${parts[1]}.${parts[0]}`;
     }
     return tarihStr;
   };
@@ -70,12 +69,8 @@ export default function Home() {
 
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
-    
     duzeltilmis.ekran_fiyat = item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
-    
-    // İsim Gizleme (Gerekirse açılabilir, şimdilik boş)
-    duzeltilmis.bas_harfler = "";
-
+    duzeltilmis.bas_harfler = ""; // İsim gizli
     duzeltilmis.marka_format = formatYazi(item.marka);
     duzeltilmis.model_format = formatYazi(item.model);
     return duzeltilmis;
@@ -108,6 +103,7 @@ export default function Home() {
     
     const form = e.target as HTMLFormElement;
     const inputs = form.querySelectorAll('input');
+    const textArea = form.querySelector('textarea'); // Not alanı için
     
     let resimUrl = null;
 
@@ -136,6 +132,7 @@ export default function Home() {
         sehir: (inputs[9] as HTMLInputElement).value,
         ilce: (inputs[10] as HTMLInputElement).value,
         yakit_motor: (inputs[11] as HTMLInputElement).value,
+        notlar: textArea ? textArea.value : "", // Notları buradan alıyoruz
         
         yetkili_mi: servisTipi === "Yetkili",
         servis_tipi: servisTipi === "Yetkili" ? "yetkili" : "ozel",
@@ -219,8 +216,6 @@ export default function Home() {
                   <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu || "Periyodik Bakım"}</p></div>
                   <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Konum</span><p className="text-base text-slate-700">{item.sehir} {item.ilce && <span className="text-slate-400 text-xs">/ {item.ilce}</span>}</p></div>
                   <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Tarih</span><div className="text-base text-slate-500">{formatTarih(item.tarih) || "-"}</div></div>
-                  
-                  {/* FİYAT DÜZELTİLDİ: whitespace-nowrap ile tek satıra zorlandı */}
                   <div className="flex flex-col items-end md:items-start text-left">
                     <span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Tutar</span>
                     <p className="text-3xl font-black text-yellow-600 tracking-tighter whitespace-nowrap">{item.ekran_fiyat}</p>
@@ -230,10 +225,20 @@ export default function Home() {
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
                 <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic">Detaylar</p><p><b>Motor:</b> {item.yakit_motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
-                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic">Servis Bilgisi</p><p><b>Servis:</b> {item.servis_adi}</p></div>
+                
+                {/* --- SERVİS BİLGİSİ (YENİ ESTETİK TASARIM) --- */}
+                <div className="flex flex-col text-left">
+                   <span className="text-[10px] font-black text-slate-300 mb-2 uppercase tracking-widest border-b pb-1 italic">Servis Bilgisi</span>
+                   <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
+                      <MapPin size={18} className="text-yellow-500 shrink-0" />
+                      <span className="not-italic text-base truncate">{item.servis_adi}</span>
+                   </div>
+                </div>
+
+                {/* --- SARI KUTU (KULLANICI NOTU) --- */}
                 <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
                   <div className="text-[12px] font-bold opacity-90 leading-relaxed text-left">
-                    "{item.notlar || "Doğrulanmış kullanıcı paylaşımı."}"
+                    "{item.notlar || "Standart bakım prosedürü uygulandı."}"
                     {item.fatura_url && (
                         <a href={item.fatura_url} target="_blank" className="block mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl text-center hover:bg-slate-800 transition-all flex items-center justify-center gap-2 not-italic">
                             <FileCheck size={16} /> Faturayı Görüntüle
@@ -292,9 +297,14 @@ export default function Home() {
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs uppercase transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-400'}`}>ÖZEL</button>
                   </div>
                 </div>
+
+                {/* YENİ EKLENEN KUTUCUK: KULLANICI NOTU */}
+                <div className="space-y-2 text-left md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-left"><MessageSquare size={14}/> Kullanıcı Notu / Tavsiyeler</label>
+                    <textarea placeholder="Diğer araç sahiplerine bakım süreci, ilgi alaka veya ekstra masraflar hakkında bilgi verebilirsiniz..." className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner h-32 resize-none" />
+                </div>
               </div>
 
-              {/* FOTOĞRAF YÜKLEME ALANI */}
               <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 text-center bg-slate-50/50 hover:bg-blue-50 transition-all cursor-pointer relative mt-4">
                 <input 
                     type="file" 
