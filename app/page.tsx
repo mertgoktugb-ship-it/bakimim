@@ -213,7 +213,16 @@ export default function Home() {
           <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left">
             <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
                 <div className="md:w-64 mr-10 text-left">
-                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-slate-100 text-slate-500'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
+                  
+                  {/* --- YENİLENEN ETİKET TASARIMI --- */}
+                  <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${
+                      item.yetkili_mi 
+                      ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' 
+                      : 'bg-indigo-600 text-white shadow-indigo-600/30'
+                  }`}>
+                      {item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL SERVİS'}
+                  </span>
+
                   <div className="flex flex-col gap-1 text-left">
                     <div className="flex items-center gap-2 uppercase font-bold text-slate-400">{getMarkaIcon(item.marka)}<span className="text-sm tracking-widest">{item.marka_format}</span></div>
                     <span className="text-3xl font-black text-slate-800 tracking-tight italic">{item.model_format} <span className="text-slate-300 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></span>
@@ -232,7 +241,6 @@ export default function Home() {
             {acikKartId === item.id && (
               <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-left animate-in slide-in-from-top-4">
                 
-                {/* --- DETAYLAR BÖLÜMÜ (MODERNLEŞTİRİLDİ) --- */}
                 <div className="flex flex-col gap-4 text-left">
                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-1">Detaylar</p>
                    <div className="flex flex-col gap-3">
@@ -247,7 +255,6 @@ export default function Home() {
                    </div>
                 </div>
 
-                {/* --- SERVİS BİLGİSİ (FERAHLATILDI) --- */}
                 <div className="flex flex-col text-left">
                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-2">Servis Bilgisi</span>
                    <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
@@ -256,13 +263,11 @@ export default function Home() {
                    </div>
                 </div>
                 
-                {/* --- SARI KUTU: İSİM + NOT (BOŞSA GÖSTERME) --- */}
                 <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
                   {item.bas_harfler && (
                     <p className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-4">{item.bas_harfler}</p>
                   )}
                   
-                  {/* Not varsa göster, yoksa gösterme. Fatura butonu varsa her türlü göster. */}
                   <div className={`text-[12px] font-bold opacity-90 leading-relaxed text-left ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
                     {item.notlar && `"${item.notlar}"`}
                     
