@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, Filter
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -19,11 +19,11 @@ export default function Home() {
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
   const [secilenSehir, setSecilenSehir] = useState("");
-  const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez"); // YENİ: Servis Tipi Filtresi
+  const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez");
 
   // Veri State'leri
-  const [sonuclar, setSonuclar] = useState<any[]>([]); // Ekranda listelenenler
-  const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]); // Ortalamalar için kullanılan veri
+  const [sonuclar, setSonuclar] = useState<any[]>([]);
+  const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]);
   
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
@@ -45,9 +45,11 @@ export default function Home() {
                 .order('id', { ascending: false });
 
             if (data) {
-                setDuzenlenenVeri(data);
-                setSonuclar(data);
-                setIstatistikVerisi(data); // Başlangıçta istatistik hepsi
+                // GÜVENLİK FİLTRESİ: Boş veya hatalı verileri arayüze sokma
+                const temizData = data.filter(item => item.marka && item.model && item.fiyat);
+                setDuzenlenenVeri(temizData);
+                setSonuclar(temizData);
+                setIstatistikVerisi(temizData);
             }
         } catch (error) {
             console.error("Veri çekme hatası:", error);
@@ -89,14 +91,14 @@ export default function Home() {
         duzeltilmis.bas_harfler = "";
     }
 
-    duzeltilmis.marka_format = item.marka ? formatYazi(item.marka) : "Marka?";
-    duzeltilmis.model_format = item.model ? formatYazi(item.model) : "Model?";
+    duzeltilmis.marka_format = item.marka ? formatYazi(item.marka) : "";
+    duzeltilmis.model_format = item.model ? formatYazi(item.model) : "";
     
     return duzeltilmis;
   };
 
   const islenmisVeri = duzenlenenVeri.map(veriyiDüzelt);
-  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).filter(m => m !== "Marka?").sort();
+  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).filter(Boolean).sort();
   const tumSehirler = Array.from(new Set(islenmisVeri.map(item => item.sehir))).filter(Boolean).sort();
 
   useEffect(() => {
@@ -106,9 +108,7 @@ export default function Home() {
     } else { setMusaitModeller([]); }
   }, [secilenMarka, duzenlenenVeri]);
 
-  // --- SORGULA (AKILLI FİLTRELEME) ---
   const sorgula = () => {
-    // 1. Temel Filtre (Marka, Model, Şehir) -> İstatistikler buna göre hesaplanır
     const temelFiltre = islenmisVeri.filter(item => {
       const markaUygun = !secilenMarka || item.marka_format === secilenMarka;
       const modelUygun = !secilenModel || item.model_format === secilenModel;
@@ -116,15 +116,14 @@ export default function Home() {
       return markaUygun && modelUygun && sehirUygun;
     });
 
-    // 2. Liste Filtresi (Temel + Servis Tipi) -> Aşağıdaki liste buna göre daralır
     const listeFiltresi = temelFiltre.filter(item => {
         if (filtreServisTipi === "Yetkili") return item.yetkili_mi === true;
         if (filtreServisTipi === "Özel") return item.yetkili_mi === false;
-        return true; // Farketmez
+        return true;
     });
 
-    setIstatistikVerisi(temelFiltre); // Ortalamalar için geniş veri
-    setSonuclar(listeFiltresi);       // Liste için daraltılmış veri
+    setIstatistikVerisi(temelFiltre);
+    setSonuclar(listeFiltresi);
   };
 
   const veriyiGonder = async (e: React.FormEvent) => {
@@ -184,7 +183,6 @@ export default function Home() {
     }
   };
 
-  // İstatistikler (istatistikVerisi üzerinden hesaplanır - Filtreden bağımsız)
   const yetkiliKayitlar = istatistikVerisi.filter(i => i.yetkili_mi === true);
   const ozelKayitlar = istatistikVerisi.filter(i => i.yetkili_mi !== true);
   
@@ -208,19 +206,32 @@ export default function Home() {
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 uppercase italic tracking-tighter text-center text-left">FİYAT <span className="text-yellow-500 text-left">KIYASLA</span></h1>
           
-          {/* FİLTRE KUTUSU - DÜZENLENDİ */}
           <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4 text-left">
-              {/* focus:ring-0 ve focus:outline-none ile mavi çerçeveyi kaldırdık */}
-              <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Model Seçin</option>{musaitModeller.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
-              <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none"><option value="">Şehir Seçin</option>{tumSehirler.map((s:any) => <option key={s} value={s}>{s}</option>)}</select>
               
-              {/* YENİ: SERVİS TİPİ FİLTRESİ */}
-              <select value={filtreServisTipi} onChange={(e) => setFiltreServisTipi(e.target.value)} className="p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none cursor-pointer focus:ring-0 focus:outline-none text-slate-700">
-                  <option value="Farketmez">Farketmez</option>
-                  <option value="Yetkili">Yetkili Servis</option>
-                  <option value="Özel">Özel Servis</option>
-              </select>
+              {/* ÖZEL SELECT BİLEŞENLERİ (Çerçevesiz ve Özel Ok Tuşu ile) */}
+              <div className="relative">
+                  <select value={secilenMarka} onChange={(e) => setSecilenMarka(e.target.value)} className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none appearance-none cursor-pointer text-slate-700"><option value="">Marka Seçin</option>{tumMarkalar.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><ChevronDown size={20} /></div>
+              </div>
+
+              <div className="relative">
+                  <select value={secilenModel} onChange={(e) => setSecilenModel(e.target.value)} className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none appearance-none cursor-pointer text-slate-700"><option value="">Model Seçin</option>{musaitModeller.map((m:any) => <option key={m} value={m}>{m}</option>)}</select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><ChevronDown size={20} /></div>
+              </div>
+
+              <div className="relative">
+                  <select value={secilenSehir} onChange={(e) => setSecilenSehir(e.target.value)} className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none appearance-none cursor-pointer text-slate-700"><option value="">Şehir Seçin</option>{tumSehirler.map((s:any) => <option key={s} value={s}>{s}</option>)}</select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><ChevronDown size={20} /></div>
+              </div>
+              
+              <div className="relative">
+                  <select value={filtreServisTipi} onChange={(e) => setFiltreServisTipi(e.target.value)} className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none appearance-none cursor-pointer text-slate-700">
+                      <option value="Farketmez">Farketmez</option>
+                      <option value="Yetkili">Yetkili Servis</option>
+                      <option value="Özel">Özel Servis</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><ChevronDown size={20} /></div>
+              </div>
 
               <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg"><Search size={24} /> Sorgula</button>
           </div>
@@ -258,7 +269,7 @@ export default function Home() {
                   </span>
 
                   <div className="flex flex-col gap-1 text-left">
-                    <div className="flex items-center gap-2 uppercase font-bold text-slate-400">{getMarkaIcon(item.marka)}<span className="text-sm tracking-widest">{item.marka_format}</span></div>
+                    <div className="flex items-center gap-2 uppercase font-bold text-slate-400">{getMarkaIcon(item.marka_format)}<span className="text-sm tracking-widest">{item.marka_format}</span></div>
                     <span className="text-3xl font-black text-slate-800 tracking-tight italic">{item.model_format} <span className="text-slate-300 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></span>
                   </div>
                 </div>
