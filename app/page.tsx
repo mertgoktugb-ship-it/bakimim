@@ -8,7 +8,13 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-// --- ÖZEL SELECT BİLEŞENİ (ESTETİK DROPDOWN) ---
+// --- BLOG VERİLERİ (Build hatasını çözen eksik değişken) ---
+const blogYazilari = [
+  { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
+  { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
+];
+
+// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -193,7 +199,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans">
-      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
         <Link href="/" className="flex items-center gap-3">
           <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} /></div>
@@ -205,30 +210,23 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* HERO & FILTERS */}
       <div className="bg-[#0f172a] py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-10 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
-          
           <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4">
             <CustomSelect label="Marka Seçin" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} />
             <CustomSelect label="Model Seçin" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} />
             <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSecilenSehir} icon={MapPin} />
             <CustomSelect label="Servis Tipi" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} />
-            
-            <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg active:scale-95">
-              <Search size={24} /> Sorgula
-            </button>
+            <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg active:scale-95"><Search size={24} /> Sorgula</button>
           </div>
         </div>
       </div>
 
-      {/* CONTENT AREA */}
       {veriYukleniyor ? (
         <div className="text-center py-20 font-bold text-slate-300 animate-pulse text-2xl uppercase italic tracking-widest">Veritabanına Bağlanılıyor...</div>
       ) : (
         <>
-          {/* STATS */}
           <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
             <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 text-center transition-transform hover:-translate-y-1">
               <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-yellow-600"/> Yetkili Ortalaması</p>
@@ -240,7 +238,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* LIST */}
           <section className="max-w-5xl mx-auto px-6 space-y-6">
             {sonuclar.length > 0 ? sonuclar.map((item) => (
               <div key={item.id} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:border-yellow-400 transition-all">
@@ -359,7 +356,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* CUSTOM CSS FOR SCROLLBAR */}
+      {/* CUSTOM CSS */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
