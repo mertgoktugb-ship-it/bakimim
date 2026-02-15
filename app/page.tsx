@@ -69,8 +69,15 @@ export default function Home() {
 
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
+    
     duzeltilmis.ekran_fiyat = item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
-    duzeltilmis.bas_harfler = ""; // İsim gizli
+    
+    if (item.ad_soyad) {
+        duzeltilmis.bas_harfler = item.ad_soyad.trim().split(/\s+/).map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ");
+    } else {
+        duzeltilmis.bas_harfler = "";
+    }
+
     duzeltilmis.marka_format = formatYazi(item.marka);
     duzeltilmis.model_format = formatYazi(item.model);
     return duzeltilmis;
@@ -103,7 +110,7 @@ export default function Home() {
     
     const form = e.target as HTMLFormElement;
     const inputs = form.querySelectorAll('input');
-    const textArea = form.querySelector('textarea'); // Not alanı için
+    const textArea = form.querySelector('textarea');
     
     let resimUrl = null;
 
@@ -132,7 +139,7 @@ export default function Home() {
         sehir: (inputs[9] as HTMLInputElement).value,
         ilce: (inputs[10] as HTMLInputElement).value,
         yakit_motor: (inputs[11] as HTMLInputElement).value,
-        notlar: textArea ? textArea.value : "", // Notları buradan alıyoruz
+        notlar: textArea ? textArea.value : "",
         
         yetkili_mi: servisTipi === "Yetkili",
         servis_tipi: servisTipi === "Yetkili" ? "yetkili" : "ozel",
@@ -223,22 +230,42 @@ export default function Home() {
                 </div>
             </div>
             {acikKartId === item.id && (
-              <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm italic text-left animate-in slide-in-from-top-4">
-                <div className="space-y-2 uppercase text-left"><p className="text-[10px] font-black text-slate-400 tracking-widest border-b pb-1 mb-2 italic">Detaylar</p><p><b>Motor:</b> {item.yakit_motor || '-'}</p><p><b>KM:</b> {item.km}</p></div>
+              <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 text-left animate-in slide-in-from-top-4">
                 
-                {/* --- SERVİS BİLGİSİ (YENİ ESTETİK TASARIM) --- */}
-                <div className="flex flex-col text-left">
-                   <span className="text-[10px] font-black text-slate-300 mb-2 uppercase tracking-widest border-b pb-1 italic">Servis Bilgisi</span>
-                   <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
-                      <MapPin size={18} className="text-yellow-500 shrink-0" />
-                      <span className="not-italic text-base truncate">{item.servis_adi}</span>
+                {/* --- DETAYLAR BÖLÜMÜ (MODERNLEŞTİRİLDİ) --- */}
+                <div className="flex flex-col gap-4 text-left">
+                   <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-1">Detaylar</p>
+                   <div className="flex flex-col gap-3">
+                      <div>
+                         <span className="block text-[10px] font-bold text-slate-400 uppercase">Motor</span>
+                         <span className="text-base font-bold text-slate-700">{item.yakit_motor || '-'}</span>
+                      </div>
+                      <div>
+                         <span className="block text-[10px] font-bold text-slate-400 uppercase">KM</span>
+                         <span className="text-base font-bold text-slate-700">{item.km ? item.km.toLocaleString('tr-TR') : '-'}</span>
+                      </div>
                    </div>
                 </div>
 
-                {/* --- SARI KUTU (KULLANICI NOTU) --- */}
+                {/* --- SERVİS BİLGİSİ (FERAHLATILDI) --- */}
+                <div className="flex flex-col text-left">
+                   <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-2">Servis Bilgisi</span>
+                   <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
+                      <MapPin size={20} className="text-yellow-500 shrink-0" />
+                      <span className="not-italic text-base">{item.servis_adi}</span>
+                   </div>
+                </div>
+                
+                {/* --- SARI KUTU: İSİM + NOT (BOŞSA GÖSTERME) --- */}
                 <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center text-left">
-                  <div className="text-[12px] font-bold opacity-90 leading-relaxed text-left">
-                    "{item.notlar || "Standart bakım prosedürü uygulandı."}"
+                  {item.bas_harfler && (
+                    <p className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-4">{item.bas_harfler}</p>
+                  )}
+                  
+                  {/* Not varsa göster, yoksa gösterme. Fatura butonu varsa her türlü göster. */}
+                  <div className={`text-[12px] font-bold opacity-90 leading-relaxed text-left ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
+                    {item.notlar && `"${item.notlar}"`}
+                    
                     {item.fatura_url && (
                         <a href={item.fatura_url} target="_blank" className="block mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl text-center hover:bg-slate-800 transition-all flex items-center justify-center gap-2 not-italic">
                             <FileCheck size={16} /> Faturayı Görüntüle
@@ -298,7 +325,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* YENİ EKLENEN KUTUCUK: KULLANICI NOTU */}
                 <div className="space-y-2 text-left md:col-span-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 text-left"><MessageSquare size={14}/> Kullanıcı Notu / Tavsiyeler</label>
                     <textarea placeholder="Diğer araç sahiplerine bakım süreci, ilgi alaka veya ekstra masraflar hakkında bilgi verebilirsiniz..." className="w-full p-5 bg-slate-50 border-0 rounded-2xl font-bold outline-none text-left shadow-inner h-32 resize-none" />
