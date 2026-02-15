@@ -1,57 +1,46 @@
 "use client";
 import React, { useState } from 'react';
-import { Car, Search, ShieldCheck, Share2, ChevronRight, CheckCircle, AlertCircle, BookOpen } from 'lucide-react';
+import { Car, Search, ShieldCheck, Share2, ChevronRight, CheckCircle, AlertCircle, BookOpen, User } from 'lucide-react';
 import Link from 'next/link';
-// HATA ÇÖZÜMÜ: Yolu göreceli (relative path) yaparak garantiye aldık
 import { supabase } from '../lib/supabase';
 
 export default function AnaSayfa() {
-  // FORM STATE YÖNETİMİ
   const [formData, setFormData] = useState({
-    marka_model: '',
-    servis_adi: '',
-    bakim_turu: 'Periyodik Bakım',
-    sehir: '',
+    ad_soyad: '', // Yeni alan eklendi
+    marka: '',
+    servis: '',
     fiyat: '',
     km: '',
-    notlar: ''
+    sehir: ''
   });
 
-  const [durum, setDurum] = useState<{ tipi: 'basari' | 'hata' | null, mesaj: string }>({ tipi: null, mesaj: '' });
+  const [durum, setDurum] = useState({ mesaj: '', tip: '' });
   const [yukleniyor, setYukleniyor] = useState(false);
 
-  // FORM GÖNDERME FONKSİYONU
   const veriyiGonder = async (e: React.FormEvent) => {
     e.preventDefault();
     setYukleniyor(true);
-    setDurum({ tipi: null, mesaj: '' });
+    setDurum({ mesaj: '', tip: '' });
 
     try {
-      // Supabase'e veri ekleme işlemi
       const { error } = await supabase
         .from('bakim_kayitlari')
-        .insert([
-          {
-            marka_model: formData.marka_model,
-            servis_adi: formData.servis_adi,
-            bakim_turu: formData.bakim_turu,
-            sehir: formData.sehir,
-            fiyat: parseFloat(formData.fiyat),
-            km: parseInt(formData.km),
-            notlar: formData.notlar,
-            onayli_mi: false // Admin onayı için false olarak gidiyor
-          }
-        ]);
+        .insert([{
+          ad_soyad: formData.ad_soyad, // Supabase'e gönderiliyor
+          marka_model: formData.marka,
+          servis_adi: formData.servis,
+          fiyat: parseFloat(formData.fiyat),
+          km: parseInt(formData.km),
+          sehir: formData.sehir,
+          onayli_mi: false
+        }]);
 
       if (error) throw error;
 
-      setDurum({ tipi: 'basari', mesaj: 'Veriler başarıyla onaya gönderildi! Teşekkür ederiz.' });
-      // Formu temizle
-      setFormData({ marka_model: '', servis_adi: '', bakim_turu: 'Periyodik Bakım', sehir: '', fiyat: '', km: '', notlar: '' });
-      
+      setDurum({ mesaj: 'Veri başarıyla onaya gönderildi!', tip: 'basari' });
+      setFormData({ ad_soyad: '', marka: '', servis: '', fiyat: '', km: '', sehir: '' });
     } catch (error: any) {
-      console.error("Supabase Hatası:", error);
-      setDurum({ tipi: 'hata', mesaj: 'Gönderim sırasında bir sorun oluştu. Lütfen tekrar deneyin.' });
+      setDurum({ mesaj: 'Bir hata oluştu, tekrar deneyin.', tip: 'hata' });
     } finally {
       setYukleniyor(false);
     }
@@ -82,18 +71,14 @@ export default function AnaSayfa() {
            </div>
       </nav>
 
-      {/* HERO SECTION */}
+      {/* HERO */}
       <section className="bg-[#0f172a] pt-24 pb-32 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-8xl font-black text-white mb-8 uppercase italic tracking-tighter leading-[0.9]">
             Hangi Servis <br/> <span className="text-yellow-500">Kaç Para?</span>
           </h1>
-          <p className="text-slate-400 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-12">
-            2026 model araç bakımları, servis faturaları ve gerçek kullanıcı deneyimleri. <span className="text-white underline decoration-yellow-500 decoration-2 italic">Sürpriz faturalara son verin.</span>
-          </p>
-          
-          <div className="max-w-3xl mx-auto relative group">
+          <div className="max-w-3xl mx-auto relative group mt-12">
             <div className="absolute inset-y-0 left-6 flex items-center text-slate-400 group-focus-within:text-yellow-500 transition-colors">
               <Search size={24} />
             </div>
@@ -106,43 +91,52 @@ export default function AnaSayfa() {
         </div>
       </section>
 
-      {/* VERİ PAYLAŞIM FORMU */}
+      {/* FORM */}
       <section className="max-w-6xl mx-auto px-6 -mt-16 relative z-20 pb-20">
         <div className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 border border-slate-100">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
             <div>
               <div className="flex items-center gap-3 text-yellow-600 font-black text-sm uppercase tracking-widest mb-2">
-                <Share2 size={20}/> TOPLULUK VERİTABANI
+                <Share2 size={20}/> VERİ TABANINA KATKI SAĞLA
               </div>
               <h2 className="text-4xl font-black text-slate-800 uppercase italic tracking-tight">Servis Fiyatı Paylaş</h2>
             </div>
             <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
               <ShieldCheck className="text-green-500" size={32} />
-              <p className="text-[11px] font-bold text-slate-500 uppercase leading-tight">Verileriniz Anonim <br/> Olarak Korunur</p>
+              <p className="text-[11px] font-bold text-slate-400 uppercase leading-tight">Verileriniz Güvenle <br/> İncelenir</p>
             </div>
           </div>
 
           <form onSubmit={veriyiGonder} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* AD SOYAD ALANI */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Ad Soyad</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input required value={formData.ad_soyad} onChange={(e)=>setFormData({...formData, ad_soyad: e.target.value})} type="text" placeholder="Örn: Mert Şen" className="w-full bg-slate-50 border-2 border-slate-100 p-5 pl-12 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Araç Marka / Model</label>
-              <input required value={formData.marka_model} onChange={(e) => setFormData({...formData, marka_model: e.target.value})} type="text" placeholder="Örn: Renault Clio 1.0 TCe" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
+              <input required value={formData.marka} onChange={(e)=>setFormData({...formData, marka: e.target.value})} type="text" placeholder="Örn: Clio 1.0 TCe" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
             </div>
+            
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Servis Adı</label>
-              <input required value={formData.servis_adi} onChange={(e) => setFormData({...formData, servis_adi: e.target.value})} type="text" placeholder="Örn: Ankara Yetkili Servis" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
+              <input required value={formData.servis} onChange={(e)=>setFormData({...formData, servis: e.target.value})} type="text" placeholder="Örn: Ankara Mais" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
             </div>
+
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Bakım Ücreti (TL)</label>
-              <input required value={formData.fiyat} onChange={(e) => setFormData({...formData, fiyat: e.target.value})} type="number" placeholder="Örn: 8500" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Ücret (TL)</label>
+              <input required value={formData.fiyat} onChange={(e)=>setFormData({...formData, fiyat: e.target.value})} type="number" placeholder="Örn: 8500" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Araç Kilometresi</label>
-              <input required value={formData.km} onChange={(e) => setFormData({...formData, km: e.target.value})} type="number" placeholder="Örn: 20000" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
-            </div>
+
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Şehir</label>
-              <input required value={formData.sehir} onChange={(e) => setFormData({...formData, sehir: e.target.value})} type="text" placeholder="Örn: İstanbul" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
+              <input required value={formData.sehir} onChange={(e)=>setFormData({...formData, sehir: e.target.value})} type="text" placeholder="Örn: İstanbul" className="w-full bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl focus:border-yellow-500 outline-none font-bold transition-all text-slate-800" />
             </div>
+
             <div className="flex items-end">
               <button 
                 disabled={yukleniyor}
@@ -154,11 +148,10 @@ export default function AnaSayfa() {
             </div>
           </form>
 
-          {/* BİLDİRİM PANELİ */}
-          {durum.tipi && (
-            <div className={`mt-8 p-6 rounded-[1.5rem] flex items-center gap-4 animate-pulse ${durum.tipi === 'basari' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'}`}>
-              {durum.tipi === 'basari' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
-              <span className="font-black uppercase tracking-wider text-xs italic">{durum.mesaj}</span>
+          {durum.mesaj && (
+            <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 font-bold text-xs uppercase tracking-wider ${durum.tip === 'basari' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              {durum.tip === 'basari' ? <CheckCircle size={18}/> : <AlertCircle size={18}/>}
+              {durum.mesaj}
             </div>
           )}
         </div>
@@ -166,11 +159,11 @@ export default function AnaSayfa() {
 
       <footer className="bg-white border-t border-slate-200 py-16 px-8 text-center">
           <div className="flex flex-col gap-2 justify-center items-center">
-            <span className="text-2xl font-black italic text-slate-800 uppercase">
+            <span className="text-2xl font-black italic text-slate-800 uppercase leading-none">
               bakımım<span className="text-yellow-500">.com</span>
             </span>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-              © 2026 Şeffaf Servis Rehberi - Marka Bağımsız Analiz Platformu
+              © 2026 Şeffaf Servis Rehberi
             </p>
           </div>
       </footer>
