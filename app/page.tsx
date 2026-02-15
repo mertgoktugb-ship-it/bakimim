@@ -31,17 +31,22 @@ export default function Home() {
   useEffect(() => {
     const veriCek = async () => {
         setVeriYukleniyor(true);
-        let { data, error } = await supabase
-            .from('bakim_kayitlari')
-            .select('*')
-            .eq('onayli_mi', true)
-            .order('id', { ascending: false });
+        try {
+            let { data, error } = await supabase
+                .from('bakim_kayitlari')
+                .select('*')
+                .eq('onayli_mi', true)
+                .order('id', { ascending: false });
 
-        if (data) {
-            setDuzenlenenVeri(data);
-            setSonuclar(data);
+            if (data) {
+                setDuzenlenenVeri(data);
+                setSonuclar(data);
+            }
+        } catch (error) {
+            console.error("Veri çekme hatası:", error);
+        } finally {
+            setVeriYukleniyor(false);
         }
-        setVeriYukleniyor(false);
     };
     veriCek();
   }, []);
@@ -52,7 +57,7 @@ export default function Home() {
   };
 
   const formatTarih = (tarihStr: string) => {
-    if (!tarihStr) return "";
+    if (!tarihStr) return "-";
     const parts = tarihStr.split('-');
     if (parts.length === 3) {
         return `${parts[2]}.${parts[1]}.${parts[0]}`;
@@ -70,6 +75,7 @@ export default function Home() {
   const veriyiDüzelt = (item: any) => {
     let duzeltilmis = { ...item };
     
+    // GÜVENLİK KONTROLÜ: Veri eksikse varsayılan değer ata
     duzeltilmis.ekran_fiyat = item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız";
     
     if (item.ad_soyad) {
@@ -78,13 +84,15 @@ export default function Home() {
         duzeltilmis.bas_harfler = "";
     }
 
-    duzeltilmis.marka_format = formatYazi(item.marka);
-    duzeltilmis.model_format = formatYazi(item.model);
+    // Marka ve Model boşsa "Belirtilmemiş" yazmasın diye kontrol
+    duzeltilmis.marka_format = item.marka ? formatYazi(item.marka) : "Marka?";
+    duzeltilmis.model_format = item.model ? formatYazi(item.model) : "Model?";
+    
     return duzeltilmis;
   };
 
   const islenmisVeri = duzenlenenVeri.map(veriyiDüzelt);
-  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).filter(Boolean).sort();
+  const tumMarkalar = Array.from(new Set(islenmisVeri.map(item => item.marka_format))).filter(m => m !== "Marka?").sort();
   const tumSehirler = Array.from(new Set(islenmisVeri.map(item => item.sehir))).filter(Boolean).sort();
 
   useEffect(() => {
@@ -214,13 +222,13 @@ export default function Home() {
             <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
                 <div className="md:w-64 mr-10 text-left">
                   
-                  {/* --- YENİLENEN ETİKET TASARIMI --- */}
+                  {/* --- GÜNCELLENEN ETİKETLER --- */}
                   <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${
                       item.yetkili_mi 
                       ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' 
                       : 'bg-indigo-600 text-white shadow-indigo-600/30'
                   }`}>
-                      {item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL SERVİS'}
+                      {item.yetkili_mi ? 'YETKİLİ SERVİS' : 'ÖZEL SERVİS'}
                   </span>
 
                   <div className="flex flex-col gap-1 text-left">
@@ -231,7 +239,7 @@ export default function Home() {
                 <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full text-left font-black">
                   <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu || "Periyodik Bakım"}</p></div>
                   <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Konum</span><p className="text-base text-slate-700">{item.sehir} {item.ilce && <span className="text-slate-400 text-xs">/ {item.ilce}</span>}</p></div>
-                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Tarih</span><div className="text-base text-slate-500">{formatTarih(item.tarih) || "-"}</div></div>
+                  <div className="flex flex-col text-left"><span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Tarih</span><div className="text-base text-slate-500">{formatTarih(item.tarih)}</div></div>
                   <div className="flex flex-col items-end md:items-start text-left">
                     <span className="text-[11px] text-slate-300 mb-2 uppercase text-left">Tutar</span>
                     <p className="text-3xl font-black text-yellow-600 tracking-tighter whitespace-nowrap">{item.ekran_fiyat}</p>
@@ -282,18 +290,6 @@ export default function Home() {
             )}
           </div>
         ))}
-      </section>
-
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200">
-        <div className="flex justify-between items-center mb-12 text-left">
-          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter text-left">Servis Rehberi</h2></div>
-          <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
-          {blogYazilari.map((blog) => (
-            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3></div></div></Link>
-          ))}
-        </div>
       </section>
 
       {formAcik && (
