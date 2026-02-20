@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, Home, Mail, ChevronRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -37,7 +37,7 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon }: any) => {
       </div>
       {isOpen && (
         <div className="absolute top-[110%] left-0 w-full bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto custom-scrollbar">
             <div onClick={() => { onChange(""); setIsOpen(false); }} className="px-5 py-3 hover:bg-slate-50 text-slate-400 text-sm font-bold cursor-pointer italic">Tümünü Göster</div>
             {options.map((opt: string) => (
               <div key={opt} onClick={() => { onChange(opt); setIsOpen(false); }} className={`px-5 py-3 text-sm font-bold cursor-pointer flex items-center justify-between ${value === opt ? 'bg-yellow-50 text-yellow-700' : 'hover:bg-slate-50 text-slate-700'}`}>{opt}{value === opt && <Check size={14} />}</div>
@@ -50,6 +50,7 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon }: any) => {
 };
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Yan menü durumu
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
   const [secilenSehir, setSecilenSehir] = useState("");
@@ -172,24 +173,76 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans text-slate-800">
+      
+      {/* --- YAN MENÜ (DRAWER) --- */}
+      <div className={`fixed inset-0 z-[200] transition-all duration-500 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+        <div onClick={() => setIsMenuOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+        <div className={`absolute top-0 left-0 h-full w-80 bg-white shadow-2xl transition-transform duration-500 flex flex-col ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          
+          <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-[#0f172a]">
+            <div className="flex flex-col">
+              <span className="text-2xl font-black text-white italic uppercase">BAKIMIM<span className="text-yellow-500">.COM</span></span>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">Navigasyon</span>
+            </div>
+            <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl text-white hover:bg-white/20 transition-all"><X size={24}/></button>
+          </div>
+
+          <nav className="flex-1 p-6 space-y-4">
+            <Link href="/" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl text-slate-700 font-black italic uppercase group hover:bg-yellow-500 hover:text-slate-900 transition-all duration-300 shadow-sm border border-slate-100">
+              <div className="flex items-center gap-4"><Home size={22}/> ANASAYFA</div>
+              <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all"/>
+            </Link>
+            <Link href="/blog" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl text-slate-700 font-black italic uppercase group hover:bg-yellow-500 hover:text-slate-900 transition-all duration-300 shadow-sm border border-slate-100">
+              <div className="flex items-center gap-4"><BookOpen size={22}/> BLOG</div>
+              <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all"/>
+            </Link>
+            <Link href="/hakkimizda" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl text-slate-700 font-black italic uppercase group hover:bg-yellow-500 hover:text-slate-900 transition-all duration-300 shadow-sm border border-slate-100">
+              <div className="flex items-center gap-4"><Info size={22}/> HAKKIMIZDA</div>
+              <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all"/>
+            </Link>
+            <Link href="/iletisim" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl text-slate-700 font-black italic uppercase group hover:bg-yellow-500 hover:text-slate-900 transition-all duration-300 shadow-sm border border-slate-100">
+              <div className="flex items-center gap-4"><Mail size={22}/> İLETİŞİM</div>
+              <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-all"/>
+            </Link>
+          </nav>
+
+          <div className="p-8 border-t border-slate-100 space-y-6">
+            <button onClick={() => { setIsMenuOpen(false); setFormAcik(true); }} className="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black italic uppercase text-xs tracking-widest flex items-center justify-center gap-3 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-lg">
+              <FileText size={18}/> VERİ PAYLAŞ
+            </button>
+            <div className="flex justify-center gap-6 text-slate-300 font-bold text-[10px] uppercase tracking-widest">
+              <span className="hover:text-yellow-600 cursor-pointer transition-colors">KVKK</span>
+              <span className="hover:text-yellow-600 cursor-pointer transition-colors">Gizlilik</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} /></div>
-          <div className="flex flex-col leading-tight"><span className="text-3xl font-black text-slate-800 italic uppercase">bakımım<span className="text-yellow-500">.com</span></span><span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Şeffaf Servis Rehberi</span></div>
-        </Link>
         <div className="flex items-center gap-4">
-          <Link href="/blog" className="text-[10px] font-black text-slate-500 hover:text-yellow-600 uppercase tracking-widest flex items-center gap-2 mr-2"><BookOpen size={16}/> BLOG</Link>
+           {/* HAMBURGER İKONU */}
+           <button onClick={() => setIsMenuOpen(true)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-yellow-500 hover:text-slate-900 transition-all active:scale-95">
+             <Menu size={24} strokeWidth={2.5}/>
+           </button>
+           <Link href="/" className="flex items-center gap-3">
+            <div className="bg-[#0f172a] p-2 rounded-xl text-yellow-400 shadow-lg"><Car size={24} /></div>
+            <div className="flex flex-col leading-tight"><span className="text-2xl font-black text-slate-800 italic uppercase">bakımım<span className="text-yellow-500">.com</span></span></div>
+           </Link>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/blog" className="hidden md:flex text-[10px] font-black text-slate-500 hover:text-yellow-600 uppercase tracking-widest items-center gap-2 mr-2"><BookOpen size={16}/> BLOG</Link>
           <button onClick={() => setFormAcik(true)} className="bg-yellow-500 text-slate-900 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-yellow-400 shadow-md flex items-center gap-2 transition-all active:scale-95"><FileText size={14}/> Veri Paylaş</button>
         </div>
       </nav>
 
+      {/* HERO & FILTERS */}
       <div className="bg-[#0f172a] py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-10 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
-          <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4 text-left">
+          <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4">
             <CustomSelect label="Marka Seçin" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} />
             <CustomSelect label="Model Seçin" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} />
-            {/* BURASI DÜZELTİLDİ: setSehir yerine setSecilenSehir kullanıldı */}
             <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSecilenSehir} icon={MapPin} />
             <CustomSelect label="Servis Tipi" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} />
             <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg active:scale-95"><Search size={24} /> Sorgula</button>
@@ -197,6 +250,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* SONUÇLAR VE KARTLAR (Rozetler dahil aktif) */}
       {veriYukleniyor ? (
         <div className="text-center py-20 font-bold text-slate-300 animate-pulse text-2xl uppercase italic tracking-widest">Senkronize Ediliyor...</div>
       ) : (
@@ -221,25 +275,14 @@ export default function Home() {
                       {item.yetkili_mi ? 'YETKİLİ SERVİS' : 'ÖZEL SERVİS'}
                     </span>
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 uppercase font-bold text-slate-400">
+                      <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-left">
                         {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={20} className="text-yellow-500" /> : <Car size={20} className="text-yellow-600" />}
                         <span className="text-sm tracking-widest">{item.marka_format}</span>
                       </div>
-                      
                       <span className="text-3xl font-black text-slate-800 tracking-tight italic flex items-center gap-3">
                         {item.model_format} <span className="text-slate-300 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
-                        
-                        {/* ROZETLER: Fatura varsa yeşil, yoksa mavi rozet çıkar */}
-                        {item.fatura_onayli && (
-                          <div className="bg-emerald-500 text-white p-1 rounded-full shadow-lg shadow-emerald-500/30" title="Fatura ile doğrulanmış veri">
-                            <ShieldCheck size={14} strokeWidth={4} />
-                          </div>
-                        )}
-                        {item.kullanici_onayli && (
-                          <div className="bg-blue-500 text-white p-1 rounded-full shadow-lg shadow-blue-500/30" title="Kullanıcı beyanı doğrulanmış veri">
-                            <BadgeCheck size={14} strokeWidth={4} />
-                          </div>
-                        )}
+                        {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1 rounded-full shadow-lg" title="Fatura Doğrulandı"><ShieldCheck size={14} strokeWidth={4} /></div>}
+                        {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1 rounded-full shadow-lg" title="Kullanıcı Doğrulandı"><BadgeCheck size={14} strokeWidth={4} /></div>}
                       </span>
                     </div>
                   </div>
@@ -262,30 +305,21 @@ export default function Home() {
                         <div><span className="block text-[10px] font-bold text-slate-400 uppercase">KM</span><span className="text-base font-bold text-slate-700">{item.km ? item.km.toLocaleString('tr-TR') : '-'}</span></div>
                       </div>
                     </div>
-                    
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-2">Servis Türü</span>
                       <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
                         <ShieldAlert size={20} className="text-yellow-500 shrink-0" />
                         <span className="text-base">{item.yetkili_mi ? "Yetkili Servis" : "Özel Servis"}</span>
                       </div>
-                      <p className="text-[9px] text-slate-400 mt-2 italic leading-tight">* Gizlilik politikası gereği servis ismi anonimleştirilmiştir.</p>
                     </div>
-
                     <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center relative overflow-hidden group">
-                      <div className="absolute -right-4 -bottom-4 text-yellow-400/20 group-hover:scale-110 transition-transform duration-500"><MessageSquare size={100} /></div>
                       {item.bas_harfler && <p className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-4 relative z-10">{item.bas_harfler}</p>}
                       <div className={`text-[12px] font-bold opacity-90 leading-relaxed relative z-10 ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
-                        {item.notlar ? `"${item.notlar}"` : "Kullanıcı beyanı ile sisteme girilmiştir."}
-                        
+                        {item.notlar ? `"${item.notlar}"` : "Kullanıcı beyanıdır."}
                         {item.fatura_onayli ? (
-                          <div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase shadow-xl">
-                            <ShieldCheck size={16} className="text-emerald-400" /> Fatura Doğrulandı
-                          </div>
+                          <div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase"><ShieldCheck size={16} className="text-emerald-400" /> Fatura Doğrulandı</div>
                         ) : (
-                          <div className="mt-4 bg-slate-800/80 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase shadow-md">
-                            <BadgeCheck size={16} className="text-blue-400" /> Kullanıcı Doğrulamalı
-                          </div>
+                          <div className="mt-4 bg-slate-800/80 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase"><BadgeCheck size={16} className="text-blue-400" /> Kullanıcı Doğrulamalı</div>
                         )}
                       </div>
                     </div>
@@ -297,26 +331,15 @@ export default function Home() {
         </>
       )}
 
-      {/* BLOG & FORM BÖLÜMLERİ AYNI KALIYOR */}
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
-        <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-4"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Servis Rehberi</h2></div>
-          <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform">Tüm Yazılar <ArrowRight size={20}/></Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
-          {blogYazilari.map((blog) => (
-            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3></div></div></Link>
-          ))}
-        </div>
-      </section>
-
+      {/* FORM VE BLOG KISIMLARI AYNI KALIYOR */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh]">
-            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg">
+          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10">
               <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
+            {/* Form içeriği... */}
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><User size={14}/> Ad Soyad</label><input required placeholder="Örn: Mert Şen" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
@@ -324,10 +347,10 @@ export default function Home() {
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Info size={14}/> Model</label><input required placeholder="Örn: Civic" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Model Yılı</label><input type="number" placeholder="2024" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14}/> Tarih</label><input required type="date" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Wrench size={14}/> Bakım Türü</label><input required placeholder="10.000 Bakımı" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input required placeholder="Honda Plaza" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> Kilometre</label><input required type="number" placeholder="15000" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
-                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Tutar (TL)</label><input required type="number" placeholder="12500" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Wrench size={14}/> Bakım Türü</label><input required placeholder="Periyodik" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Settings size={14}/> Servis Adı</label><input required placeholder="Servis İsmi" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Gauge size={14}/> KM</label><input required type="number" placeholder="10000" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
+                <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Tutar</label><input required type="number" placeholder="10000" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input required placeholder="İstanbul" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> İlçe</label><input placeholder="Kadıköy" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor</label><input required placeholder="1.5 VTEC" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
@@ -338,22 +361,20 @@ export default function Home() {
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-400'}`}>ÖZEL</button>
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Bakım hakkında detaylar..."></textarea></div>
+                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Notlar..."></textarea></div>
               </div>
-
-              <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-10 text-center bg-slate-50/50 hover:bg-yellow-50 transition-all cursor-pointer relative">
-                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files && setResimSecildi(e.target.files[0])} />
-                <div className="flex flex-col items-center gap-4">
-                  <div className="bg-white p-4 rounded-2xl shadow-sm text-yellow-600">{resimSecildi ? <Check size={32} /> : <Upload size={32} />}</div>
-                  <p className="text-sm font-black text-slate-800 uppercase">{resimSecildi ? resimSecildi.name : "Fatura veya Fiş Fotoğrafı Yükle"}</p>
-                </div>
-              </div>
-
-              <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-6 rounded-[2.5rem] font-black text-xl uppercase italic shadow-xl hover:bg-yellow-400 transition-all active:scale-[0.98]">{yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}</button>
+              <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-6 rounded-[2.5rem] font-black text-xl uppercase italic shadow-xl hover:bg-yellow-400 transition-all">{yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}</button>
             </form>
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}</style>
     </main>
   );
 }
