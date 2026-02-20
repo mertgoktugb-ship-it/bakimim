@@ -14,6 +14,7 @@ const blogYazilari = [
   { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
 ];
 
+// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -83,7 +84,7 @@ export default function Home() {
           ekran_fiyat: item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız",
           bas_harfler: item.ad_soyad ? item.ad_soyad.trim().split(/\s+/).map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ") : "",
           fatura_onayli: !!item.fatura_url,
-          kullanici_onayli: !item.fatura_url // Faturası yok ama onaylıysa kullanıcı beyanıdır
+          kullanici_onayli: !item.fatura_url
         }));
         setDuzenlenenVeri(valideEdilmisData);
         setSonuclar(valideEdilmisData);
@@ -185,10 +186,11 @@ export default function Home() {
       <div className="bg-[#0f172a] py-20 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-10 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
-          <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4 text-left">
             <CustomSelect label="Marka Seçin" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} />
             <CustomSelect label="Model Seçin" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} />
-            <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSehir} icon={MapPin} />
+            {/* BURASI DÜZELTİLDİ: setSehir yerine setSecilenSehir kullanıldı */}
+            <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSecilenSehir} icon={MapPin} />
             <CustomSelect label="Servis Tipi" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} />
             <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg active:scale-95"><Search size={24} /> Sorgula</button>
           </div>
@@ -224,18 +226,15 @@ export default function Home() {
                         <span className="text-sm tracking-widest">{item.marka_format}</span>
                       </div>
                       
-                      {/* --- ROZET ALANI --- */}
                       <span className="text-3xl font-black text-slate-800 tracking-tight italic flex items-center gap-3">
                         {item.model_format} <span className="text-slate-300 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
                         
-                        {/* Fatura Rozeti */}
+                        {/* ROZETLER: Fatura varsa yeşil, yoksa mavi rozet çıkar */}
                         {item.fatura_onayli && (
                           <div className="bg-emerald-500 text-white p-1 rounded-full shadow-lg shadow-emerald-500/30" title="Fatura ile doğrulanmış veri">
                             <ShieldCheck size={14} strokeWidth={4} />
                           </div>
                         )}
-                        
-                        {/* Kullanıcı Rozeti */}
                         {item.kullanici_onayli && (
                           <div className="bg-blue-500 text-white p-1 rounded-full shadow-lg shadow-blue-500/30" title="Kullanıcı beyanı doğrulanmış veri">
                             <BadgeCheck size={14} strokeWidth={4} />
@@ -244,7 +243,7 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black">
+                  <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black text-left">
                     <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase tracking-wider">Bakım</span><p className="text-base text-slate-700">{item.bakim_turu || "Periyodik"}</p></div>
                     <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase tracking-wider">Konum</span><p className="text-base text-slate-700 truncate">{item.sehir} {item.ilce && <span className="text-slate-400 text-xs">/ {item.ilce}</span>}</p></div>
                     <div className="flex flex-col"><span className="text-[11px] text-slate-300 mb-2 uppercase tracking-wider">Tarih</span><div className="text-base text-slate-500">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div></div>
@@ -255,7 +254,7 @@ export default function Home() {
                   </div>
                 </div>
                 {acikKartId === item.id && (
-                  <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 animate-in slide-in-from-top-4 duration-300">
+                  <div className="p-10 bg-slate-50 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-8 animate-in slide-in-from-top-4 duration-300 text-left">
                     <div className="flex flex-col gap-4">
                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2">Detaylar</p>
                       <div className="flex flex-col gap-3">
@@ -279,7 +278,6 @@ export default function Home() {
                       <div className={`text-[12px] font-bold opacity-90 leading-relaxed relative z-10 ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
                         {item.notlar ? `"${item.notlar}"` : "Kullanıcı beyanı ile sisteme girilmiştir."}
                         
-                        {/* Detay Kartı Altındaki Onay Rozeti */}
                         {item.fatura_onayli ? (
                           <div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase shadow-xl">
                             <ShieldCheck size={16} className="text-emerald-400" /> Fatura Doğrulandı
@@ -299,9 +297,9 @@ export default function Home() {
         </>
       )}
 
-      {/* BLOG & FORM bölümleri aynı kalıyor */}
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200">
-        <div className="flex justify-between items-center mb-12 text-left">
+      {/* BLOG & FORM BÖLÜMLERİ AYNI KALIYOR */}
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
+        <div className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-4"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Servis Rehberi</h2></div>
           <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
@@ -314,12 +312,12 @@ export default function Home() {
 
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left">
+          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg">
-              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
-            <form onSubmit={veriyiGonder} className="p-10 space-y-8">
+            <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><User size={14}/> Ad Soyad</label><input required placeholder="Örn: Mert Şen" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka</label><input required placeholder="Örn: Honda" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
@@ -334,13 +332,13 @@ export default function Home() {
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> İlçe</label><input placeholder="Kadıköy" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Fuel size={14}/> Motor</label><input required placeholder="1.5 VTEC" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Servis Tipi</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">Servis Tipi</label>
                   <div className="flex bg-slate-50 p-1.5 rounded-2xl gap-2 shadow-inner">
                     <button type="button" onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Yetkili' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-400'}`}>YETKİLİ</button>
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-400'}`}>ÖZEL</button>
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Bakım hakkında detaylar, tavsiyeler..."></textarea></div>
+                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Bakım hakkında detaylar..."></textarea></div>
               </div>
 
               <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-10 text-center bg-slate-50/50 hover:bg-yellow-50 transition-all cursor-pointer relative">
@@ -356,13 +354,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-      `}</style>
     </main>
   );
 }
