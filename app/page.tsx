@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+// --- BLOG VERİLERİ ---
 const blogYazilari = [
   { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
   { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
@@ -81,7 +82,8 @@ export default function Home() {
           model_format: normalizeMetin(item.model),
           ekran_fiyat: item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız",
           bas_harfler: item.ad_soyad ? item.ad_soyad.trim().split(/\s+/).map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ") : "",
-          fatura_onayli: !!item.fatura_url // Faturası olanları işaretliyoruz
+          fatura_onayli: !!item.fatura_url,
+          kullanici_onayli: !item.fatura_url // Faturası yok ama onaylıysa kullanıcı beyanıdır
         }));
         setDuzenlenenVeri(valideEdilmisData);
         setSonuclar(valideEdilmisData);
@@ -168,7 +170,7 @@ export default function Home() {
     ? Math.round(istatistikVerisi.filter(i => !i.yetkili_mi).reduce((a, b) => a + (b.fiyat || 0), 0) / istatistikVerisi.filter(i => !i.yetkili_mi).length) : 0;
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans">
+    <main className="min-h-screen bg-[#F8FAFC] pb-20 text-left relative font-sans text-slate-800">
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
         <Link href="/" className="flex items-center gap-3">
           <div className="bg-[#0f172a] p-2.5 rounded-2xl text-yellow-400 shadow-lg flex items-center justify-center transition-transform hover:scale-105"><Car size={28} /></div>
@@ -186,7 +188,7 @@ export default function Home() {
           <div className="bg-white p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 md:grid-cols-5 gap-4">
             <CustomSelect label="Marka Seçin" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} />
             <CustomSelect label="Model Seçin" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} />
-            <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSecilenSehir} icon={MapPin} />
+            <CustomSelect label="Şehir Seçin" value={secilenSehir} options={tumSehirler} onChange={setSehir} icon={MapPin} />
             <CustomSelect label="Servis Tipi" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} />
             <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-3 uppercase shadow-xl transition-all text-lg active:scale-95"><Search size={24} /> Sorgula</button>
           </div>
@@ -194,7 +196,7 @@ export default function Home() {
       </div>
 
       {veriYukleniyor ? (
-        <div className="text-center py-20 font-bold text-slate-300 animate-pulse text-2xl uppercase italic tracking-widest">Veriler Senkronize Ediliyor...</div>
+        <div className="text-center py-20 font-bold text-slate-300 animate-pulse text-2xl uppercase italic tracking-widest">Senkronize Ediliyor...</div>
       ) : (
         <>
           <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
@@ -221,9 +223,24 @@ export default function Home() {
                         {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={20} className="text-yellow-500" /> : <Car size={20} className="text-yellow-600" />}
                         <span className="text-sm tracking-widest">{item.marka_format}</span>
                       </div>
+                      
+                      {/* --- ROZET ALANI --- */}
                       <span className="text-3xl font-black text-slate-800 tracking-tight italic flex items-center gap-3">
                         {item.model_format} <span className="text-slate-300 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
-                        {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1 rounded-full" title="Fatura ile doğrulanmış veri"><Check size={14} strokeWidth={4} /></div>}
+                        
+                        {/* Fatura Rozeti */}
+                        {item.fatura_onayli && (
+                          <div className="bg-emerald-500 text-white p-1 rounded-full shadow-lg shadow-emerald-500/30" title="Fatura ile doğrulanmış veri">
+                            <ShieldCheck size={14} strokeWidth={4} />
+                          </div>
+                        )}
+                        
+                        {/* Kullanıcı Rozeti */}
+                        {item.kullanici_onayli && (
+                          <div className="bg-blue-500 text-white p-1 rounded-full shadow-lg shadow-blue-500/30" title="Kullanıcı beyanı doğrulanmış veri">
+                            <BadgeCheck size={14} strokeWidth={4} />
+                          </div>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -247,14 +264,13 @@ export default function Home() {
                       </div>
                     </div>
                     
-                    {/* KRİTİK GÜNCELLEME: Servis İsmi Gizlendi */}
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-200 pb-2 mb-2">Servis Türü</span>
                       <div className="flex items-center gap-2 text-slate-700 font-bold mt-1">
                         <ShieldAlert size={20} className="text-yellow-500 shrink-0" />
-                        <span className="text-base">{item.yetkili_mi ? "Yetkili Servis (Gizli)" : "Özel Servis (Gizli)"}</span>
+                        <span className="text-base">{item.yetkili_mi ? "Yetkili Servis" : "Özel Servis"}</span>
                       </div>
-                      <p className="text-[9px] text-slate-400 mt-2 italic leading-tight">* KVKK ve Ticari Sırların korunması amacıyla servis isimleri anonimleştirilmiştir.</p>
+                      <p className="text-[9px] text-slate-400 mt-2 italic leading-tight">* Gizlilik politikası gereği servis ismi anonimleştirilmiştir.</p>
                     </div>
 
                     <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center relative overflow-hidden group">
@@ -262,9 +278,15 @@ export default function Home() {
                       {item.bas_harfler && <p className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-4 relative z-10">{item.bas_harfler}</p>}
                       <div className={`text-[12px] font-bold opacity-90 leading-relaxed relative z-10 ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
                         {item.notlar ? `"${item.notlar}"` : "Kullanıcı beyanı ile sisteme girilmiştir."}
-                        {item.fatura_onayli && (
-                          <div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase">
-                            <ShieldCheck size={16} className="text-yellow-500" /> Fatura Doğrulandı
+                        
+                        {/* Detay Kartı Altındaki Onay Rozeti */}
+                        {item.fatura_onayli ? (
+                          <div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase shadow-xl">
+                            <ShieldCheck size={16} className="text-emerald-400" /> Fatura Doğrulandı
+                          </div>
+                        ) : (
+                          <div className="mt-4 bg-slate-800/80 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase shadow-md">
+                            <BadgeCheck size={16} className="text-blue-400" /> Kullanıcı Doğrulamalı
                           </div>
                         )}
                       </div>
@@ -277,12 +299,13 @@ export default function Home() {
         </>
       )}
 
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200 text-left">
-        <div className="flex justify-between items-center mb-12">
+      {/* BLOG & FORM bölümleri aynı kalıyor */}
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200">
+        <div className="flex justify-between items-center mb-12 text-left">
           <div className="flex items-center gap-4"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg"><BookOpen size={28} /></div><h2 className="text-4xl font-black italic text-slate-800 uppercase tracking-tighter">Servis Rehberi</h2></div>
           <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
           {blogYazilari.map((blog) => (
             <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase">{blog.baslik}</h3></div></div></Link>
           ))}
@@ -291,12 +314,12 @@ export default function Home() {
 
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div className="bg-white rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left">
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg">
-              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
-            <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
+            <form onSubmit={veriyiGonder} className="p-10 space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><User size={14}/> Ad Soyad</label><input required placeholder="Örn: Mert Şen" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Car size={14}/> Marka</label><input required placeholder="Örn: Honda" className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner" /></div>
@@ -317,7 +340,7 @@ export default function Home() {
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-400'}`}>ÖZEL</button>
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Bakım hakkında detaylar..."></textarea></div>
+                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className="w-full p-4 bg-slate-50 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none" placeholder="Bakım hakkında detaylar, tavsiyeler..."></textarea></div>
               </div>
 
               <div className="border-2 border-dashed border-slate-200 rounded-[2.5rem] p-10 text-center bg-slate-50/50 hover:bg-yellow-50 transition-all cursor-pointer relative">
@@ -333,6 +356,13 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}</style>
     </main>
   );
 }
