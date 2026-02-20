@@ -68,6 +68,18 @@ export default function BakimimApp() {
   const [veriYukleniyor, setVeriYukleniyor] = useState(true);
   const [resimSecildi, setResimSecildi] = useState<File | null>(null);
 
+  // --- DARK MODE KAYDETME MANTIĞI ---
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') setIsDarkMode(true);
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+  };
+
   const normalizeMetin = (str: string) => {
     if (!str) return "";
     const temiz = str.trim();
@@ -172,26 +184,35 @@ export default function BakimimApp() {
   return (
     <main className={`min-h-screen pb-20 text-left relative font-sans transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-slate-200' : 'bg-[#F8FAFC] text-slate-800'}`}>
       
-      {/* YAN MENÜ */}
+      {/* YAN MENÜ (DRAWER) */}
       <div className={`fixed inset-0 z-[200] transition-all duration-500 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
         <div onClick={() => setIsMenuOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div className={`absolute top-0 left-0 h-full w-80 shadow-2xl transition-transform duration-500 flex flex-col ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
-          <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-[#0f172a] text-white text-left">
-            <div className="flex flex-col"><span className="text-2xl font-black italic uppercase">BAKIMIM<span className="text-yellow-500">.COM</span></span></div>
+          <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-[#0f172a] text-white">
+            <div className="flex flex-col text-left"><span className="text-2xl font-black italic uppercase">BAKIMIM<span className="text-yellow-500">.COM</span></span></div>
             <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl"><X size={24}/></button>
           </div>
+          
           <nav className="flex-1 p-6 space-y-4 text-left">
-            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}><div className="flex items-center gap-4 text-left"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/></Link>
-            <Link href="/blog" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}><div className="flex items-center gap-4 text-left"><BookOpen size={22}/> BLOG</div><ChevronRight size={18}/></Link>
-            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}><div className="flex items-center gap-4 text-left"><Info size={22}/> HAKKIMIZDA</div><ChevronRight size={18}/></Link>
-            <div className="pt-4 space-y-2">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">İletişim</p>
-              <a href="mailto:contact.bakimim@gmail.com" className={`flex items-center gap-4 p-4 rounded-2xl font-bold text-xs transition-all border border-dashed ${isDarkMode ? 'bg-slate-800/50 border-slate-700 text-slate-400 hover:text-blue-400' : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-blue-600'}`}><Mail size={20}/> contact.bakimim@gmail.com</a>
-            </div>
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}>
+              <div className="flex items-center gap-4"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/>
+            </Link>
+            <Link href="/blog" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}>
+              <div className="flex items-center gap-4"><BookOpen size={22}/> BLOG</div><ChevronRight size={18}/>
+            </Link>
+            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}>
+              <div className="flex items-center gap-4"><Info size={22}/> HAKKIMIZDA</div><ChevronRight size={18}/>
+            </Link>
+            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-4 rounded-2xl font-black italic uppercase transition-all shadow-sm border ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 border-slate-100 text-slate-700 hover:bg-yellow-500'}`}>
+              <div className="flex items-center gap-4"><Mail size={22}/> İLETİŞİM</div><ChevronRight size={18}/>
+            </Link>
           </nav>
-          <div className="p-6 border-t border-slate-100 bg-slate-50/5 dark:bg-slate-800/50 space-y-4">
-             <button onClick={() => { setIsMenuOpen(false); setFormAcik(true); }} className="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black italic uppercase text-xs tracking-widest flex items-center justify-center gap-3 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-lg active:scale-95"><Zap size={20} className="text-yellow-500"/> VERİ PAYLAŞ</button>
-             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`w-full p-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${isDarkMode ? 'bg-yellow-500 text-slate-900' : 'bg-slate-800 text-white'}`}>
+
+          <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/5 dark:bg-slate-800/50 space-y-4">
+             <button onClick={() => { setIsMenuOpen(false); setFormAcik(true); }} className="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black italic uppercase text-xs tracking-widest flex items-center justify-center gap-3 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-lg active:scale-95">
+               <Zap size={20} className="text-yellow-500"/> VERİ PAYLAŞ
+             </button>
+             <button onClick={toggleDarkMode} className={`w-full p-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${isDarkMode ? 'bg-yellow-500 text-slate-900' : 'bg-slate-800 text-white'}`}>
                 {isDarkMode ? <><Sun size={18}/> GÜNDÜZ MODU</> : <><Moon size={18}/> KARANLIK MOD</>}
              </button>
           </div>
@@ -221,7 +242,7 @@ export default function BakimimApp() {
         </div>
       </div>
 
-      {/* SONUÇLAR */}
+      {/* SONUÇLAR VE KARTLAR */}
       {veriYukleniyor ? (
         <div className="text-center py-20 font-bold text-slate-500 animate-pulse text-2xl uppercase italic tracking-widest text-left">Veriler Senkronize Ediliyor...</div>
       ) : (
@@ -242,11 +263,11 @@ export default function BakimimApp() {
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
                 <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
                   <div className="md:w-64 mr-10 text-left">
-                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' : 'bg-indigo-600 text-white shadow-indigo-600/30'}`}>{item.yetkili_mi ? 'YETKİLİ SERVİS' : 'ÖZEL SERVİS'}</span>
+                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900 shadow-yellow-500/30' : 'bg-indigo-600 text-white shadow-indigo-600/30'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
                     <div className="flex flex-col gap-1 text-left">
-                      <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-left">
-                        {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={20} className="text-yellow-500" /> : <Car size={20} className="text-yellow-600" />}
-                        <span className="text-sm tracking-widest">{item.marka_format}</span>
+                      <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-left text-sm tracking-widest">
+                        {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={18} className="text-yellow-500" /> : <Car size={18} />}
+                        <span>{item.marka_format}</span>
                       </div>
                       <span className={`text-3xl font-black tracking-tight italic flex items-center gap-3 text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                         {item.model_format} <span className="text-slate-500 text-xl not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
@@ -256,7 +277,7 @@ export default function BakimimApp() {
                     </div>
                   </div>
                   <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 md:mt-0 w-full font-black text-left">
-                    <div className="flex flex-col text-left"><span className="text-[11px] text-slate-500 mb-2 uppercase tracking-wider">Bakım</span><p className="text-base">{item.bakim_turu || "Periyodik"}</p></div>
+                    <div className="flex flex-col text-left"><span className="text-[11px] text-slate-500 mb-2 uppercase tracking-wider">Bakım</span><p className="text-base truncate">{item.bakim_turu || "Periyodik"}</p></div>
                     <div className="flex flex-col text-left"><span className="text-[11px] text-slate-500 mb-2 uppercase tracking-wider">Konum</span><p className="text-base truncate">{item.sehir}</p></div>
                     <div className="flex flex-col text-left"><span className="text-[11px] text-slate-500 mb-2 uppercase tracking-wider">Tarih</span><div className="text-base text-slate-500">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div></div>
                     <div className="flex flex-col items-end md:items-start text-left">
@@ -275,13 +296,12 @@ export default function BakimimApp() {
                       </div>
                     </div>
                     <div className="flex flex-col text-left">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/20 pb-2 mb-2 text-left">Servis Türü</span>
-                      <div className="flex items-center gap-2 font-bold mt-1"><ShieldAlert size={20} className="text-yellow-500 shrink-0" /><span className="text-base">{item.yetkili_mi ? "Yetkili Servis" : "Özel Servis"}</span></div>
-                      <p className="text-[9px] text-slate-400 mt-2 italic leading-tight">* Gizlilik gereği servis ismi saklanmıştır.</p>
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200/20 pb-2 mb-2">Servis Türü</span>
+                      <div className="flex items-center gap-2 font-bold mt-1 text-slate-700 dark:text-slate-300"><ShieldAlert size={20} className="text-yellow-500 shrink-0" /><span className="text-base">{item.yetkili_mi ? "Yetkili Servis" : "Özel Servis"}</span></div>
                     </div>
                     <div className="bg-yellow-500 text-slate-900 p-7 rounded-[2.5rem] shadow-lg flex flex-col justify-center relative overflow-hidden group">
-                      {item.bas_harfler && <p className="text-3xl font-black italic tracking-tighter uppercase leading-none mb-4 relative z-10">{item.bas_harfler}</p>}
-                      <div className={`text-[12px] font-bold opacity-90 leading-relaxed relative z-10 ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
+                      {item.bas_harfler && <p className="text-3xl font-black italic tracking-tighter uppercase mb-4">{item.bas_harfler}</p>}
+                      <div className={`text-[12px] font-bold opacity-90 leading-relaxed ${item.bas_harfler ? 'border-t border-slate-900/20 pt-4' : ''}`}>
                         {item.notlar ? `"${item.notlar}"` : "Kullanıcı beyanıdır."}
                         {item.fatura_onayli ? (<div className="mt-4 bg-slate-900 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase"><ShieldCheck size={16} className="text-emerald-400" /> Fatura Doğrulandı</div>) : (<div className="mt-4 bg-slate-800/80 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase"><BadgeCheck size={16} className="text-blue-400" /> Kullanıcı Doğrulamalı</div>)}
                       </div>
@@ -299,7 +319,7 @@ export default function BakimimApp() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg text-left">
-              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
@@ -327,7 +347,7 @@ export default function BakimimApp() {
                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files && setResimSecildi(e.target.files[0])} />
                 <div className="flex flex-col items-center gap-4">
                   <div className="bg-white p-4 rounded-2xl shadow-sm text-yellow-600">{resimSecildi ? <Check size={32} /> : <Upload size={32} />}</div>
-                  <p className="text-sm font-black uppercase">{resimSecildi ? resimSecildi.name : "Fatura Yükle"}</p>
+                  <p className="text-sm font-black uppercase text-slate-400">{resimSecildi ? resimSecildi.name : "Fatura Yükle"}</p>
                 </div>
               </div>
               <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-6 rounded-[2.5rem] font-black text-xl uppercase italic shadow-xl hover:bg-yellow-400 transition-all active:scale-[0.98]">{yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}</button>
@@ -337,14 +357,14 @@ export default function BakimimApp() {
       )}
 
       {/* BLOG SEÇKİSİ */}
-      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200/20 text-left text-left">
+      <section className="max-w-5xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200/10 text-left">
         <div className="flex justify-between items-center mb-12 text-left">
           <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-left"><BookOpen size={28} /></div><h2 className={`text-4xl font-black italic uppercase tracking-tighter text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Servis Rehberi</h2></div>
           <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
           {blogYazilari.map((blog) => (
-            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">{blog.baslik}</h3></div></div></Link>
+            <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group text-left"><div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] mb-8 overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300 text-left`}><div className="absolute bottom-8 left-10 text-left"><span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block tracking-widest uppercase text-left">İçerik</span><h3 className="text-3xl font-black text-white leading-tight italic tracking-tight uppercase text-left">{blog.baslik}</h3></div></div></Link>
           ))}
         </div>
       </section>
