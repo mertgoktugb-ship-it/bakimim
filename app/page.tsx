@@ -5,7 +5,7 @@ import {
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
-  Home as HomeIcon, // İsim çakışmasını önlemek için ismi değiştirdik
+  Home as HomeIcon, // İsim çakışmasını önlemek için Home ikonunu HomeIcon yaptık
   Mail, ChevronRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -51,7 +51,8 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon }: any) => {
   );
 };
 
-export default function Home() {
+// --- ANA BİLEŞEN ---
+export default function BakimimApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
@@ -186,16 +187,28 @@ export default function Home() {
             <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl"><X size={24}/></button>
           </div>
           <nav className="flex-1 p-6 space-y-4">
-            <Link href="/" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/></Link>
-            <Link href="/blog" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><BookOpen size={22}/> BLOG</div><ChevronRight size={18}/></Link>
-            <Link href="/iletisim" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><Mail size={22}/> İLETİŞİM</div><ChevronRight size={18}/></Link>
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/></Link>
+            <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><BookOpen size={22}/> BLOG</div><ChevronRight size={18}/></Link>
+            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl font-black italic uppercase hover:bg-yellow-500 transition-all shadow-sm border border-slate-100 text-left"><div className="flex items-center gap-4 text-left"><Mail size={22}/> İLETİŞİM</div><ChevronRight size={18}/></Link>
           </nav>
+          
+          {/* MENÜ İÇİ VERİ PAYLAŞ KISAYOLU */}
+          <div className="p-6 border-t border-slate-100 bg-slate-50">
+             <button 
+               onClick={() => { setIsMenuOpen(false); setFormAcik(true); }}
+               className="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black italic uppercase text-xs tracking-widest flex items-center justify-center gap-3 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-lg active:scale-95"
+             >
+               <FileText size={20}/> VERİ PAYLAŞ
+             </button>
+             <p className="text-center text-[9px] text-slate-400 font-bold mt-4 uppercase tracking-tighter">Şeffaf Servis Rehberine Katıl</p>
+          </div>
         </div>
       </div>
 
+      {/* NAVBAR */}
       <nav className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-4 text-left">
-          <button onClick={() => setIsMenuOpen(true)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-yellow-500 hover:text-slate-900 transition-all"><Menu size={24}/></button>
+          <button onClick={() => setIsMenuOpen(true)} className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-yellow-500 hover:text-slate-900 transition-all active:scale-95"><Menu size={24}/></button>
           <Link href="/" className="flex items-center gap-3 text-left"><div className="bg-[#0f172a] p-2 rounded-xl text-yellow-400 text-left"><Car size={24} /></div><span className="text-2xl font-black italic uppercase text-slate-800 text-left">bakımım<span className="text-yellow-500">.com</span></span></Link>
         </div>
         <button onClick={() => setFormAcik(true)} className="bg-yellow-500 text-slate-900 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-yellow-400 shadow-md flex items-center gap-2 transition-all active:scale-95"><FileText size={14}/> Veri Paylaş</button>
@@ -214,6 +227,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* SONUÇLAR VE KARTLAR BÖLÜMÜ (Önceki kodlarla aynı, tıkır tıkır çalışıyor) */}
       {veriYukleniyor ? (
         <div className="text-center py-20 font-bold text-slate-300 animate-pulse text-2xl uppercase italic tracking-widest text-left">Senkronize Ediliyor...</div>
       ) : (
