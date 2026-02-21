@@ -9,16 +9,13 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-// --- BLOG VERİLERİ ---
 const blogYazilari = [
   { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
   { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
 ];
 
-// --- KATEGORİ TANIMLARI ---
 const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Yürüyen Aksam"];
 
-// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,9 +30,9 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
-        <div className="flex items-center gap-2 truncate text-left">
+        <div className="flex items-center gap-2 truncate text-left text-slate-800">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
-          <span className={value ? "" : "text-slate-400"}>{value || label}</span>
+          <span className={value ? "text-slate-800" : "text-slate-400"}>{value || label}</span>
         </div>
         <ChevronDown size={20} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
@@ -99,7 +96,7 @@ export default function BakimimApp() {
   const veriCek = useCallback(async () => {
     setVeriYukleniyor(true);
     try {
-      // GÜVENLİK GÜNCELLEMESİ: Sadece gerekli sütunlar çekiliyor
+      // 🛡️ GÜVENLİK: Sadece gerekli sütunları çekiyoruz
       const { data } = await supabase
         .from('bakim_kayitlari')
         .select('id, marka, model, yil, yakit_motor, bakim_turu, km, sehir, yetkili_mi, fiyat, fatura_url, tarih, ad_soyad, notlar')
@@ -166,10 +163,15 @@ export default function BakimimApp() {
 
   const veriyiGonder = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 🛡️ HONEYPOT: Bot tuzağı kontrolü
+    const formElement = e.target as HTMLFormElement;
+    const formData = new FormData(formElement);
+    if (formData.get("website_url")) return; 
+
     setYukleniyor(true);
-    const form = e.target as HTMLFormElement;
-    const inputs = form.querySelectorAll('input');
-    const textArea = form.querySelector('textarea');
+    const inputs = formElement.querySelectorAll('input');
+    const textArea = formElement.querySelector('textarea');
     let resimUrl = null;
 
     try {
@@ -182,29 +184,29 @@ export default function BakimimApp() {
         }
       }
       await supabase.from('bakim_kayitlari').insert([{
-        ad_soyad: (inputs[0] as HTMLInputElement).value,
-        marka: (inputs[1] as HTMLInputElement).value,
-        model: (inputs[2] as HTMLInputElement).value,
-        yil: parseInt((inputs[3] as HTMLInputElement).value) || null,
-        tarih: (inputs[4] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
-        bakim_turu: (inputs[5] as HTMLInputElement).value,
-        servis_adi: (inputs[6] as HTMLInputElement).value,
-        km: parseInt((inputs[7] as HTMLInputElement).value),
-        fiyat: parseFloat((inputs[8] as HTMLInputElement).value),
-        sehir: (inputs[9] as HTMLInputElement).value,
-        ilce: (inputs[10] as HTMLInputElement).value,
+        ad_soyad: (inputs[1] as HTMLInputElement).value, // 0. input honeypot olduğu için 1'den başlıyoruz
+        marka: (inputs[2] as HTMLInputElement).value,
+        model: (inputs[3] as HTMLInputElement).value,
+        yil: parseInt((inputs[4] as HTMLInputElement).value) || null,
+        tarih: (inputs[5] as HTMLInputElement).value || new Date().toISOString().split('T')[0],
+        bakim_turu: (inputs[6] as HTMLInputElement).value,
+        servis_adi: (inputs[7] as HTMLInputElement).value,
+        km: parseInt((inputs[8] as HTMLInputElement).value),
+        fiyat: parseFloat((inputs[9] as HTMLInputElement).value),
+        sehir: (inputs[10] as HTMLInputElement).value,
         yakit_motor: (inputs[11] as HTMLInputElement).value,
         notlar: textArea ? textArea.value : "",
         yetkili_mi: servisTipi === "Yetkili",
         servis_tipi: servisTipi === "Yetkili" ? "yetkili" : "ozel",
         kaynak: "site_formu",
-        fatura_url: resimUrl,
-        onayli_mi: false
+        fatura_url: resimUrl
       }]);
       alert("Veri başarıyla onaya gönderildi!");
       setFormAcik(false);
       setResimSecildi(null);
-      form.reset();
+      formElement.reset();
+    } catch (error) {
+      alert("Bir hata oluştu.");
     } finally { setYukleniyor(false); }
   };
 
@@ -244,7 +246,7 @@ export default function BakimimApp() {
       {/* HERO & FILTERS */}
       <div className={`${isDarkMode ? 'bg-slate-900' : 'bg-[#0f172a]'} py-16 px-6 transition-colors`}>
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter text-center">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
           <div className={`p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-left ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
             <CustomSelect label="Marka" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} isDark={isDarkMode} />
             <CustomSelect label="Model" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} isDark={isDarkMode} />
@@ -253,13 +255,12 @@ export default function BakimimApp() {
             <CustomSelect label="Servis" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} isDark={isDarkMode} />
             <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-2 uppercase shadow-xl transition-all active:scale-95"><Search size={22} /> SORGULA</button>
           </div>
-          <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest italic opacity-60 text-center">* Periyodik, Ağır ve Alt Takım gruplarıyla doğru kıyaslama yapın.</p>
         </div>
       </div>
 
       {/* İSTATİSTİKLER */}
       {veriYukleniyor ? (
-        <div className="text-center py-20 font-bold text-slate-500 animate-pulse text-2xl uppercase italic tracking-widest text-left text-center">Senkronize Ediliyor...</div>
+        <div className="text-center py-20 font-bold text-slate-500 animate-pulse text-2xl uppercase italic tracking-widest text-center">Senkronize Ediliyor...</div>
       ) : (
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-12 relative z-20">
@@ -273,7 +274,6 @@ export default function BakimimApp() {
             </div>
           </div>
 
-          {/* SONUÇLAR - 3'LÜ GRID DÜZENİ */}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
             {sonuclar.length > 0 ? sonuclar.map((item) => (
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
@@ -285,42 +285,38 @@ export default function BakimimApp() {
                       {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg" title="Kullanıcı Doğrulandı"><BadgeCheck size={12} strokeWidth={4} /></div>}
                     </div>
                   </div>
-
                   <div className="mb-6 text-left">
-                    <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1">
+                    <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 text-left">
                       {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={14} className="text-yellow-500" /> : <Car size={14} />}
                       <span>{item.marka_format}</span>
                     </div>
-                    <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                    <h3 className={`text-2xl font-black italic uppercase tracking-tight text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                       {item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
                     </h3>
                   </div>
-
                   <div className="space-y-4 mb-8 text-left">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Bakım Kategorisi</span>
-                      <p className="text-sm font-bold text-yellow-600 dark:text-yellow-500">{item.bakim_kategorisi}</p>
-                      <p className="text-[11px] text-slate-400 italic line-clamp-1">{item.bakim_turu_format}</p>
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 text-left">Kategori & Detay</span>
+                      <p className="text-sm font-bold text-yellow-600 dark:text-yellow-500 text-left">{item.bakim_kategorisi}</p>
+                      <p className="text-[11px] text-slate-400 italic line-clamp-1 text-left">{item.bakim_turu_format}</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Konum</span><p className="text-xs font-bold truncate">{item.sehir}</p></div>
-                      <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Tarih</span><p className="text-xs font-bold text-slate-500">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</p></div>
+                    <div className="grid grid-cols-2 gap-4 text-left">
+                      <div className="flex flex-col text-left"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 text-left">Konum</span><p className="text-xs font-bold truncate text-left">{item.sehir}</p></div>
+                      <div className="flex flex-col text-left"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 text-left">Tarih</span><p className="text-xs font-bold text-slate-500 text-left">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</p></div>
                     </div>
                   </div>
-
                   <div className={`mt-auto pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                     <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span>
                     <p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p>
                   </div>
                 </div>
-
                 {acikKartId === item.id && (
                   <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                    <div className="space-y-4 text-left text-slate-800">
-                      <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold">{item.yakit_motor || '-'}</p></div>
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
+                    <div className="space-y-4 text-left">
+                      <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 text-left">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug text-left">{item.bakim_turu_format}</p></div>
+                      <div className="grid grid-cols-2 gap-4 text-left">
+                        <div className="text-left"><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 text-left">Motor</span><p className="text-sm font-bold text-left">{item.yakit_motor || '-'}</p></div>
+                        <div className="text-left"><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 text-left">Kilometre</span><p className="text-sm font-bold text-left">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
                       </div>
                     </div>
                     <div className="bg-yellow-500 text-slate-900 p-6 rounded-3xl shadow-lg relative overflow-hidden text-left">
@@ -329,11 +325,7 @@ export default function BakimimApp() {
                          <ShieldAlert size={20} className="opacity-50" />
                        </div>
                        <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
-                       {item.fatura_onayli ? (
-                         <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Fatura Onaylı</div>
-                       ) : (
-                         <div className="bg-slate-800/20 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><BadgeCheck size={14} className="opacity-50" /> Kullanıcı Beyanı</div>
-                       )}
+                       {item.fatura_onayli ? (<div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Fatura Onaylı</div>) : (<div className="bg-slate-800/20 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><BadgeCheck size={14} className="opacity-50" /> Kullanıcı Beyanı</div>)}
                     </div>
                   </div>
                 )}
@@ -348,11 +340,13 @@ export default function BakimimApp() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg text-left">
-              <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
+              <div className="text-left"><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                {/* 🛡️ HONEYPOT: Bot Tuzağı */}
+                <input type="text" name="website_url" className="hidden" tabIndex={-1} autoComplete="off" />
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><User size={14}/> Ad Soyad</label><input required placeholder="Mert Şen" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Car size={14}/> Marka</label><input required placeholder="Honda" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Info size={14}/> Model</label><input required placeholder="Civic" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
@@ -363,7 +357,7 @@ export default function BakimimApp() {
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Gauge size={14}/> KM</label><input required type="number" placeholder="15000" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><BadgePercent size={14}/> Tutar</label><input required type="number" placeholder="12500" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><MapPin size={14}/> Şehir</label><input required placeholder="İstanbul" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left md:col-span-2">
+                <div className="space-y-2 text-left md:col-span-2 text-left">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">Servis Tipi</label>
                   <div className={`flex p-1.5 rounded-2xl gap-2 shadow-inner ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                     <button type="button" onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Yetkili' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-500'}`}>YETKİLİ</button>
@@ -388,7 +382,7 @@ export default function BakimimApp() {
       {/* BLOG SEÇKİSİ */}
       <section className="max-w-7xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200/10 text-left">
         <div className="flex justify-between items-center mb-12 text-left">
-          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-left text-center"><BookOpen size={28} /></div><h2 className={`text-4xl font-black italic uppercase tracking-tighter text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Servis Rehberi</h2></div>
+          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-center"><BookOpen size={28} /></div><h2 className={`text-4xl font-black italic uppercase tracking-tighter text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Servis Rehberi</h2></div>
           <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
