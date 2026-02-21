@@ -6,7 +6,7 @@ import {
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
   Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
-} from 'lucide-center'; // Eğer lucide-react değilse lucide-react olarak düzeltin
+} from 'lucide-react'; // Hatayı burada düzelttim (lucide-react)
 import { supabase } from '../lib/supabase';
 
 // --- BLOG VERİLERİ ---
@@ -33,7 +33,7 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
-        <div className="flex items-center gap-2 truncate text-left">
+        <div className="flex items-center gap-2 truncate text-left text-slate-800">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
           <span className={value ? "" : "text-slate-400"}>{value || label}</span>
         </div>
@@ -124,7 +124,6 @@ export default function BakimimApp() {
 
   useEffect(() => { veriCek(); }, [veriCek]);
 
-  // --- HATA VEREN TANIMLAMALARIN DÜZELTİLDİĞİ YER ---
   const tumMarkalar = Array.from(new Set(duzenlenenVeri.map(item => item.marka_format))).sort();
   const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).sort();
 
@@ -250,13 +249,13 @@ export default function BakimimApp() {
             <CustomSelect label="Servis" value={filtreServisTipi} options={["Farketmez", "Yetkili", "Özel"]} onChange={setFiltreServisTipi} icon={ShieldCheck} isDark={isDarkMode} />
             <button onClick={sorgula} className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-black rounded-2xl py-4 flex items-center justify-center gap-2 uppercase shadow-xl transition-all active:scale-95"><Search size={22} /> SORGULA</button>
           </div>
-          <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest italic opacity-60">* Bakımları Periyodik, Ağır ve Alt Takım gruplarıyla doğru kıyaslama yapın.</p>
+          <p className="text-slate-400 text-[10px] mt-4 font-bold uppercase tracking-widest italic opacity-60 text-center">* Periyodik, Ağır ve Alt Takım gruplarıyla doğru kıyaslama yapın.</p>
         </div>
       </div>
 
       {/* İSTATİSTİKLER */}
       {veriYukleniyor ? (
-        <div className="text-center py-20 font-bold text-slate-500 animate-pulse text-2xl uppercase italic tracking-widest text-left">Senkronize Ediliyor...</div>
+        <div className="text-center py-20 font-bold text-slate-500 animate-pulse text-2xl uppercase italic tracking-widest text-left text-center">Senkronize Ediliyor...</div>
       ) : (
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-12 relative z-20">
@@ -313,8 +312,8 @@ export default function BakimimApp() {
 
                 {acikKartId === item.id && (
                   <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                    <div className="space-y-4 text-left">
-                      <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">İşlem Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
+                    <div className="space-y-4 text-left text-slate-800">
+                      <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
                       <div className="grid grid-cols-2 gap-4">
                         <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold">{item.yakit_motor || '-'}</p></div>
                         <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
@@ -335,7 +334,7 @@ export default function BakimimApp() {
                   </div>
                 )}
               </div>
-            )) : <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}><p className="font-bold text-lg italic uppercase tracking-widest">Kriterlere Uygun Kayıt Yok</p></div>}
+            )) : <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}><p className="font-bold text-lg italic uppercase tracking-widest text-center">Kriterlere Uygun Kayıt Yok</p></div>}
           </section>
         </div>
       )}
@@ -343,37 +342,37 @@ export default function BakimimApp() {
       {/* FORM MODAL */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 text-left ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg text-left">
               <div><h2 className="text-4xl font-black italic tracking-tighter leading-none text-left">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left text-slate-800">
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><User size={14}/> Ad Soyad</label><input required placeholder="Mert Şen" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Car size={14}/> Marka</label><input required placeholder="Honda" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Info size={14}/> Model</label><input required placeholder="Civic" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Calendar size={14}/> Yıl</label><input type="number" placeholder="2024" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Calendar size={14}/> Tarih</label><input required type="date" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Wrench size={14}/> Bakım Türü</label><input required placeholder="10.000 Bakımı" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Settings size={14}/> Servis Adı</label><input required placeholder="Servis İsmi" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Gauge size={14}/> KM</label><input required type="number" placeholder="15000" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><BadgePercent size={14}/> Tutar</label><input required type="number" placeholder="12500" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
-                <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><MapPin size={14}/> Şehir</label><input required placeholder="İstanbul" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><User size={14}/> Ad Soyad</label><input required placeholder="Mert Şen" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Car size={14}/> Marka</label><input required placeholder="Honda" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Info size={14}/> Model</label><input required placeholder="Civic" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Calendar size={14}/> Yıl</label><input type="number" placeholder="2024" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Calendar size={14}/> Tarih</label><input required type="date" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Wrench size={14}/> Bakım Türü</label><input required placeholder="10.000 Bakımı" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Settings size={14}/> Servis Adı</label><input required placeholder="Servis İsmi" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Gauge size={14}/> KM</label><input required type="number" placeholder="15000" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><BadgePercent size={14}/> Tutar</label><input required type="number" placeholder="12500" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
+                <div className="space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><MapPin size={14}/> Şehir</label><input required placeholder="İstanbul" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left md:col-span-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Servis Tipi</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left">Servis Tipi</label>
                   <div className={`flex p-1.5 rounded-2xl gap-2 shadow-inner ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                     <button type="button" onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Yetkili' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-500'}`}>YETKİLİ</button>
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-500'}`}>ÖZEL</button>
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><MessageSquare size={14}/> Notlar</label><textarea className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} placeholder="Notlarınız..."></textarea></div>
+                <div className="md:col-span-2 space-y-2 text-left text-slate-800"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><MessageSquare size={14}/> Notlar</label><textarea className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner h-32 resize-none ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} placeholder="Notlarınız..."></textarea></div>
               </div>
               <div className={`border-2 border-dashed rounded-[2.5rem] p-10 text-center transition-all cursor-pointer relative ${isDarkMode ? 'bg-slate-800/50 border-slate-700 hover:bg-slate-800' : 'bg-slate-50 border-slate-200 hover:bg-blue-50'}`}>
                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files && setResimSecildi(e.target.files[0])} />
-                <div className="flex flex-col items-center gap-4">
-                  <div className="bg-white p-4 rounded-2xl shadow-sm text-yellow-600">{resimSecildi ? <Check size={32} /> : <Upload size={32} />}</div>
-                  <p className="text-sm font-black uppercase text-slate-400">{resimSecildi ? resimSecildi.name : "Fatura Yükle (Varsa)"}</p>
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="bg-white p-4 rounded-2xl shadow-sm text-yellow-600 mx-auto">{resimSecildi ? <Check size={32} /> : <Upload size={32} />}</div>
+                  <p className="text-sm font-black uppercase text-slate-400 text-center">{resimSecildi ? resimSecildi.name : "Fatura Yükle (Varsa)"}</p>
                 </div>
               </div>
               <button disabled={yukleniyor} type="submit" className="w-full bg-yellow-500 text-slate-900 py-6 rounded-[2.5rem] font-black text-xl uppercase italic shadow-xl hover:bg-yellow-400 transition-all active:scale-[0.98]">{yukleniyor ? 'GÖNDERİLİYOR...' : 'VERİYİ ONAYA GÖNDER'}</button>
@@ -385,7 +384,7 @@ export default function BakimimApp() {
       {/* BLOG SEÇKİSİ */}
       <section className="max-w-7xl mx-auto px-6 mt-32 mb-20 pt-20 border-t border-slate-200/10 text-left">
         <div className="flex justify-between items-center mb-12 text-left">
-          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-left"><BookOpen size={28} /></div><h2 className={`text-4xl font-black italic uppercase tracking-tighter text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Servis Rehberi</h2></div>
+          <div className="flex items-center gap-4 text-left"><div className="bg-yellow-500 p-3 rounded-2xl text-slate-900 shadow-lg text-left text-center"><BookOpen size={28} /></div><h2 className={`text-4xl font-black italic uppercase tracking-tighter text-left ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Servis Rehberi</h2></div>
           <Link href="/blog" className="text-xs font-black text-yellow-600 uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform text-left">Tüm Yazılar <ArrowRight size={20}/></Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left">
