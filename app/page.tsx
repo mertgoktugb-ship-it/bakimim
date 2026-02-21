@@ -5,7 +5,7 @@ import {
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, Wrench, MessageSquare, ChevronDown, BadgeCheck, Menu, 
-  Home as HomeIcon, ChevronRight, Layers, Moon, Sun
+  Home as HomeIcon, ChevronRight, Layers, Moon, Sun, Upload
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -215,7 +215,7 @@ export default function BakimimApp() {
       {/* HERO SECTION */}
       <div className={`${isDarkMode ? 'bg-slate-900' : 'bg-[#0f172a]'} py-16 px-6 transition-colors`}>
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter tracking-tight">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
           <div className={`p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
             <CustomSelect label="Marka" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} isDark={isDarkMode} />
             <CustomSelect label="Model" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} isDark={isDarkMode} />
@@ -249,7 +249,6 @@ export default function BakimimApp() {
                 isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
               } ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}
             >
-              {/* TIKLANABİLİR GÖVDE (AÇILIR ÖZELLİK) */}
               <div 
                 onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)}
                 className="p-8 flex-1 flex flex-col text-left cursor-pointer"
@@ -277,7 +276,6 @@ export default function BakimimApp() {
                   <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Kilometre</span><p className="text-xs font-bold uppercase">{item.km?.toLocaleString('tr-TR')} KM</p></div>
                 </div>
 
-                {/* AÇILAN DETAYLAR */}
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-6 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
                     <div className="flex flex-col bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">
@@ -290,14 +288,10 @@ export default function BakimimApp() {
                         {item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}
                       </p>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest text-slate-400">
-                      <Settings size={12}/> {item.servis_adi || 'Servis Belirtilmemiş'}
-                    </div>
                   </div>
                 )}
               </div>
 
-              {/* SABİT ALT KISIM (FİYAT VE SEO BUTONU) */}
               <div className="p-8 pt-0 flex flex-col gap-4 mt-auto">
                 <div className={`pt-6 border-t flex justify-between items-end ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
@@ -314,16 +308,16 @@ export default function BakimimApp() {
                 </Link>
               </div>
             </div>
-          )) : <div className="col-span-full text-center py-32 border-2 border-dashed border-slate-200 rounded-[3rem] text-slate-400 uppercase font-black italic tracking-widest">Kayıt Bulunamadı</div>}
+          )) : <div className="col-span-full text-center py-32 rounded-[3rem] border border-dashed text-slate-400 uppercase font-black italic tracking-widest">Kayıt Bulunamadı</div>}
         </section>
       </div>
 
-      {/* FORM MODAL (VERİ PAYLAŞ) */}
+      {/* FORM MODAL */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] text-left ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10">
-              <div><h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none">Veri Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 underline underline-offset-4">Şeffaf Maliyetlere Katkıda Bulun</p></div>
+              <div><h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none text-left">Veri Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">Şeffaf Maliyetlere Katkıda Bulun</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8">
@@ -340,13 +334,13 @@ export default function BakimimApp() {
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><BadgePercent size={14}/> Tutar</label><input required type="number" placeholder="12500" className={`w-full p-4 rounded-2xl font-bold border-0 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50'}`} /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><MapPin size={14}/> Şehir</label><input required placeholder="İstanbul" className={`w-full p-4 rounded-2xl font-bold border-0 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50'}`} /></div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Servis Tipi</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-left block">Servis Tipi</label>
                   <div className={`flex p-1.5 rounded-2xl gap-2 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                     <button type="button" onClick={() => setServisTipi("Yetkili")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Yetkili' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-500'}`}>YETKİLİ</button>
                     <button type="button" onClick={() => setServisTipi("Özel")} className={`flex-1 py-4 rounded-xl font-black text-xs transition-all ${servisTipi === 'Özel' ? 'bg-yellow-500 text-slate-900 shadow-lg' : 'text-slate-500'}`}>ÖZEL</button>
                   </div>
                 </div>
-                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className={`w-full p-4 rounded-2xl font-bold border-0 h-32 resize-none ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50'}`} placeholder="Eklemek istediğiniz notlar..."></textarea></div>
+                <div className="md:col-span-2 space-y-2"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><MessageSquare size={14}/> Notlar</label><textarea className={`w-full p-4 rounded-2xl font-bold border-0 h-32 resize-none ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-50'}`} placeholder="Değişen parçalar, notlar..."></textarea></div>
               </div>
               <div className={`border-2 border-dashed rounded-[2.5rem] p-10 text-center cursor-pointer relative ${isDarkMode ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-50'}`}>
                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onChange={(e) => e.target.files && setResimSecildi(e.target.files[0])} />
@@ -372,7 +366,7 @@ export default function BakimimApp() {
             <Link key={blog.slug} href={`/blog/${blog.slug}`} className="group">
               <div className={`bg-gradient-to-br ${blog.renk} aspect-video rounded-[3rem] overflow-hidden relative shadow-xl group-hover:-translate-y-2 transition-all duration-300`}>
                 <div className="absolute bottom-8 left-10 text-left">
-                  <span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block uppercase">İnceleme</span>
+                  <span className="bg-yellow-500 text-slate-900 text-[10px] font-black px-5 py-2 rounded-full mb-4 inline-block uppercase">İçerik</span>
                   <h3 className="text-3xl font-black text-white leading-tight italic uppercase">{blog.baslik}</h3>
                 </div>
               </div>
