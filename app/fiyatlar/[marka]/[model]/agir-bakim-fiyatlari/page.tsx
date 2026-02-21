@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../../../lib/supabase'; // Yol bir alt klasöre indiği için import yolu değişti
+import { supabase } from '../../../../../lib/supabase';
 import Link from 'next/link';
 import { 
   ArrowLeft, ShieldCheck, BadgePercent, Zap, Car, 
@@ -14,7 +14,6 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Tema Kontrolü
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') setIsDarkMode(true);
@@ -33,7 +32,6 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
     return "Periyodik Bakım";
   };
 
-  // Params ve Veri Çekme - SADECE AĞIR BAKIM FİLTRESİ
   useEffect(() => {
     const veriGetir = async () => {
       const p = await params;
@@ -84,10 +82,8 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
   return (
     <main className={`min-h-screen pb-20 text-left font-sans transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-slate-200' : 'bg-[#F8FAFC] text-slate-800'}`}>
       
-      {/* Header */}
       <div className={`py-16 px-6 border-b ${isDarkMode ? 'bg-[#0f172a] border-slate-800' : 'bg-[#0f172a] border-slate-800'} text-white`}>
         <div className="max-w-7xl mx-auto">
-          {/* LİNK DÜZELTİLDİ: DİREKT ANA SAYFAYA DÖNÜYOR */}
           <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-yellow-500 mb-8 transition-colors font-black uppercase text-[10px] tracking-widest">
             <ArrowLeft size={16} /> Ana Sayfaya Dön
           </Link>
@@ -107,7 +103,6 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
       </div>
 
       <div className="max-w-7xl mx-auto px-6">
-        {/* Ortalamalar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-20 relative z-20">
           <div className={`p-8 rounded-[2rem] shadow-xl border text-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
@@ -132,7 +127,6 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
           Ağır Bakım Kayıtları
         </h2>
 
-        {/* 3'lü Izgara ve Açılır Kartlar */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
           {kayitlar.length > 0 ? kayitlar.map((item) => (
             <div 
