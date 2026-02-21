@@ -227,7 +227,7 @@ export default function BakimimApp() {
 
       {/* NAVBAR */}
       <nav className={`px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm border-b transition-colors duration-500 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 text-left">
           <button onClick={() => setIsMenuOpen(true)} className={`p-2.5 rounded-xl transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 text-slate-600 hover:bg-yellow-500'}`}><Menu size={24}/></button>
           <Link href="/" className="flex items-center gap-3"><div className="bg-[#0f172a] p-2 rounded-xl text-yellow-400"><Car size={24} /></div><span className={`text-2xl font-black italic uppercase ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>bakımım<span className="text-yellow-500">.com</span></span></Link>
         </div>
@@ -267,7 +267,7 @@ export default function BakimimApp() {
         </div>
 
         {/* SONUÇ KARTLARI */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 text-left">
           {sonuclar.length > 0 ? sonuclar.map((item) => (
             <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
               <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 flex-1 flex flex-col text-left cursor-pointer">
@@ -279,15 +279,18 @@ export default function BakimimApp() {
                   </div>
                 </div>
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 leading-none"><Car size={14} /><span>{item.marka_format}</span></div>
+                  <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1"><Car size={14} /><span>{item.marka_format}</span></div>
                   <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'} leading-tight`}>{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
                   
+                  {/* KATMANLI BAKIM BİLGİSİ - KM BİRLEŞTİRME */}
                   <div className="mt-4 space-y-1">
                     <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                       <Layers size={14} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">İşlem Türü: {item.bakim_kategorisi}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">
+                        {item.bakim_kategorisi === "Periyodik Bakım" ? `PERİYODİK BAKIM (${item.km?.toLocaleString('tr-TR')} KM)` : item.bakim_kategorisi}
+                      </span>
                     </div>
-                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-transparent text-slate-500 border-slate-100'}`}>
                        {item.bakim_turu_format}
                     </p>
                   </div>
@@ -295,17 +298,17 @@ export default function BakimimApp() {
 
                 <div className="grid grid-cols-2 gap-4 mb-2">
                   <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Şehir</span><p className="text-xs font-bold uppercase truncate">{item.sehir}</p></div>
-                  <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Kilometre</span><p className="text-xs font-bold uppercase">{item.km?.toLocaleString('tr-TR')} KM</p></div>
+                  <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Konum</span><p className="text-xs font-bold uppercase truncate tracking-tight text-slate-400 italic">Servis Verisi</p></div>
                 </div>
 
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-6 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
-                    {/* DÜZELTME: bg-white yerine bg-transparent yapıldı, border eklendi */}
-                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl">
+                    {/* DÜZELTME: ARKA PLANLAR TAMAMEN BEYAZ/ŞEFFAF YAPILDI */}
+                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><Fuel size={12}/> Motor & Yakıt Bilgisi</span>
                       <p className="text-xs font-bold uppercase">{item.yakit_motor || 'Belirtilmemiş'}</p>
                     </div>
-                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl">
+                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><MessageSquare size={12}/> Kullanıcı Notu</span>
                       <p className="text-xs font-bold text-slate-600 dark:text-slate-300 italic leading-relaxed">{item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}</p>
                     </div>
@@ -317,7 +320,7 @@ export default function BakimimApp() {
                   <div><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
                   <div className="text-[10px] font-black text-slate-400 uppercase italic">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div>
                 </div>
-                <Link href={`/fiyatlar/${item.marka_format.toLowerCase()}/${item.model_format.toLowerCase()}`} className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/></Link>
+                <Link href={`/fiyatlar/${item.marka_format.toLowerCase()}/${item.model_format.toLowerCase()}`} className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-white text-slate-500 border-slate-100'}`}>TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/></Link>
               </div>
             </div>
           )) : <div className="col-span-full text-center py-32 border-2 border-dashed border-slate-200 rounded-[3rem] text-slate-400 uppercase font-black italic tracking-widest text-left px-10">Kayıt Bulunamadı</div>}
