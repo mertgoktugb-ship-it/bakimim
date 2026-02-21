@@ -17,6 +17,7 @@ const blogYazilari = [
 
 const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Yürüyen Aksam"];
 
+// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -207,13 +208,13 @@ export default function BakimimApp() {
             <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl hover:bg-yellow-500 hover:text-slate-900 transition-colors"><X size={24}/></button>
           </div>
           <nav className="flex-1 p-6 space-y-4">
-            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
               <div className="flex items-center gap-4"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/>
             </Link>
-            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
+            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
               <div className="flex items-center gap-4"><Users size={22}/> HAKKIMIZDA</div><ChevronRight size={18}/>
             </Link>
-            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
+            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
               <div className="flex items-center gap-4"><Mail size={22}/> İLETİŞİM</div><ChevronRight size={18}/>
             </Link>
           </nav>
@@ -226,7 +227,7 @@ export default function BakimimApp() {
 
       {/* NAVBAR */}
       <nav className={`px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm border-b transition-colors duration-500 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="flex items-center gap-4 text-left">
+        <div className="flex items-center gap-4">
           <button onClick={() => setIsMenuOpen(true)} className={`p-2.5 rounded-xl transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 text-slate-600 hover:bg-yellow-500'}`}><Menu size={24}/></button>
           <Link href="/" className="flex items-center gap-3"><div className="bg-[#0f172a] p-2 rounded-xl text-yellow-400"><Car size={24} /></div><span className={`text-2xl font-black italic uppercase ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>bakımım<span className="text-yellow-500">.com</span></span></Link>
         </div>
@@ -254,7 +255,6 @@ export default function BakimimApp() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 text-left">
-        {/* Ortalamalar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-12 relative z-20">
           <div className={`p-8 rounded-[2rem] shadow-xl border text-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-yellow-600"/> Yetkili Servis Ortalaması</p>
@@ -267,7 +267,7 @@ export default function BakimimApp() {
         </div>
 
         {/* SONUÇ KARTLARI */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 text-left">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {sonuclar.length > 0 ? sonuclar.map((item) => (
             <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
               <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 flex-1 flex flex-col text-left cursor-pointer">
@@ -279,16 +279,15 @@ export default function BakimimApp() {
                   </div>
                 </div>
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1"><Car size={14} /><span>{item.marka_format}</span></div>
+                  <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 leading-none"><Car size={14} /><span>{item.marka_format}</span></div>
                   <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'} leading-tight`}>{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
                   
-                  {/* KONSEPT DÜZELTME: KATMANLI BAKIM BİLGİSİ */}
                   <div className="mt-4 space-y-1">
                     <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                       <Layers size={14} />
                       <span className="text-[10px] font-black uppercase tracking-widest">İşlem Türü: {item.bakim_kategorisi}</span>
                     </div>
-                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
                        {item.bakim_turu_format}
                     </p>
                   </div>
@@ -301,11 +300,12 @@ export default function BakimimApp() {
 
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-6 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
-                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
+                    {/* DÜZELTME: bg-white yerine bg-transparent yapıldı, border eklendi */}
+                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><Fuel size={12}/> Motor & Yakıt Bilgisi</span>
                       <p className="text-xs font-bold uppercase">{item.yakit_motor || 'Belirtilmemiş'}</p>
                     </div>
-                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
+                    <div className="flex flex-col bg-transparent border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><MessageSquare size={12}/> Kullanıcı Notu</span>
                       <p className="text-xs font-bold text-slate-600 dark:text-slate-300 italic leading-relaxed">{item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}</p>
                     </div>
