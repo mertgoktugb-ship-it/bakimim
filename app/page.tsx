@@ -9,6 +9,12 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+// --- BLOG VERİLERİ (Hatanın Çözümü Burada) ---
+const blogYazilari = [
+  { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
+  { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
+];
+
 // --- KATEGORİ TANIMLARI ---
 const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Yürüyen Aksam"];
 
@@ -27,9 +33,9 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
-        <div className="flex items-center gap-2 truncate text-left">
+        <div className="flex items-center gap-2 truncate text-left text-slate-800">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
-          <span className={value ? "" : "text-slate-400"}>{value || label}</span>
+          <span className={value ? "text-slate-800" : "text-slate-400"}>{value || label}</span>
         </div>
         <ChevronDown size={20} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
@@ -85,19 +91,10 @@ export default function BakimimApp() {
     return temiz.charAt(0).toLocaleUpperCase('tr-TR') + temiz.slice(1).toLocaleLowerCase('tr-TR');
   };
 
-  // --- AKILLI KATEGORİZASYON MOTORU ---
   const kategorizeEt = (metin: string) => {
     const m = metin.toLocaleLowerCase('tr-TR');
-    
-    // Ağır Bakım Önceliği
-    if (m.includes("ağır") || m.includes("triger") || m.includes("motor revizyon") || m.includes("şanzıman") || m.includes("rektifiye") || m.includes("sandık motor")) {
-      return "Ağır Bakım";
-    }
-    // Alt Takım Önceliği
-    if (m.includes("alt takım") || m.includes("yürüyen") || m.includes("fren") || m.includes("balata") || m.includes("disk") || m.includes("amortisör") || m.includes("rot")) {
-      return "Alt Takım & Yürüyen Aksam";
-    }
-    // Geri Kalan Periyodik (KM ve Yıl bakımları dahil)
+    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman") || m.includes("rektifiye") || m.includes("sandık")) return "Ağır Bakım";
+    if (m.includes("alt takım") || m.includes("fren") || m.includes("balata") || m.includes("disk") || m.includes("rot")) return "Alt Takım & Yürüyen Aksam";
     return "Periyodik Bakım";
   };
 
@@ -112,6 +109,7 @@ export default function BakimimApp() {
           marka_format: normalizeMetin(item.marka),
           model_format: normalizeMetin(item.model),
           bakim_kategorisi: kategorizeEt(item.bakim_turu || ""),
+          bakim_turu_format: normalizeMetin(item.bakim_turu),
           ekran_fiyat: item.fiyat ? item.fiyat.toLocaleString('tr-TR') + " TL" : "Fiyat Alınız",
           bas_harfler: item.ad_soyad ? item.ad_soyad.trim().split(/\s+/).map((p: string) => p.charAt(0).toUpperCase() + ".").join(" ") : "",
           fatura_onayli: !!item.fatura_url,
@@ -209,12 +207,12 @@ export default function BakimimApp() {
   return (
     <main className={`min-h-screen pb-20 text-left relative font-sans transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-slate-200' : 'bg-[#F8FAFC] text-slate-800'}`}>
       
-      {/* YAN MENÜ (Drawer) */}
+      {/* YAN MENÜ */}
       <div className={`fixed inset-0 z-[200] transition-all duration-500 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
         <div onClick={() => setIsMenuOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
         <div className={`absolute top-0 left-0 h-full w-80 shadow-2xl transition-transform duration-500 flex flex-col ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'} ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
           <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-[#0f172a] text-white">
-            <div className="flex flex-col text-left"><span className="text-2xl font-black italic uppercase text-left">BAKIMIM<span className="text-yellow-500">.COM</span></span></div>
+            <div className="flex flex-col text-left"><span className="text-2xl font-black italic uppercase">BAKIMIM<span className="text-yellow-500">.COM</span></span></div>
             <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl text-white"><X size={24}/></button>
           </div>
           <nav className="flex-1 p-6 space-y-4 text-left">
@@ -243,7 +241,6 @@ export default function BakimimApp() {
       <div className={`${isDarkMode ? 'bg-slate-900' : 'bg-[#0f172a]'} py-16 px-6 transition-colors`}>
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
-          
           <div className={`p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-left ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
             <CustomSelect label="Marka" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} isDark={isDarkMode} />
             <CustomSelect label="Model" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} isDark={isDarkMode} />
@@ -263,15 +260,11 @@ export default function BakimimApp() {
         <>
           <div className="max-w-4xl mx-auto px-6 -mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 relative z-20">
             <div className={`p-8 rounded-[2rem] shadow-xl border text-center transition-all hover:border-yellow-500 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
-                <ShieldCheck size={18} className="text-yellow-600"/> {secilenMarka ? `${secilenMarka} Yetkili Ortanca` : 'Genel Yetkili Ortanca'}
-              </p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-yellow-600"/> {secilenMarka ? `${secilenMarka} Yetkili Ortanca` : 'Genel Yetkili Ortanca'}</p>
               <p className={`text-4xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{medYetkili.toLocaleString('tr-TR')} TL</p>
             </div>
             <div className={`p-8 rounded-[2rem] shadow-xl border text-center transition-all hover:border-indigo-500 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2 text-indigo-600">
-                <BadgePercent size={18}/> {secilenMarka ? `${secilenMarka} Özel Ortanca` : 'Genel Özel Ortanca'}
-              </p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2 text-indigo-600"><BadgePercent size={18}/> {secilenMarka ? `${secilenMarka} Özel Ortanca` : 'Genel Özel Ortanca'}</p>
               <p className={`text-4xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{medOzel.toLocaleString('tr-TR')} TL</p>
             </div>
           </div>
@@ -280,7 +273,7 @@ export default function BakimimApp() {
             {sonuclar.length > 0 ? sonuclar.map((item) => (
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all text-left ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
                 <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 md:p-10 flex flex-col md:flex-row items-center cursor-pointer text-left">
-                  <div className="md:w-64 mr-10 text-left text-slate-800">
+                  <div className="md:w-64 mr-10 text-left">
                     <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase mb-4 inline-block shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
                     <div className="flex flex-col gap-1 text-left">
                       <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-sm tracking-widest">
@@ -341,7 +334,7 @@ export default function BakimimApp() {
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20 transition-all"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left text-slate-800">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                 <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><User size={14}/> Ad Soyad</label><input required placeholder="Mert Şen" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Car size={14}/> Marka</label><input required placeholder="Honda" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
                 <div className="space-y-2 text-left"><label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 text-left"><Info size={14}/> Model</label><input required placeholder="Civic" className={`w-full p-4 border-0 rounded-2xl font-bold outline-none shadow-inner ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-600' : 'bg-slate-50 text-slate-800'}`} /></div>
