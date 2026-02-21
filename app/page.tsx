@@ -17,7 +17,6 @@ const blogYazilari = [
 
 const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Yürüyen Aksam"];
 
-// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -207,14 +206,14 @@ export default function BakimimApp() {
             <span className="text-2xl font-black italic uppercase">BAKIMIM<span className="text-yellow-500">.COM</span></span>
             <button onClick={() => setIsMenuOpen(false)} className="bg-white/10 p-2 rounded-xl hover:bg-yellow-500 hover:text-slate-900 transition-colors"><X size={24}/></button>
           </div>
-          <nav className="flex-1 p-6 space-y-4 text-left">
-            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
+          <nav className="flex-1 p-6 space-y-4">
+            <Link href="/" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
               <div className="flex items-center gap-4"><HomeIcon size={22}/> ANASAYFA</div><ChevronRight size={18}/>
             </Link>
-            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
+            <Link href="/hakkimizda" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
               <div className="flex items-center gap-4"><Users size={22}/> HAKKIMIZDA</div><ChevronRight size={18}/>
             </Link>
-            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500 hover:text-slate-900'}`}>
+            <Link href="/iletisim" onClick={() => setIsMenuOpen(false)} className={`flex items-center justify-between p-5 rounded-2xl font-black italic uppercase transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-900' : 'bg-slate-50 text-slate-700 hover:bg-yellow-500'}`}>
               <div className="flex items-center gap-4"><Mail size={22}/> İLETİŞİM</div><ChevronRight size={18}/>
             </Link>
           </nav>
@@ -227,7 +226,7 @@ export default function BakimimApp() {
 
       {/* NAVBAR */}
       <nav className={`px-8 py-5 sticky top-0 z-50 flex justify-between items-center shadow-sm border-b transition-colors duration-500 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 text-left">
           <button onClick={() => setIsMenuOpen(true)} className={`p-2.5 rounded-xl transition-all ${isDarkMode ? 'bg-slate-800 text-slate-200 hover:bg-yellow-500 hover:text-slate-950' : 'bg-slate-50 text-slate-600 hover:bg-yellow-500'}`}><Menu size={24}/></button>
           <Link href="/" className="flex items-center gap-3"><div className="bg-[#0f172a] p-2 rounded-xl text-yellow-400"><Car size={24} /></div><span className={`text-2xl font-black italic uppercase ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>bakımım<span className="text-yellow-500">.com</span></span></Link>
         </div>
@@ -241,8 +240,8 @@ export default function BakimimApp() {
 
       {/* HERO SECTION */}
       <div className={`${isDarkMode ? 'bg-slate-900' : 'bg-[#0f172a]'} py-16 px-6 transition-colors`}>
-        <div className="max-w-7xl mx-auto text-center text-left">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter tracking-tight">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-8 uppercase italic tracking-tighter">FİYAT <span className="text-yellow-500">KIYASLA</span></h1>
           <div className={`p-5 rounded-[2.5rem] shadow-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
             <CustomSelect label="Marka" value={secilenMarka} options={tumMarkalar} onChange={setSecilenMarka} icon={Car} isDark={isDarkMode} />
             <CustomSelect label="Model" value={secilenModel} options={musaitModeller} onChange={setSecilenModel} icon={Info} isDark={isDarkMode} />
@@ -282,23 +281,31 @@ export default function BakimimApp() {
                 <div className="mb-6">
                   <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1"><Car size={14} /><span>{item.marka_format}</span></div>
                   <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'} leading-tight`}>{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
-                  {/* BAKIM BİLGİSİ BURAYA EKLENDİ */}
-                  <div className="inline-flex items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 px-3 py-1 rounded-lg mt-3">
-                    <Wrench size={14} />
-                    <span className="text-xs font-black uppercase tracking-tight">{item.bakim_turu_format}</span>
+                  
+                  {/* KONSEPT DÜZELTME: KATMANLI BAKIM BİLGİSİ */}
+                  <div className="mt-4 space-y-1">
+                    <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                      <Layers size={14} />
+                      <span className="text-[10px] font-black uppercase tracking-widest">İşlem Türü: {item.bakim_kategorisi}</span>
+                    </div>
+                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                       {item.bakim_turu_format}
+                    </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-2 text-left">
+
+                <div className="grid grid-cols-2 gap-4 mb-2">
                   <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Şehir</span><p className="text-xs font-bold uppercase truncate">{item.sehir}</p></div>
                   <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Kilometre</span><p className="text-xs font-bold uppercase">{item.km?.toLocaleString('tr-TR')} KM</p></div>
                 </div>
+
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-6 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4">
-                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm text-left">
+                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><Fuel size={12}/> Motor & Yakıt Bilgisi</span>
                       <p className="text-xs font-bold uppercase">{item.yakit_motor || 'Belirtilmemiş'}</p>
                     </div>
-                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm text-left">
+                    <div className="flex flex-col bg-white border border-slate-100 dark:bg-slate-800/50 dark:border-transparent p-3 rounded-xl shadow-sm">
                       <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><MessageSquare size={12}/> Kullanıcı Notu</span>
                       <p className="text-xs font-bold text-slate-600 dark:text-slate-300 italic leading-relaxed">{item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}</p>
                     </div>
@@ -310,7 +317,7 @@ export default function BakimimApp() {
                   <div><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
                   <div className="text-[10px] font-black text-slate-400 uppercase italic">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div>
                 </div>
-                <Link href={`/fiyatlar/${item.marka_format.toLowerCase()}/${item.model_format.toLowerCase()}`} className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-100 text-slate-500 border-slate-100'}`}>TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/></Link>
+                <Link href={`/fiyatlar/${item.marka_format.toLowerCase()}/${item.model_format.toLowerCase()}`} className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-slate-50 text-slate-500 border-slate-100'}`}>TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/></Link>
               </div>
             </div>
           )) : <div className="col-span-full text-center py-32 border-2 border-dashed border-slate-200 rounded-[3rem] text-slate-400 uppercase font-black italic tracking-widest text-left px-10">Kayıt Bulunamadı</div>}
@@ -321,8 +328,8 @@ export default function BakimimApp() {
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] text-left ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
-            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10">
-              <div><h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none text-left">Veri Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3 text-left">Şeffaf Maliyetlere Katkıda Bulun</p></div>
+            <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 text-left">
+              <div><h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none">Veri Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">Şeffaf Maliyetlere Katkıda Bulun</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl"><X size={28} /></button>
             </div>
             <form onSubmit={veriyiGonder} className="p-10 space-y-8 text-left">
