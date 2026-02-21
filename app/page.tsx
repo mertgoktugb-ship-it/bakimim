@@ -6,7 +6,7 @@ import {
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
   Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
-} from 'lucide-react'; // Hatayı burada düzelttim (lucide-react)
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 // --- BLOG VERİLERİ ---
@@ -33,7 +33,7 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
-        <div className="flex items-center gap-2 truncate text-left text-slate-800">
+        <div className="flex items-center gap-2 truncate text-left">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
           <span className={value ? "" : "text-slate-400"}>{value || label}</span>
         </div>
@@ -56,13 +56,11 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
 export default function BakimimApp() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
   const [secilenMarka, setSecilenMarka] = useState("");
   const [secilenModel, setSecilenModel] = useState("");
   const [secilenSehir, setSecilenSehir] = useState("");
   const [secilenBakimKategorisi, setSecilenBakimKategorisi] = useState("");
   const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez");
-
   const [sonuclar, setSonuclar] = useState<any[]>([]);
   const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]);
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
@@ -101,7 +99,13 @@ export default function BakimimApp() {
   const veriCek = useCallback(async () => {
     setVeriYukleniyor(true);
     try {
-      const { data } = await supabase.from('bakim_kayitlari').select('*').eq('onayli_mi', true).order('id', { ascending: false });
+      // GÜVENLİK GÜNCELLEMESİ: Sadece gerekli sütunlar çekiliyor
+      const { data } = await supabase
+        .from('bakim_kayitlari')
+        .select('id, marka, model, yil, yakit_motor, bakim_turu, km, sehir, yetkili_mi, fiyat, fatura_url, tarih, ad_soyad, notlar')
+        .eq('onayli_mi', true)
+        .order('id', { ascending: false });
+
       if (data) {
         const valideEdilmisData = data.filter(item => item.marka && item.model && item.fiyat).map(item => ({
           ...item,
