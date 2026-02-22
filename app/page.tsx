@@ -31,7 +31,6 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      {/* KOYU MODDA YAZILARIN GÖRÜNMESİ İÇİN: isDark ? 'text-white' : 'text-slate-800' */}
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
         <div className="flex items-center gap-2 truncate text-left">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
@@ -247,7 +246,6 @@ export default function BakimimApp() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6">
-        {/* ORTALAMALAR */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-12 relative z-20">
           <div className={`p-8 rounded-[2rem] shadow-xl border text-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-yellow-600"/> Yetkili Servis Ortalaması</p>
@@ -275,10 +273,13 @@ export default function BakimimApp() {
                 <div className="mb-6">
                   <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 leading-none"><Car size={14} /><span>{item.marka_format}</span></div>
                   <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'} leading-tight`}>{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
-                  <div className="mt-4 space-y-1 text-yellow-700 dark:text-yellow-500 font-black uppercase text-[10px] tracking-widest flex items-center gap-2"><Layers size={14} /> {item.km?.toLocaleString('tr-TR')} KM BAKIM KAYDI</div>
+                  {/* Bakım Tipi + KM Bilgisi Buraya Eklendi */}
+                  <div className="mt-4 space-y-1 text-yellow-700 dark:text-yellow-500 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
+                    <Layers size={14} /> {item.km?.toLocaleString('tr-TR')} KM BAKIM KAYDI
+                  </div>
                 </div>
                 
-                {/* DETAY KISMI: Sarı renk ve detaylar eklendi */}
+                {/* DETAY KISMI: Sarı renk, detaylar ve doğrulama yazıları */}
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-4 border-t space-y-3 animate-in fade-in slide-in-from-top-2">
                      <div className="bg-yellow-500 text-slate-900 p-4 rounded-xl shadow-lg border border-yellow-600">
@@ -292,7 +293,6 @@ export default function BakimimApp() {
                      <div className="bg-yellow-500 text-slate-900 p-4 rounded-xl shadow-lg border border-yellow-600">
                         <div className="flex justify-between items-center mb-2"><span className="text-xl font-black italic uppercase">{item.bas_harfler}</span><ShieldAlert size={16} className="opacity-50"/></div>
                         <p className="text-xs italic font-bold">"{item.notlar || 'Detay belirtilmemiş.'}"</p>
-                        {/* KULLANICI BEYANI / BELGE DOĞRULAMA YAZILARI GERİ GELDİ */}
                         <div className="mt-4 flex items-center gap-2 text-[9px] font-black tracking-widest uppercase py-2 px-3 rounded-xl bg-slate-900 text-white w-fit">
                            {item.fatura_onayli ? <><ShieldCheck size={12} className="text-emerald-400" /> Belge Destekli Bildirim</> : <><BadgeCheck size={12} className="opacity-50" /> Kullanıcı Beyanı</>}
                         </div>
@@ -315,7 +315,7 @@ export default function BakimimApp() {
       {/* VERİ PAYLAŞ FORMU */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
+          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-800'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg">
               <div><h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20"><X size={28} /></button>
