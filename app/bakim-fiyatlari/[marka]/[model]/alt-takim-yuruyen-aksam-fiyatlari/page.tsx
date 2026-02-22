@@ -54,7 +54,7 @@ export default function AltTakimSayfasi({ params }: { params: any }) {
             kullanici_onayli: !item.fatura_url
           })).filter(item => {
             const m = (item.bakim_turu || "").toLocaleLowerCase('tr-TR');
-            return m.includes("alt takım") || m.includes("fren") || m.includes("balata") || m.includes("disk") || m.includes("amortisör");
+            return m.includes("alt takım") || m.includes("fren") || m.includes("balata") || m.includes("disk");
           });
           setKayitlar(duzenlenmisData);
         }
@@ -79,16 +79,13 @@ export default function AltTakimSayfasi({ params }: { params: any }) {
           <h1 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9]">
             {normalizeMetin(resolvedParams.marka.replace(/-/g, ' '))} <span className="text-yellow-500">{normalizeMetin(resolvedParams.model.replace(/-/g, ' '))}</span><br/>ALT TAKIM FİYATLARI
           </h1>
-          <p className="text-slate-400 font-bold uppercase text-[11px] tracking-[0.3em] mt-4 flex items-center gap-2">
-            <Zap size={14} className="text-yellow-500" /> TOPLAM {kayitlar.length} DOĞRULANMIŞ ALT TAKIM KAYDI
-          </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {kayitlar.length > 0 ? kayitlar.map((item) => (
-            <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500' : ''}`}>
+          {kayitlar.map((item) => (
+            <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm flex flex-col h-fit transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
               <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 flex-1 flex flex-col text-left cursor-pointer relative">
                 <div className="absolute top-8 right-8"><ChevronDown size={20} className={`text-slate-400 transition-transform ${acikKartId === item.id ? 'rotate-180 text-yellow-500' : ''}`} /></div>
                 <div className="flex justify-between items-start mb-6 pr-8">
@@ -100,27 +97,40 @@ export default function AltTakimSayfasi({ params }: { params: any }) {
                 </div>
                 <div className="mb-6">
                   <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 leading-none"><Car size={14} /><span>{item.marka_format}</span></div>
-                  <h3 className="text-2xl font-black italic uppercase leading-tight">{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
+                  <h3 className="text-2xl font-black italic uppercase tracking-tight leading-tight">{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
                   <div className="mt-4 space-y-1">
                     <div className="flex items-center gap-2 text-indigo-600"><Layers size={14} /><span className="text-[10px] font-black uppercase tracking-widest">ALT TAKIM & FREN SİSTEMİ</span></div>
-                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-white text-slate-500 border-slate-100'}`}>{item.bakim_turu_format}</p>
+                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-white text-slate-500 border-slate-100 shadow-none'}`}>{item.bakim_turu_format}</p>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Şehir</span><p className="text-xs font-bold uppercase truncate">{item.sehir}</p></div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 text-slate-400">Durum</span>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-tighter ${item.fatura_onayli ? 'text-emerald-500' : 'text-blue-500'}`}>{item.fatura_onayli ? 'Belge Onaylı' : 'Kullanıcı Beyanı'}</p>
+                  </div>
+                </div>
+
                 {acikKartId === item.id && (
-                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex flex-col bg-transparent border border-slate-200 dark:border-slate-700 p-4 rounded-xl">
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex flex-col border border-slate-200 dark:border-slate-700 p-4 rounded-xl">
+                      <span className="text-[9px] text-slate-500 uppercase font-black mb-1 flex items-center gap-1"><Fuel size={12}/> Motor & Yakıt Bilgisi</span>
+                      <p className="text-xs font-bold uppercase">{item.yakit_motor || 'Belirtilmemiş'}</p>
+                    </div>
+                    <div className="flex flex-col border border-slate-200 dark:border-slate-700 p-4 rounded-xl mt-3">
                       <span className="text-[9px] text-slate-500 uppercase font-black mb-1 flex items-center gap-1"><MessageSquare size={12}/> Kullanıcı Notu</span>
-                      <p className="text-xs font-bold italic">{item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}</p>
+                      <p className="text-xs font-bold italic">"{item.notlar || 'Detay belirtilmemiş.'}"</p>
                     </div>
                   </div>
                 )}
               </div>
               <div className="p-8 pt-0 border-t flex justify-between items-end">
-                <div><span className="text-[10px] text-slate-500 uppercase font-black block">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600">{item.fiyat?.toLocaleString('tr-TR')} TL</p></div>
+                <div><span className="text-[10px] text-slate-500 uppercase font-black block">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.fiyat?.toLocaleString('tr-TR')} TL</p></div>
                 <div className="text-[10px] font-black text-slate-400 italic">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div>
               </div>
             </div>
-          )) : <div className="col-span-full text-center py-20 border-2 border-dashed border-slate-200 rounded-[2rem] text-slate-400 uppercase font-black italic">Henüz veri bulunmuyor.</div>}
+          ))}
         </div>
       </div>
     </main>
