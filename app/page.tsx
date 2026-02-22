@@ -5,7 +5,7 @@ import {
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
-  Home as HomeIcon, Mail, ChevronRight, Moon, Sun, Layers
+  Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -22,17 +22,19 @@ const slugify = (text: string) => {
              .replace(/^-|-$/g, '') : '';
 };
 
+// --- BLOG VERİLERİ ---
 const blogYazilari = [
   { slug: "yetkili-vs-ozel-servis", kategori: "Analiz", baslik: "Yetkili Servis mi Özel Servis mi?", renk: "from-slate-900 to-black" },
   { slug: "ankara-toyota-chr-batarya-degisim-maliyeti", kategori: "Hibrit", baslik: "Ankara Toyota C-HR Batarya Değişimi", renk: "from-slate-800 to-slate-900" }
 ];
 
+// --- KATEGORİ TANIMLARI ---
 const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Yürüyen Aksam"];
 
+// --- ÖZEL SELECT BİLEŞENİ ---
 const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
@@ -73,6 +75,8 @@ export default function BakimimApp() {
   const [secilenSehir, setSecilenSehir] = useState("");
   const [secilenBakimKategorisi, setSecilenBakimKategorisi] = useState("");
   const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez");
+
+  // YENİ EKLENEN SIRALAMA STATE'İ
   const [siralamaTipi, setSiralamaTipi] = useState("tarih-yeni");
 
   const [sonuclar, setSonuclar] = useState<any[]>([]);
@@ -290,7 +294,7 @@ export default function BakimimApp() {
             </div>
           </div>
 
-          {/* SIRALAMA KUTUSU */}
+          {/* SIRALAMA KUTUSU (TOPLAM SAYI YAZISI OLMADAN, SAĞA DAYALI) */}
           {siraliSonuclar.length > 0 && (
             <div className="flex justify-end items-center mb-6 animate-in fade-in duration-500">
               <div className="flex items-center gap-3">
@@ -312,7 +316,7 @@ export default function BakimimApp() {
 
           {/* SONUÇLAR - ORİJİNAL 3'LÜ GRID DÜZENİ */}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-            {siraliSonuclar.map((item) => {
+            {siraliSonuclar.length > 0 ? siraliSonuclar.map((item) => {
               let kategoriPath = "";
               if (item.bakim_kategorisi === "Periyodik Bakım") kategoriPath = "/periyodik-bakim-fiyatlari";
               else if (item.bakim_kategorisi === "Ağır Bakım") kategoriPath = "/agir-bakim-fiyatlari";
@@ -331,8 +335,11 @@ export default function BakimimApp() {
                     <div className="flex justify-between items-start mb-6 pr-8">
                       <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
                       <div className="flex gap-1">
-                        {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Fatura Doğrulandı"><ShieldCheck size={12} strokeWidth={4} /></div>}
-                        {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg" title="Kullanıcı Doğrulandı"><BadgeCheck size={12} strokeWidth={4} /></div>}
+                        {item.fatura_onayli ? (
+                          <div className="bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Belge Destekli Kullanıcı Bildirimi"><ShieldCheck size={12} strokeWidth={4} /></div>
+                        ) : (
+                          <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg" title="Kullanıcı Beyanı"><BadgeCheck size={12} strokeWidth={4} /></div>
+                        )}
                       </div>
                     </div>
 
@@ -359,14 +366,15 @@ export default function BakimimApp() {
                     </div>
 
                     <div className={`mt-auto pt-6 border-t flex justify-between items-end ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-                      <div><span className="text-[10px] text-slate-500 uppercase font-black block">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p></div>
+                      <div><span className="text-[10px] text-slate-500 uppercase font-black block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p></div>
                     </div>
                   </div>
 
+                  {/* KART AÇILINCA ÇIKAN MOTOR, KİLOMETRE BİLGİSİNİN YAZI RENGİ DARK MOD'DA ÇÖZÜLDÜ */}
                   {acikKartId === item.id && (
                     <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                      <div className="space-y-4 text-left text-slate-800">
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
+                      <div className={`space-y-4 text-left ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className={`text-sm font-bold leading-snug ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{item.bakim_turu_format}</p></div>
                         <div className="grid grid-cols-2 gap-4">
                           <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold">{item.yakit_motor || '-'}</p></div>
                           <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
@@ -379,29 +387,25 @@ export default function BakimimApp() {
                          </div>
                          <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
                          {item.fatura_onayli ? (
-                           <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Fatura Onaylı</div>
+                           <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Belge Destekli Kullanıcı Bildirimi</div>
                          ) : (
                            <div className="bg-slate-800/20 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><BadgeCheck size={14} className="opacity-50" /> Kullanıcı Beyanı</div>
                          )}
                       </div>
                     </div>
                   )}
-                  
+
+                  {/* DİNAMİK YÖNLENDİRME BUTONU (Altında) */}
                   <Link 
                     href={linkHref} 
-                    className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest transition-colors border-t ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
+                    className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest transition-colors border-t ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-200'}`}
                   >
                     Tüm {item.marka_format} {item.model_format} Bakımlarını Gör
                   </Link>
+
                 </div>
               );
-            })}
-            
-            {siraliSonuclar.length === 0 && (
-              <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
-                <p className="font-bold text-lg italic uppercase tracking-widest text-center">Kriterlere Uygun Kayıt Yok</p>
-              </div>
-            )}
+            }) : <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}><p className="font-bold text-lg italic uppercase tracking-widest text-center">Kriterlere Uygun Kayıt Yok</p></div>}
           </section>
         </div>
       )}
