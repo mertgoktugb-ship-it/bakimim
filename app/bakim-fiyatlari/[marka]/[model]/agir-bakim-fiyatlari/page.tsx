@@ -30,8 +30,8 @@ export default function AltKategoriDetaySayfasi() {
   const aktifKategori = "agir";
 
   // URL'den elde edilecek marka ve model slug'ları (Butonlar için)
-  const markaSlug = params.marka;
-  const modelSlug = params.model;
+  const markaSlug = params.marka as string;
+  const modelSlug = params.model as string;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -46,8 +46,8 @@ export default function AltKategoriDetaySayfasi() {
 
   const kategorizeEt = (metin: string) => {
     const m = metin.toLocaleLowerCase('tr-TR');
-    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman") || m.includes("rektifiye") || m.includes("sandık")) return "Ağır Bakım";
-    if (m.includes("alt takım") || m.includes("yürüyen") || m.includes("fren") || m.includes("balata") || m.includes("disk") || m.includes("rot")) return "Alt Takım & Yürüyen Aksam";
+    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman")) return "Ağır Bakım";
+    if (m.includes("alt takım") || m.includes("yürüyen") || m.includes("fren") || m.includes("balata")) return "Alt Takım & Yürüyen Aksam";
     return "Periyodik Bakım";
   };
 
@@ -101,7 +101,6 @@ export default function AltKategoriDetaySayfasi() {
     if (siralamaTipi === "fiyat-azalan") return (b.fiyat || 0) - (a.fiyat || 0);
     if (siralamaTipi === "tarih-yeni") return new Date(b.tarih || 0).getTime() - new Date(a.tarih || 0).getTime();
     if (siralamaTipi === "tarih-eski") return new Date(a.tarih || 0).getTime() - new Date(b.tarih || 0).getTime();
-    if (siralamaTipi === "model-a-z") return (a.model_format || "").localeCompare(b.model_format || "");
     return 0;
   });
 
@@ -127,44 +126,28 @@ export default function AltKategoriDetaySayfasi() {
         <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-4 custom-scrollbar">
           <Link 
             href={`/bakim-fiyatlari/${markaSlug}/${modelSlug}`} 
-            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2
-              ${aktifKategori === 'tumu' 
-                ? 'bg-yellow-500 text-slate-900 shadow-md' 
-                : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
-              }`}
+            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2 ${aktifKategori === 'tumu' ? 'bg-yellow-500 text-slate-900 shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'}`}
           >
             <Layers size={14} /> Tüm Bakımlar
           </Link>
 
           <Link 
             href={`/bakim-fiyatlari/${markaSlug}/${modelSlug}/periyodik-bakim-fiyatlari`} 
-            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2
-              ${aktifKategori === 'periyodik' 
-                ? 'bg-yellow-500 text-slate-900 shadow-md' 
-                : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
-              }`}
+            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2 ${aktifKategori === 'periyodik' ? 'bg-yellow-500 text-slate-900 shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'}`}
           >
             <Calendar size={14} /> Periyodik Bakım
           </Link>
 
           <Link 
             href={`/bakim-fiyatlari/${markaSlug}/${modelSlug}/agir-bakim-fiyatlari`} 
-            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2
-              ${aktifKategori === 'agir' 
-                ? 'bg-yellow-500 text-slate-900 shadow-md' 
-                : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
-              }`}
+            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2 ${aktifKategori === 'agir' ? 'bg-yellow-500 text-slate-900 shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'}`}
           >
             <Wrench size={14} /> Ağır Bakım
           </Link>
 
           <Link 
             href={`/bakim-fiyatlari/${markaSlug}/${modelSlug}/alt-takim-yuruyen-aksam-fiyatlari`} 
-            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2
-              ${aktifKategori === 'alt-takim' 
-                ? 'bg-yellow-500 text-slate-900 shadow-md' 
-                : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
-              }`}
+            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest whitespace-nowrap transition-all shadow-sm active:scale-95 flex items-center gap-2 ${aktifKategori === 'alt-takim' ? 'bg-yellow-500 text-slate-900 shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'}`}
           >
             <Car size={14} /> Alt Takım & Yürüyen
           </Link>
@@ -185,7 +168,6 @@ export default function AltKategoriDetaySayfasi() {
                 <option value="tarih-eski">Bakım Tarihi (En Eski)</option>
                 <option value="fiyat-artan">Fiyat (En Düşük)</option>
                 <option value="fiyat-azalan">Fiyat (En Yüksek)</option>
-                <option value="model-a-z">Modele Göre (A-Z)</option>
               </select>
             </div>
           </div>
@@ -203,7 +185,6 @@ export default function AltKategoriDetaySayfasi() {
             const linkHref = `/bakim-fiyatlari/${slugify(item.marka_format)}/${slugify(item.model_format)}${kategoriPath}`;
 
             return (
-              {/* h-fit EKLENDİ - KARTLAR ESNEMEZ */}
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
                 <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 cursor-pointer flex-1 flex flex-col relative">
                   
@@ -250,7 +231,6 @@ export default function AltKategoriDetaySayfasi() {
                   </div>
                 </div>
 
-                {/* KART AÇILINCA ÇIKAN MOTOR VE KM YAZI RENGİ DARK MOD İÇİN DÜZELTİLDİ */}
                 {acikKartId === item.id && (
                   <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
                     <div className={`space-y-4 text-left ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
@@ -267,7 +247,6 @@ export default function AltKategoriDetaySayfasi() {
                        </div>
                        <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
                        
-                       {/* ROZET YAZILARI DÜZELTİLDİ */}
                        {item.fatura_onayli ? (
                          <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Belge Destekli Bildirim</div>
                        ) : (
@@ -279,7 +258,7 @@ export default function AltKategoriDetaySayfasi() {
 
                 <Link 
                   href={linkHref} 
-                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/50 text-yellow-500 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100'}`}
+                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
                 >
                   Tüm {item.marka_format} {item.model_format} Bakımlarını Gör
                 </Link>
@@ -293,6 +272,13 @@ export default function AltKategoriDetaySayfasi() {
           )}
         </div>
       </div>
+      
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}</style>
     </main>
   );
 }
