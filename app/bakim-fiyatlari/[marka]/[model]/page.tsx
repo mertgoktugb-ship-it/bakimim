@@ -14,13 +14,13 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Tema Kontrolü (Ana sayfayla senkronize)
+  // Tema Kontrolü
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') setIsDarkMode(true);
   }, []);
 
-  // Metin Düzenleme Fonksiyonları (Ana sayfadan alındı)
+  // Metin Düzenleme Fonksiyonları
   const normalizeMetin = (str: string) => {
     if (!str) return "";
     const temiz = str.trim();
@@ -34,22 +34,25 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
     return "Periyodik Bakım";
   };
 
-  // Params ve Veri Çekme
+  // Params ve Veri Çekme (URL'deki tireler ile DB'deki boşluklar eşleştirildi)
   useEffect(() => {
     const veriGetir = async () => {
       const p = await params;
       setResolvedParams(p);
 
+      // URL'den gelen tireleri (%) joker karakterine çeviriyoruz ki veritabanı boşlukları da bulabilsin
+      const markaSorgu = p.marka.replace(/-/g, '%');
+      const modelSorgu = p.model.replace(/-/g, '%');
+
       const { data } = await supabase
         .from('bakim_kayitlari')
         .select('*')
         .eq('onayli_mi', true)
-        .ilike('marka', p.marka)
-        .ilike('model', p.model)
+        .ilike('marka', `%${markaSorgu}%`)
+        .ilike('model', `%${modelSorgu}%`)
         .order('fiyat', { ascending: true });
 
       if (data) {
-        // Verileri ana sayfadaki gibi düzenliyoruz
         const duzenlenmisData = data.map(item => ({
           ...item,
           sehir: normalizeMetin(item.sehir),
@@ -94,10 +97,10 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3 text-yellow-500 text-left">
               <Car size={32} />
-              <span className="font-black italic uppercase tracking-widest text-sm">{normalizeMetin(resolvedParams.marka)} Veri Havuzu</span>
+              <span className="font-black italic uppercase tracking-widest text-sm">{normalizeMetin(resolvedParams.marka.replace(/-/g, ' '))} Veri Havuzu</span>
             </div>
             <h1 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-left">
-              {normalizeMetin(resolvedParams.marka)} <span className="text-yellow-500">{normalizeMetin(resolvedParams.model)}</span><br/>BAKIM MALİYETLERİ
+              {normalizeMetin(resolvedParams.marka.replace(/-/g, ' '))} <span className="text-yellow-500">{normalizeMetin(resolvedParams.model.replace(/-/g, ' '))}</span><br/>BAKIM MALİYETLERİ
             </h1>
             <p className="text-slate-400 font-bold uppercase text-[11px] tracking-[0.3em] mt-4 flex items-center gap-2">
               <Zap size={14} className="text-yellow-500" /> TOPLAM {kayitlar.length} DOĞRULANMIŞ VERİ
@@ -132,7 +135,7 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
           Servis Kayıtları
         </h2>
 
-        {/* 3'lü Izgara ve Açılır Kartlar (Ana sayfa tasarımıyla birebir) */}
+        {/* 3'lü Izgara ve Açılır Kartlar */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
           {kayitlar.length > 0 ? kayitlar.map((item) => (
             <div 
@@ -140,7 +143,6 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
               className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}
             >
               <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 flex-1 flex flex-col text-left cursor-pointer relative">
-                 {/* Kart açıp kapama oku */}
                  <div className="absolute top-8 right-8">
                   <ChevronDown size={20} className={`text-slate-400 transition-transform duration-300 ${acikKartId === item.id ? 'rotate-180 text-yellow-500' : ''}`} />
                 </div>
@@ -163,7 +165,6 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
                     {item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
                   </h3>
                   
-                  {/* KM BİRLEŞTİRİLMİŞ BAKIM BİLGİSİ (Ana sayfadaki gibi) */}
                   <div className="mt-4 space-y-1">
                     <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
                       <Layers size={14} />
@@ -177,7 +178,6 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
                   </div>
                 </div>
 
-                {/* Şehir ve Durum Bilgisi */}
                 <div className="grid grid-cols-2 gap-4 mb-2 text-left">
                   <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Şehir</span><p className="text-xs font-bold uppercase truncate">{item.sehir}</p></div>
                   
@@ -189,7 +189,6 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
                   </div>
                 </div>
 
-                {/* AÇILAN DETAYLAR */}
                 {acikKartId === item.id && (
                   <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-3 text-left">
                     <div className="flex flex-col bg-transparent border border-slate-200 dark:border-slate-700 p-4 rounded-xl">
@@ -204,7 +203,6 @@ export default function ModelDetaySayfasi({ params }: { params: any }) {
                 )}
               </div>
               
-              {/* Tutar ve Tarih */}
               <div className="p-8 pt-0 flex flex-col gap-4 mt-auto">
                 <div className={`pt-6 border-t flex justify-between items-end ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
