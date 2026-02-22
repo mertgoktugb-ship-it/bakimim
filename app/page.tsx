@@ -325,9 +325,9 @@ export default function BakimimApp() {
                   <div className="text-[10px] font-black text-slate-400 uppercase italic">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div>
                 </div>
                 
-                {/* DİNAMİK VE SEO UYUMLU YÖNLENDİRME LİNKİ BURADA */}
+                {/* LİNK /bakim-fiyatlari/... OLARAK GÜNCELLENDİ */}
                 <Link 
-                  href={`/fiyatlar/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${item.bakim_kategorisi === 'Ağır Bakım' ? '/agir-bakim-fiyatlari' : ''}`}
+                  href={`/bakim-fiyatlari/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${item.bakim_kategorisi === 'Ağır Bakım' ? '/agir-bakim-fiyatlari' : ''}`}
                   className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-transparent text-slate-400 border-slate-700 hover:border-yellow-500' : 'bg-transparent text-slate-500 border-slate-200 hover:border-yellow-500'}`}
                 >
                   TÜM {item.marka_format} {item.model_format} {item.bakim_kategorisi === 'Ağır Bakım' ? 'AĞIR BAKIMLARINI' : 'BAKIMLARINI'} GÖR <ArrowRight size={14}/>
