@@ -1,13 +1,16 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useParams, usePathname } from 'next/navigation'; 
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
   Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+
+// --- EN DERİN KLASÖRLER İÇİN DÜZELTİLMİŞ YOL (5 KLASÖR GERİ) ---
+import { supabase } from '../../../../../lib/supabase'; 
 
 // --- YARDIMCI FONKSİYONLAR ---
 const slugify = (text: string) => {
@@ -74,6 +77,9 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
 };
 
 export default function BakimimApp() {
+  const params = useParams(); 
+  const pathname = usePathname(); 
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -136,24 +142,34 @@ export default function BakimimApp() {
           kullanici_onayli: !item.fatura_url
         }));
         setDuzenlenenVeri(valideEdilmisData);
-        setSonuclar(valideEdilmisData);
-        setIstatistikVerisi(valideEdilmisData);
       }
     } finally { setVeriYukleniyor(false); }
   }, []);
 
   useEffect(() => { veriCek(); }, [veriCek]);
 
-  const tumMarkalar = Array.from(new Set(duzenlenenVeri.map(item => item.marka_format))).sort();
-  const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).sort();
-
+  // --- URL'den PARAMS OKUYUP OTOMATİK SEÇİM YAPMA BÖLÜMÜ ---
   useEffect(() => {
-    if (secilenMarka) {
-      setMusaitModeller(Array.from(new Set(duzenlenenVeri.filter(item => item.marka_format === secilenMarka).map(item => item.model_format))).sort());
-    } else setMusaitModeller([]);
-  }, [secilenMarka, duzenlenenVeri]);
+    if (duzenlenenVeri.length > 0 && params?.marka && params?.model) {
+      const urlMarka = params.marka as string;
+      const urlModel = params.model as string;
 
-  const sorgula = () => {
+      const matchedMarka = duzenlenenVeri.find(d => slugify(d.marka_format) === urlMarka)?.marka_format || "";
+      const matchedModel = duzenlenenVeri.find(d => slugify(d.model_format) === urlModel)?.model_format || "";
+
+      if (matchedMarka) setSecilenMarka(matchedMarka);
+      if (matchedModel) setSecilenModel(matchedModel);
+
+      if (pathname) {
+        if (pathname.includes("periyodik-bakim-fiyatlari")) setSecilenBakimKategorisi("Periyodik Bakım");
+        else if (pathname.includes("agir-bakim-fiyatlari")) setSecilenBakimKategorisi("Ağır Bakım");
+        else if (pathname.includes("alt-takim-yuruyen-aksam-fiyatlari")) setSecilenBakimKategorisi("Alt Takım & Yürüyen Aksam");
+      }
+    }
+  }, [duzenlenenVeri, params, pathname]);
+
+  // --- SEÇİMLER DEĞİŞTİĞİNDE OTOMATİK FİLTRELEME ---
+  useEffect(() => {
     const temelFiltre = duzenlenenVeri.filter(item => {
       const mUygun = !secilenMarka || item.marka_format === secilenMarka;
       const moUygun = !secilenModel || item.model_format === secilenModel;
@@ -167,7 +183,18 @@ export default function BakimimApp() {
       return true;
     }));
     setIstatistikVerisi(temelFiltre);
-  };
+  }, [duzenlenenVeri, secilenMarka, secilenModel, secilenSehir, secilenBakimKategorisi, filtreServisTipi]);
+
+  const tumMarkalar = Array.from(new Set(duzenlenenVeri.map(item => item.marka_format))).sort();
+  const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).sort();
+
+  useEffect(() => {
+    if (secilenMarka) {
+      setMusaitModeller(Array.from(new Set(duzenlenenVeri.filter(item => item.marka_format === secilenMarka).map(item => item.model_format))).sort());
+    } else setMusaitModeller([]);
+  }, [secilenMarka, duzenlenenVeri]);
+
+  const sorgula = () => {};
 
   const getMedian = (arr: any[]) => {
     if (arr.length === 0) return 0;
@@ -361,7 +388,6 @@ export default function BakimimApp() {
                     </div>
                   )}
 
-                  {/* EKLENEN BUTON / LİNK */}
                   <Link
                     href={hedefUrl}
                     className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest transition-colors ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-t border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-t border-slate-200'}`}
