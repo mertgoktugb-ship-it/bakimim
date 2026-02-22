@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
-  Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
-  Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
+  Zap, BookOpen, ArrowRight, Gauge, Fuel, Wrench, MessageSquare, 
+  ChevronDown, ShieldAlert, BadgeCheck, Menu, 
+  Home as HomeIcon, Mail, ChevronRight, Moon, Sun, Layers, Users
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -22,6 +23,7 @@ const BAKIM_KATEGORILERI = ["Periyodik Bakım", "Ağır Bakım", "Alt Takım & Y
 const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) setIsOpen(false);
@@ -33,18 +35,21 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
-        <div className="flex items-center gap-2 truncate text-left text-slate-800">
+        <div className="flex items-center gap-2 truncate text-left">
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
-          <span className={value ? "" : "text-slate-400"}>{value || label}</span>
+          <span className={value ? (isDark ? "text-white" : "text-slate-800") : "text-slate-400"}>{value || label}</span>
         </div>
         <ChevronDown size={20} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
       {isOpen && (
-        <div className={`absolute top-[110%] left-0 w-full rounded-2xl shadow-2xl z-[100] py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200 border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
-          <div className="max-h-60 overflow-y-auto custom-scrollbar text-left text-slate-800">
+        <div className={`absolute top-[110%] left-0 w-full rounded-2xl shadow-2xl z-[100] py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200 border ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
+          <div className="max-h-60 overflow-y-auto custom-scrollbar text-left">
             <div onClick={() => { onChange(""); setIsOpen(false); }} className={`px-5 py-3 text-sm font-bold cursor-pointer italic ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-400 hover:bg-slate-50'}`}>Tümünü Göster</div>
             {options.map((opt: string) => (
-              <div key={opt} onClick={() => { onChange(opt); setIsOpen(false); }} className={`px-5 py-3 text-sm font-bold cursor-pointer flex items-center justify-between transition-colors ${value === opt ? 'bg-yellow-500 text-slate-900' : isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'}`}>{opt}{value === opt && <Check size={14} />}</div>
+              <div key={opt} onClick={() => { onChange(opt); setIsOpen(false); }} className={`px-5 py-3 text-sm font-bold cursor-pointer flex items-center justify-between transition-colors ${value === opt ? 'bg-yellow-500 text-slate-900' : isDark ? 'text-slate-200 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'}`}>
+                {opt}
+                {value === opt && <Check size={14} />}
+              </div>
             ))}
           </div>
         </div>
@@ -66,8 +71,10 @@ export default function BakimimApp() {
   const [sonuclar, setSonuclar] = useState<any[]>([]);
   const [istatistikVerisi, setIstatistikVerisi] = useState<any[]>([]);
   const [musaitModeller, setMusaitModeller] = useState<string[]>([]);
-  // DÜZELTME 1: String ID kullanımı (3'lü açılma sorununu çözer)
+  
+  // DÜZELTME 1: Aynı anda açılan kart sorununu tamamen çözen benzersiz kimlik (ID) tutucu
   const [acikKartId, setAcikKartId] = useState<string | null>(null);
+  
   const [formAcik, setFormAcik] = useState(false);
   const [servisTipi, setServisTipi] = useState("Yetkili");
   const [duzenlenenVeri, setDuzenlenenVeri] = useState<any[]>([]);
@@ -139,7 +146,13 @@ export default function BakimimApp() {
       const mUygun = !secilenMarka || item.marka_format === secilenMarka;
       const moUygun = !secilenModel || item.model_format === secilenModel;
       const sUygun = !secilenSehir || item.sehir === secilenSehir;
-      const kUygun = !secilenBakimKategorisi || item.bakim_kategorisi === secilenBakimKategorisi;
+      
+      const m = (item.bakim_turu || "").toLocaleLowerCase('tr-TR');
+      let kUygun = !secilenBakimKategorisi;
+      if (secilenBakimKategorisi === "Periyodik Bakım") kUygun = m.includes("bakım") || m.includes("yağ") || m.includes("periyodik");
+      else if (secilenBakimKategorisi === "Alt Takım & Yürüyen Aksam") kUygun = m.includes("fren") || m.includes("alt takım") || m.includes("balata") || m.includes("disk");
+      else if (secilenBakimKategorisi === "Ağır Bakım") kUygun = m.includes("ağır") || m.includes("triger") || m.includes("revizyon");
+      
       return mUygun && moUygun && sUygun && kUygun;
     });
     setSonuclar(temelFiltre.filter(item => {
@@ -205,7 +218,6 @@ export default function BakimimApp() {
     } finally { setYukleniyor(false); }
   };
   
-  // DÜZELTME 2: Link Yönlendirmesi için Kategori Eki
   const getKategoriLinkEki = (item: any) => {
     const m = (item.bakim_turu || "").toLocaleLowerCase('tr-TR');
     if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon")) return "/agir-bakim-fiyatlari";
@@ -280,78 +292,90 @@ export default function BakimimApp() {
 
           {/* SONUÇLAR - 3'LÜ GRID DÜZENİ */}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-            {sonuclar.length > 0 ? sonuclar.map((item, index) => {
-              // DÜZELTME 1: 3 Kartın birden açılmasını engelleyen benzersiz ID
-              const uniqueCardId = item.id ? `${item.id}-${index}` : `fallback-${index}`;
-              
-              return (
-              <div key={uniqueCardId} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
-                <div onClick={() => setAcikKartId(acikKartId === uniqueCardId ? null : uniqueCardId)} className="p-8 cursor-pointer flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-6">
-                    <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
-                    <div className="flex gap-1">
-                      {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Fatura Doğrulandı"><ShieldCheck size={12} strokeWidth={4} /></div>}
-                      {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg" title="Kullanıcı Doğrulandı"><BadgeCheck size={12} strokeWidth={4} /></div>}
-                    </div>
-                  </div>
+            {sonuclar.length > 0 ? (
+              sonuclar.map((item, index) => {
+                // DÜZELTME 1: Aynı anda açılmayı önleyen %100 Benzersiz ID yapısı
+                const uniqueCardId = item.id ? `${item.id}-${index}` : `fallback-${index}`;
+                
+                return (
+                  <div key={uniqueCardId} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
+                    <div onClick={() => setAcikKartId(acikKartId === uniqueCardId ? null : uniqueCardId)} className="p-8 cursor-pointer flex-1 flex flex-col">
+                      <div className="flex justify-between items-start mb-6">
+                        <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
+                        <div className="flex gap-1">
+                          {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Fatura Doğrulandı"><ShieldCheck size={12} strokeWidth={4} /></div>}
+                          {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg" title="Kullanıcı Doğrulandı"><BadgeCheck size={12} strokeWidth={4} /></div>}
+                        </div>
+                      </div>
 
-                  <div className="mb-6 text-left">
-                    <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1">
-                      {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={14} className="text-yellow-500" /> : <Car size={14} />}
-                      <span>{item.marka_format}</span>
-                    </div>
-                    <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                      {item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
-                    </h3>
-                  </div>
+                      <div className="mb-6 text-left">
+                        <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1">
+                          {item.marka_format === 'Honda' || item.marka_format === 'Toyota' ? <Zap size={14} className="text-yellow-500" /> : <Car size={14} />}
+                          <span>{item.marka_format}</span>
+                        </div>
+                        <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                          {item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span>
+                        </h3>
+                      </div>
 
-                  <div className="space-y-4 mb-8 text-left">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Bakım Kategorisi</span>
-                      <p className="text-sm font-bold text-yellow-600 dark:text-yellow-500">{item.bakim_kategorisi}</p>
-                      <p className="text-[11px] text-slate-400 italic line-clamp-1">{item.bakim_turu_format}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Konum</span><p className="text-xs font-bold truncate">{item.sehir}</p></div>
-                      <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Tarih</span><p className="text-xs font-bold text-slate-500">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</p></div>
-                    </div>
-                  </div>
+                      <div className="space-y-4 mb-8 text-left">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Bakım Kategorisi</span>
+                          <p className="text-sm font-bold text-yellow-600 dark:text-yellow-500">{item.bakim_kategorisi}</p>
+                          <p className="text-[11px] text-slate-400 italic line-clamp-1">{item.bakim_turu_format}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Konum</span><p className="text-xs font-bold truncate">{item.sehir}</p></div>
+                          <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Tarih</span><p className="text-xs font-bold text-slate-500">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</p></div>
+                        </div>
+                      </div>
 
-                  <div className={`mt-auto pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-                    <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span>
-                    <p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p>
-                  </div>
-                </div>
-
-                {acikKartId === uniqueCardId && (
-                  <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                    <div className="space-y-4 text-left text-slate-800">
-                      <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold dark:text-slate-200">{item.yakit_motor || '-'}</p></div>
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold dark:text-slate-200">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
+                      <div className={`mt-auto pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span>
+                        <p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p>
                       </div>
                     </div>
-                    <div className="bg-yellow-500 text-slate-900 p-6 rounded-3xl shadow-lg relative overflow-hidden text-left">
-                       <div className="flex items-center justify-between mb-4">
-                         <span className="text-3xl font-black italic tracking-tighter uppercase">{item.bas_harfler || 'K.B.'}</span>
-                         <ShieldAlert size={20} className="opacity-50" />
-                       </div>
-                       <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
-                    </div>
-                    
-                    {/* DÜZELTME 2: Dinamik Marka Model Yönlendirme Butonu */}
-                    <Link 
-                      href={`/bakim-fiyatlari/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${getKategoriLinkEki(item)}`}
-                      className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'border-slate-700 text-slate-300' : 'border-slate-300 text-slate-600'}`}
-                    >
-                      TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/>
-                    </Link>
 
+                    {acikKartId === uniqueCardId && (
+                      <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
+                        <div className="space-y-4 text-left text-slate-800">
+                          <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold dark:text-slate-200">{item.yakit_motor || '-'}</p></div>
+                            <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold dark:text-slate-200">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
+                          </div>
+                        </div>
+                        <div className="bg-yellow-500 text-slate-900 p-6 rounded-3xl shadow-lg relative overflow-hidden text-left">
+                           <div className="flex items-center justify-between mb-4">
+                             <span className="text-3xl font-black italic tracking-tighter uppercase">{item.bas_harfler || 'K.B.'}</span>
+                             <ShieldAlert size={20} className="opacity-50" />
+                           </div>
+                           <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
+                           {item.fatura_onayli ? (
+                             <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase w-fit"><ShieldCheck size={14} className="text-emerald-400" /> Fatura Onaylı</div>
+                           ) : (
+                             <div className="bg-slate-800/20 py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase w-fit"><BadgeCheck size={14} className="opacity-50" /> Kullanıcı Beyanı</div>
+                           )}
+                        </div>
+                        
+                        {/* DÜZELTME 2: Dinamik Marka-Model Butonu */}
+                        <Link 
+                           href={`/bakim-fiyatlari/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${getKategoriLinkEki(item)}`} 
+                           className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all border ${isDarkMode ? 'hover:bg-yellow-500 hover:text-slate-900 border-slate-600 text-slate-300' : 'hover:bg-yellow-500 hover:text-slate-900 border-slate-300 text-slate-600'}`}
+                        >
+                           TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/>
+                        </Link>
+
+                      </div>
+                    )}
                   </div>
-                )}
+                );
+              })
+            ) : (
+              <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
+                <p className="font-bold text-lg italic uppercase tracking-widest text-center">Kriterlere Uygun Kayıt Yok</p>
               </div>
-            )})}
+            )}
           </section>
         </div>
       )}
