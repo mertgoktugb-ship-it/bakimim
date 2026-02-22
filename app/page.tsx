@@ -1,14 +1,14 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation'; // URL okumak için eklendi
+import { useParams, usePathname } from 'next/navigation'; 
 import { 
   Car, MapPin, Search, Calendar, ShieldCheck, BadgePercent, 
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
   Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../lib/supabase'; // <-- ANA SAYFA İÇİN DÜZELTİLMİŞ YOL
 
 // --- YARDIMCI FONKSİYONLAR ---
 const slugify = (text: string) => {
@@ -75,8 +75,8 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
 };
 
 export default function BakimimApp() {
-  const params = useParams(); // URL'den [marka] ve [model] değerlerini alır
-  const pathname = usePathname(); // Şu anki URL yolunu alır (kategori kontrolü için)
+  const params = useParams(); 
+  const pathname = usePathname(); 
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -152,21 +152,21 @@ export default function BakimimApp() {
       const urlMarka = params.marka as string;
       const urlModel = params.model as string;
 
-      // Veritabanındaki doğru büyük/küçük harf formatını bul
       const matchedMarka = duzenlenenVeri.find(d => slugify(d.marka_format) === urlMarka)?.marka_format || "";
       const matchedModel = duzenlenenVeri.find(d => slugify(d.model_format) === urlModel)?.model_format || "";
 
       if (matchedMarka) setSecilenMarka(matchedMarka);
       if (matchedModel) setSecilenModel(matchedModel);
 
-      // Pathname üzerinden bulunduğumuz sayfayı tespit edip kategoriyi otomatik seç
-      if (pathname.includes("periyodik-bakim-fiyatlari")) setSecilenBakimKategorisi("Periyodik Bakım");
-      else if (pathname.includes("agir-bakim-fiyatlari")) setSecilenBakimKategorisi("Ağır Bakım");
-      else if (pathname.includes("alt-takim-yuruyen-aksam-fiyatlari")) setSecilenBakimKategorisi("Alt Takım & Yürüyen Aksam");
+      if (pathname) {
+        if (pathname.includes("periyodik-bakim-fiyatlari")) setSecilenBakimKategorisi("Periyodik Bakım");
+        else if (pathname.includes("agir-bakim-fiyatlari")) setSecilenBakimKategorisi("Ağır Bakım");
+        else if (pathname.includes("alt-takim-yuruyen-aksam-fiyatlari")) setSecilenBakimKategorisi("Alt Takım & Yürüyen Aksam");
+      }
     }
   }, [duzenlenenVeri, params, pathname]);
 
-  // --- SEÇİMLER DEĞİŞTİĞİNDE OTOMATİK FİLTRELEME (Sorgula butonuna basılmış gibi) ---
+  // --- SEÇİMLER DEĞİŞTİĞİNDE OTOMATİK FİLTRELEME ---
   useEffect(() => {
     const temelFiltre = duzenlenenVeri.filter(item => {
       const mUygun = !secilenMarka || item.marka_format === secilenMarka;
@@ -183,7 +183,6 @@ export default function BakimimApp() {
     setIstatistikVerisi(temelFiltre);
   }, [duzenlenenVeri, secilenMarka, secilenModel, secilenSehir, secilenBakimKategorisi, filtreServisTipi]);
 
-
   const tumMarkalar = Array.from(new Set(duzenlenenVeri.map(item => item.marka_format))).sort();
   const tumSehirler = Array.from(new Set(duzenlenenVeri.map(item => item.sehir))).sort();
 
@@ -193,10 +192,7 @@ export default function BakimimApp() {
     } else setMusaitModeller([]);
   }, [secilenMarka, duzenlenenVeri]);
 
-  const sorgula = () => {
-    // Otomatik filtreleme eklendiği için butona basınca yapması gereken ekstra bir şey yok,
-    // ancak buton tasarımını bozmamak için fonksiyonu koruyoruz.
-  };
+  const sorgula = () => {};
 
   const getMedian = (arr: any[]) => {
     if (arr.length === 0) return 0;
