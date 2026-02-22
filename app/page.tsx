@@ -246,6 +246,7 @@ export default function BakimimApp() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6">
+        {/* ORTALAMALAR */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mt-10 mb-12 relative z-20">
           <div className={`p-8 rounded-[2rem] shadow-xl border text-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-center gap-2"><ShieldCheck size={18} className="text-yellow-600"/> Yetkili Servis Ortalaması</p>
@@ -257,12 +258,13 @@ export default function BakimimApp() {
           </div>
         </div>
 
-        {/* SONUÇ KARTLARI */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+        {/* SONUÇ KARTLARI - BİREBİR İSTENİLEN KOD BLOĞU */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 text-left">
           {sonuclar.length > 0 ? sonuclar.map((item) => (
             <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
               <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 flex-1 flex flex-col text-left cursor-pointer relative">
                 <div className="absolute top-8 right-8"><ChevronDown size={20} className={`text-slate-400 transition-transform ${acikKartId === item.id ? 'rotate-180 text-yellow-500' : ''}`} /></div>
+                
                 <div className="flex justify-between items-start mb-6 pr-8">
                   <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
                   <div className="flex gap-1">
@@ -270,52 +272,68 @@ export default function BakimimApp() {
                     {item.kullanici_onayli && <div className="bg-blue-500 text-white p-1.5 rounded-full shadow-lg"><BadgeCheck size={12} strokeWidth={4} /></div>}
                   </div>
                 </div>
+                
                 <div className="mb-6">
                   <div className="flex items-center gap-2 uppercase font-bold text-slate-400 text-[10px] tracking-[0.2em] mb-1 leading-none"><Car size={14} /><span>{item.marka_format}</span></div>
                   <h3 className={`text-2xl font-black italic uppercase tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'} leading-tight`}>{item.model_format} <span className="text-slate-500 text-lg not-italic">'{item.yil ? item.yil.toString().slice(2) : '-'}</span></h3>
-                  {/* Bakım Tipi + KM Bilgisi Buraya Eklendi */}
-                  <div className="mt-4 space-y-1 text-yellow-700 dark:text-yellow-500 font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-                    <Layers size={14} /> {item.km?.toLocaleString('tr-TR')} KM BAKIM KAYDI
+                  <div className="mt-4 space-y-1">
+                    <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+                      <Layers size={14} />
+                      <span className="text-[10px] font-black uppercase tracking-widest">
+                        {item.bakim_kategorisi === "Periyodik Bakım" ? `PERİYODİK BAKIM (${item.km?.toLocaleString('tr-TR')} KM)` : item.bakim_kategorisi}
+                      </span>
+                    </div>
+                    <p className={`text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-lg w-fit border ${isDarkMode ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-white text-slate-500 border-slate-100 shadow-none'}`}>
+                       {item.bakim_turu_format}
+                    </p>
                   </div>
                 </div>
-                
-                {/* DETAY KISMI: Sarı renk, detaylar ve doğrulama yazıları */}
+
+                <div className="grid grid-cols-2 gap-4 mb-2 text-left">
+                  <div className="flex flex-col"><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Şehir</span><p className="text-xs font-bold uppercase truncate">{item.sehir}</p></div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 text-slate-400">Durum</span>
+                    <p className={`text-[10px] sm:text-xs font-black uppercase tracking-tighter ${item.fatura_onayli ? 'text-emerald-500' : 'text-blue-500'}`}>
+                      {item.fatura_onayli ? 'Belge Destekli Kullanıcı Bildirimi' : 'Kullanıcı Beyanı'}
+                    </p>
+                  </div>
+                </div>
+
                 {acikKartId === item.id && (
-                  <div className="mt-4 pt-4 border-t space-y-3 animate-in fade-in slide-in-from-top-2">
-                     <div className="bg-yellow-500 text-slate-900 p-4 rounded-xl shadow-lg border border-yellow-600">
-                        <span className="text-[9px] font-black uppercase text-slate-800 block mb-1">Bakım Detayı</span>
-                        <p className="text-sm font-bold leading-relaxed">{item.bakim_turu_format}</p>
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                           <div><span className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-1">Motor</span><p className="text-xs font-bold">{item.yakit_motor || '-'}</p></div>
-                           <div><span className="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-1">Kilometre</span><p className="text-xs font-bold">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
-                        </div>
-                     </div>
-                     <div className="bg-yellow-500 text-slate-900 p-4 rounded-xl shadow-lg border border-yellow-600">
-                        <div className="flex justify-between items-center mb-2"><span className="text-xl font-black italic uppercase">{item.bas_harfler}</span><ShieldAlert size={16} className="opacity-50"/></div>
-                        <p className="text-xs italic font-bold">"{item.notlar || 'Detay belirtilmemiş.'}"</p>
-                        <div className="mt-4 flex items-center gap-2 text-[9px] font-black tracking-widest uppercase py-2 px-3 rounded-xl bg-slate-900 text-white w-fit">
-                           {item.fatura_onayli ? <><ShieldCheck size={12} className="text-emerald-400" /> Belge Destekli Bildirim</> : <><BadgeCheck size={12} className="opacity-50" /> Kullanıcı Beyanı</>}
-                        </div>
-                     </div>
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300 space-y-3 text-left">
+                    <div className="flex flex-col bg-transparent border border-slate-200 dark:border-slate-700 p-4 rounded-xl">
+                      <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><Fuel size={12}/> Motor & Yakıt Bilgisi</span>
+                      <p className="text-xs font-bold uppercase">{item.yakit_motor || 'Belirtilmemiş'}</p>
+                    </div>
+                    <div className="flex flex-col bg-transparent border border-slate-200 dark:border-slate-700 p-4 rounded-xl mt-3">
+                      <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest mb-1 flex items-center gap-1"><MessageSquare size={12}/> Kullanıcı Notu</span>
+                      <p className="text-xs font-bold italic leading-relaxed">{item.notlar ? `"${item.notlar}"` : 'Detay belirtilmemiş.'}</p>
+                    </div>
                   </div>
                 )}
               </div>
               <div className="p-8 pt-0 flex flex-col gap-4 mt-auto">
-                <div className="pt-6 border-t flex justify-between items-end border-slate-100 dark:border-slate-800">
+                <div className={`pt-6 border-t flex justify-between items-end ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div><span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter">{item.ekran_fiyat}</p></div>
                   <div className="text-[10px] font-black text-slate-400 uppercase italic">{item.tarih ? item.tarih.split('-').reverse().join('.') : '-'}</div>
                 </div>
-                <Link href={`/bakim-fiyatlari/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${getKategoriLinkEki(item)}`} className="w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border border-slate-200 dark:border-slate-700">TÜM KAYITLARI GÖR <ArrowRight size={14}/></Link>
+                
+                <Link 
+                  href={`/bakim-fiyatlari/${(item.marka_format || '').toLowerCase().replace(/\s+/g, '-')}/${(item.model_format || '').toLowerCase().replace(/\s+/g, '-')}${getKategoriLinkEki(item)}`}
+                  className={`w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-all hover:bg-yellow-500 hover:text-slate-900 border ${isDarkMode ? 'bg-transparent text-slate-400 border-slate-700 hover:border-yellow-500' : 'bg-transparent text-slate-500 border-slate-200 hover:border-yellow-500'}`}
+                >
+                  TÜM {item.marka_format} {item.model_format} BAKIMLARINI GÖR <ArrowRight size={14}/>
+                </Link>
               </div>
             </div>
-          )) : <div className="col-span-full text-center py-32 rounded-[3rem] border border-dashed border-slate-200 text-slate-400 uppercase font-black italic">Kayıt Bulunamadı</div>}
+          )) : <div className="col-span-full text-center py-32 border-2 border-dashed border-slate-200 rounded-[3rem] text-slate-400 uppercase font-black italic tracking-widest text-left px-10">Kayıt Bulunamadı</div>}
         </section>
       </div>
 
       {/* VERİ PAYLAŞ FORMU */}
       {formAcik && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-white text-slate-800'}`}>
+          <div className={`rounded-[3.5rem] w-full max-w-4xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}>
             <div className="bg-yellow-500 p-10 text-slate-900 flex justify-between items-start sticky top-0 z-10 shadow-lg">
               <div><h2 className="text-4xl font-black italic tracking-tighter leading-none">Bakım Verisi Paylaş</h2><p className="text-slate-800 text-[10px] font-bold uppercase tracking-widest mt-3">ŞEFFAFLIĞA KATKIDA BULUNUN</p></div>
               <button onClick={() => setFormAcik(false)} className="bg-black/10 p-3 rounded-2xl hover:bg-black/20"><X size={28} /></button>
