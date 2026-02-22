@@ -76,7 +76,6 @@ export default function BakimimApp() {
   const [secilenBakimKategorisi, setSecilenBakimKategorisi] = useState("");
   const [filtreServisTipi, setFiltreServisTipi] = useState("Farketmez");
 
-  // VARSAYILAN SIRALAMA "EN SON EKLENENLER" OLARAK DEĞİŞTİRİLDİ
   const [siralamaTipi, setSiralamaTipi] = useState("eklenme-yeni");
 
   const [sonuclar, setSonuclar] = useState<any[]>([]);
@@ -220,7 +219,6 @@ export default function BakimimApp() {
     } finally { setYukleniyor(false); }
   };
 
-  // SIRALAMA MANTIĞINA "EN SON EKLENENLER (id'ye göre)" EKLENDİ
   const siraliSonuclar = [...sonuclar].sort((a, b) => {
     if (siralamaTipi === "eklenme-yeni") return (b.id || 0) - (a.id || 0);
     if (siralamaTipi === "fiyat-artan") return (a.fiyat || 0) - (b.fiyat || 0);
@@ -296,7 +294,7 @@ export default function BakimimApp() {
             </div>
           </div>
 
-          {/* YENİ SIRALAMA KUTUSU */}
+          {/* YENİ SIRALAMA KUTUSU (SAĞA DAYALI) */}
           {siraliSonuclar.length > 0 && (
             <div className="flex justify-end items-center mb-6 animate-in fade-in duration-500">
               <div className="flex items-center gap-3">
@@ -317,8 +315,8 @@ export default function BakimimApp() {
             </div>
           )}
 
-          {/* SONUÇLAR - ORİJİNAL 3'LÜ GRID DÜZENİ */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+          {/* SONUÇLAR - KARTLAR ESNEMEZ (items-start eklendi) */}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 items-start">
             {siraliSonuclar.map((item) => {
               let kategoriPath = "";
               if (item.bakim_kategorisi === "Periyodik Bakım") kategoriPath = "/periyodik-bakim-fiyatlari";
@@ -330,9 +328,12 @@ export default function BakimimApp() {
               const linkHref = `/bakim-fiyatlari/${markaSlug}/${modelSlug}${kategoriPath}`;
 
               return (
-                <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
-                  <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 cursor-pointer flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-6">
+                <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm hover:border-yellow-400 transition-all flex flex-col h-fit ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'}`}>
+                  <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 cursor-pointer flex-1 flex flex-col relative">
+                    
+                    <div className="absolute top-8 right-8"><ChevronDown size={20} className={`text-slate-400 transition-transform ${acikKartId === item.id ? 'rotate-180 text-yellow-500' : ''}`} /></div>
+                    
+                    <div className="flex justify-between items-start mb-6 pr-8">
                       <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md ${item.yetkili_mi ? 'bg-yellow-500 text-slate-900' : 'bg-indigo-600 text-white'}`}>{item.yetkili_mi ? 'YETKİLİ' : 'ÖZEL'}</span>
                       <div className="flex gap-1">
                         {item.fatura_onayli && <div className="bg-emerald-500 text-white p-1.5 rounded-full shadow-lg" title="Fatura Doğrulandı"><ShieldCheck size={12} strokeWidth={4} /></div>}
@@ -362,16 +363,16 @@ export default function BakimimApp() {
                       </div>
                     </div>
 
-                    <div className={`mt-auto pt-6 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-                      <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1 block text-left">Toplam Tutar</span>
-                      <p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p>
+                    <div className={`mt-auto pt-6 border-t flex justify-between items-end ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                      <div><span className="text-[10px] text-slate-500 uppercase font-black block text-left">Toplam Tutar</span><p className="text-3xl font-black text-yellow-600 tracking-tighter text-left">{item.ekran_fiyat}</p></div>
                     </div>
                   </div>
 
+                  {/* KART AÇILINCA ÇIKAN MOTOR VE KM YAZI RENGİ DARK MOD İÇİN DÜZELTİLDİ */}
                   {acikKartId === item.id && (
                     <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-                      <div className="space-y-4 text-left text-slate-800">
-                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-snug">{item.bakim_turu_format}</p></div>
+                      <div className={`space-y-4 text-left ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
+                        <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Bakım Detayı</span><p className={`text-sm font-bold leading-snug ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{item.bakim_turu_format}</p></div>
                         <div className="grid grid-cols-2 gap-4">
                           <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Motor</span><p className="text-sm font-bold">{item.yakit_motor || '-'}</p></div>
                           <div><span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Kilometre</span><p className="text-sm font-bold">{item.km ? item.km.toLocaleString('tr-TR') : '-'} KM</p></div>
@@ -392,10 +393,10 @@ export default function BakimimApp() {
                     </div>
                   )}
 
-                  {/* EKLENEN YÖNLENDİRME BUTONU / LİNKİ */}
+                  {/* DİNAMİK YÖNLENDİRME BUTONU (Altında) */}
                   <Link 
                     href={linkHref} 
-                    className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest transition-colors border-t ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
+                    className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest transition-colors border-t ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-200'}`}
                   >
                     Tüm {item.marka_format} {item.model_format} Bakımlarını Gör
                   </Link>
