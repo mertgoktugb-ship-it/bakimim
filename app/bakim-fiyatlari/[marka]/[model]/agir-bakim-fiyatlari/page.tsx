@@ -37,12 +37,16 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
       const p = await params;
       setResolvedParams(p);
 
+      // TİRE VE BOŞLUK SORUNUNU ÇÖZEN KRİTİK KISIM
+      const markaSorgu = p.marka.replace(/-/g, '%');
+      const modelSorgu = p.model.replace(/-/g, '%');
+
       const { data } = await supabase
         .from('bakim_kayitlari')
         .select('*')
         .eq('onayli_mi', true)
-        .ilike('marka', p.marka)
-        .ilike('model', p.model)
+        .ilike('marka', `%${markaSorgu}%`)
+        .ilike('model', `%${modelSorgu}%`)
         .order('fiyat', { ascending: true });
 
       if (data) {
@@ -90,10 +94,10 @@ export default function AgirBakimDetaySayfasi({ params }: { params: any }) {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3 text-yellow-500 text-left">
               <Car size={32} />
-              <span className="font-black italic uppercase tracking-widest text-sm">{normalizeMetin(resolvedParams.marka)} Veri Havuzu</span>
+              <span className="font-black italic uppercase tracking-widest text-sm">{normalizeMetin(resolvedParams.marka.replace(/-/g, ' '))} Veri Havuzu</span>
             </div>
             <h1 className="text-4xl md:text-7xl font-black italic uppercase tracking-tighter leading-[0.9] text-left">
-              {normalizeMetin(resolvedParams.marka)} <span className="text-yellow-500">{normalizeMetin(resolvedParams.model)}</span><br/>AĞIR BAKIM FİYATLARI
+              {normalizeMetin(resolvedParams.marka.replace(/-/g, ' '))} <span className="text-yellow-500">{normalizeMetin(resolvedParams.model.replace(/-/g, ' '))}</span><br/>AĞIR BAKIM FİYATLARI
             </h1>
             <p className="text-slate-400 font-bold uppercase text-[11px] tracking-[0.3em] mt-4 flex items-center gap-2">
               <Zap size={14} className="text-yellow-500" /> TOPLAM {kayitlar.length} DOĞRULANMIŞ AĞIR BAKIM VERİSİ
