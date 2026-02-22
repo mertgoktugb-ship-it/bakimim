@@ -6,8 +6,21 @@ import {
   Settings, X, Check, Info, FileText, Upload, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, FileCheck, Wrench, MessageSquare, ChevronDown, ShieldAlert, BadgeCheck, Menu, 
   Home as HomeIcon, Mail, ChevronRight, Moon, Sun, BarChart3, Layers
-} from 'lucide-react'; // Hatayı burada düzelttim (lucide-react)
+} from 'lucide-react';
 import { supabase } from '../lib/supabase';
+
+// --- YARDIMCI FONKSİYONLAR ---
+const slugify = (text: string) => {
+  const trMap: { [key: string]: string } = {
+    'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u',
+    'Ç': 'c', 'Ğ': 'g', 'İ': 'i', 'Ö': 'o', 'Ş': 's', 'Ü': 'u'
+  };
+  return text ? text.replace(/[çğıöşüÇĞİÖŞÜ]/g, match => trMap[match])
+             .toLowerCase()
+             .replace(/[^a-z0-9]/g, '-')
+             .replace(/-+/g, '-')
+             .replace(/^-|-$/g, '') : '';
+};
 
 // --- BLOG VERİLERİ ---
 const blogYazilari = [
@@ -33,10 +46,12 @@ const CustomSelect = ({ label, value, options, onChange, icon: Icon, isDark }: a
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)} className={`w-full p-4 rounded-2xl font-bold cursor-pointer flex items-center justify-between transition-all border border-transparent active:scale-[0.98] ${isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-50 text-slate-800 hover:bg-slate-100'}`}>
+        {/* --- DÜZELTİLEN KISIM BURASI --- */}
         <div className={`flex items-center gap-2 truncate text-left ${isDark ? 'text-white' : 'text-slate-800'}`}>
           {Icon && <Icon size={18} className="text-slate-400 shrink-0" />}
           <span className={value ? "" : "text-slate-400"}>{value || label}</span>
         </div>
+        {/* -------------------------------- */}
         <ChevronDown size={20} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
       {isOpen && (
