@@ -7,7 +7,7 @@ import {
   MapPin, BadgeCheck, Gauge, Fuel, ChevronDown, MessageSquare, Layers, ShieldAlert, Calendar, Wrench 
 } from 'lucide-react';
 
-// 4 KLASÖR GERİ ÇIKAN DOĞRU YOL
+// 4 KLASÖR GERİ ÇIKAN DOĞRU YOL (TÜM BAKIMLAR ANA SAYFASI İÇİN)
 import { supabase } from '../../../../lib/supabase'; 
 
 const slugify = (text: string) => {
@@ -23,7 +23,7 @@ export default function ModelDetaySayfasi() {
   const [acikKartId, setAcikKartId] = useState<number | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  // YENİ EKLENEN SIRALAMA STATE'İ (Varsayılan En Son Eklenenler)
+  // SIRALAMA STATE'İ (Varsayılan En Son Eklenenler)
   const [siralamaTipi, setSiralamaTipi] = useState("eklenme-yeni");
 
   // BU SAYFA TÜM BAKIMLARI GÖSTERİR (AKTİF KATEGORİ)
@@ -46,15 +46,14 @@ export default function ModelDetaySayfasi() {
 
   const kategorizeEt = (metin: string) => {
     const m = metin.toLocaleLowerCase('tr-TR');
-    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman")) return "Ağır Bakım";
-    if (m.includes("alt takım") || m.includes("yürüyen") || m.includes("fren") || m.includes("balata")) return "Alt Takım & Yürüyen Aksam";
+    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman") || m.includes("rektifiye") || m.includes("sandık")) return "Ağır Bakım";
+    if (m.includes("alt takım") || m.includes("yürüyen") || m.includes("fren") || m.includes("balata") || m.includes("disk") || m.includes("rot")) return "Alt Takım & Yürüyen Aksam";
     return "Periyodik Bakım";
   };
 
   const veriCek = useCallback(async () => {
     setYukleniyor(true);
     try {
-      // ORDER kısmını burada kullanmaya gerek yok çünkü aşağıda siralamaTipi logic'i hallediyor
       const { data } = await supabase.from('bakim_kayitlari').select('*').eq('onayli_mi', true);
 
       if (data) {
@@ -70,7 +69,7 @@ export default function ModelDetaySayfasi() {
           fatura_onayli: !!item.fatura_url,
           kullanici_onayli: !item.fatura_url
         })).filter(item => {
-          // URL'deki isimle (boşluklu vb.) veritabanını hatasız eşleştirir
+          // Sadece Marka ve Model eşleşmesi (Tümü)
           const markaMatch = slugify(item.marka_format) === params.marka;
           const modelMatch = slugify(item.model_format) === params.model;
           return markaMatch && modelMatch;
@@ -92,6 +91,7 @@ export default function ModelDetaySayfasi() {
     if (siralamaTipi === "fiyat-azalan") return (b.fiyat || 0) - (a.fiyat || 0);
     if (siralamaTipi === "tarih-yeni") return new Date(b.tarih || 0).getTime() - new Date(a.tarih || 0).getTime();
     if (siralamaTipi === "tarih-eski") return new Date(a.tarih || 0).getTime() - new Date(b.tarih || 0).getTime();
+    if (siralamaTipi === "model-a-z") return (a.model_format || "").localeCompare(b.model_format || "");
     return 0;
   });
 
@@ -113,7 +113,7 @@ export default function ModelDetaySayfasi() {
 
       <div className="max-w-7xl mx-auto px-6 mt-12">
         
-        {/* YENİ EKLENEN KATEGORİ GEÇİŞ MENÜSÜ */}
+        {/* KATEGORİ GEÇİŞ MENÜSÜ */}
         <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-4 custom-scrollbar">
           <Link 
             href={`/bakim-fiyatlari/${markaSlug}/${modelSlug}`} 
@@ -160,7 +160,7 @@ export default function ModelDetaySayfasi() {
           </Link>
         </div>
 
-        {/* YENİ EKLENEN SIRALAMA KUTUSU (SAĞA DAYALI) */}
+        {/* SIRALAMA KUTUSU (SAĞA DAYALI) */}
         {siraliSonuclar.length > 0 && (
           <div className="flex justify-end items-center mb-6 animate-in fade-in duration-500">
             <div className="flex items-center gap-3">
@@ -175,16 +175,17 @@ export default function ModelDetaySayfasi() {
                 <option value="tarih-eski">Bakım Tarihi (En Eski)</option>
                 <option value="fiyat-artan">Fiyat (En Düşük)</option>
                 <option value="fiyat-azalan">Fiyat (En Yüksek)</option>
+                <option value="model-a-z">Modele Göre (A-Z)</option>
               </select>
             </div>
           </div>
         )}
 
-        {/* SONUÇLAR - items-start EKLENDİ */}
+        {/* SONUÇLAR - items-start EKLENDİ (ESNEME SORUNU ÇÖZÜMÜ) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 items-start">
           {siraliSonuclar.length > 0 ? siraliSonuclar.map((item) => {
             
-            // Kartın altındaki buton için dinamik yönlendirme URL'si (Kategoriye göre)
+            // Kart linki bu spesifik kategoriyi gösterecek
             let kategoriPath = "";
             if (item.bakim_kategorisi === "Periyodik Bakım") kategoriPath = "/periyodik-bakim-fiyatlari";
             else if (item.bakim_kategorisi === "Ağır Bakım") kategoriPath = "/agir-bakim-fiyatlari";
@@ -192,7 +193,6 @@ export default function ModelDetaySayfasi() {
             const linkHref = `/bakim-fiyatlari/${slugify(item.marka_format)}/${slugify(item.model_format)}${kategoriPath}`;
 
             return (
-              {/* h-fit EKLENDİ - KARTLAR ESNEMEZ */}
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
                 <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 cursor-pointer flex-1 flex flex-col relative">
                   
@@ -239,7 +239,7 @@ export default function ModelDetaySayfasi() {
                   </div>
                 </div>
 
-                {/* KART AÇILDIĞINDA MOTOR/KM YAZI RENGİ DARK MOD İÇİN DÜZELTİLDİ */}
+                {/* KART AÇILINCA ÇIKAN MOTOR VE KM YAZI RENGİ DARK MOD İÇİN DÜZELTİLDİ */}
                 {acikKartId === item.id && (
                   <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
                     <div className={`space-y-4 text-left ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
@@ -268,7 +268,7 @@ export default function ModelDetaySayfasi() {
 
                 <Link 
                   href={linkHref} 
-                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/50 text-yellow-500 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100'}`}
+                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/50 text-yellow-500 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
                 >
                   Tüm {item.marka_format} {item.model_format} Bakımlarını Gör
                 </Link>
@@ -277,7 +277,7 @@ export default function ModelDetaySayfasi() {
             );
           }) : (
             <div className={`col-span-full text-center py-32 rounded-[3rem] border border-dashed ${isDarkMode ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
-              <p className="font-bold text-lg italic uppercase tracking-widest text-center">Bu araca ait kayıt bulunamadı.</p>
+              <p className="font-bold text-lg italic uppercase tracking-widest text-center">Bu kategoriye ait kayıt bulunamadı.</p>
             </div>
           )}
         </div>
