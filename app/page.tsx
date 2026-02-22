@@ -6,7 +6,7 @@ import {
   Settings, X, Check, Info, FileText, User, 
   Zap, BookOpen, ArrowRight, Gauge, Fuel, Wrench, MessageSquare, ChevronDown, BadgeCheck, Menu, 
   Home as HomeIcon, ChevronRight, Layers, Moon, Sun, Upload, Mail, Users
-} from 'lucide-center';
+} from 'lucide-react'; // Hata buradaydı, düzeltildi.
 import { supabase } from '../lib/supabase';
 
 // --- BLOG VERİLERİ ---
@@ -87,28 +87,11 @@ export default function BakimimApp() {
     return temiz.charAt(0).toLocaleUpperCase('tr-TR') + temiz.slice(1).toLocaleLowerCase('tr-TR');
   };
 
-  // --- GÜNCELLENMİŞ KATEGORİZASYON MANTIĞI (OTOMATİK VE KAPSAYICI) ---
   const kategorizeEt = (metin: string) => {
     const m = metin.toLocaleLowerCase('tr-TR');
-    let kategoriler = [];
-    
-    // Ağır Bakım Kontrolü
-    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman")) {
-      return "Ağır Bakım"; // Ağır bakım genelde tekildir
-    }
-    
-    // Alt Takım Kontrolü
-    if (m.includes("alt takım") || m.includes("fren") || m.includes("balata") || m.includes("disk")) {
-      kategoriler.push("Alt Takım & Yürüyen Aksam");
-    }
-    
-    // Periyodik Bakım Kontrolü
-    if (m.includes("periyodik") || m.includes("bakım") || m.includes("yağ") || m.includes("filtre")) {
-      kategoriler.push("Periyodik Bakım");
-    }
-
-    // Eğer hiçbirine uymuyorsa varsayılan periyodik olsun, uyuyorsa ilkini döndürsün (UI için)
-    return kategoriler.length > 0 ? kategoriler[0] : "Periyodik Bakım";
+    if (m.includes("ağır") || m.includes("triger") || m.includes("revizyon") || m.includes("şanzıman")) return "Ağır Bakım";
+    if (m.includes("alt takım") || m.includes("fren") || m.includes("balata") || m.includes("disk")) return "Alt Takım & Yürüyen Aksam";
+    return "Periyodik Bakım";
   };
 
   const veriCek = useCallback(async () => {
@@ -156,7 +139,6 @@ export default function BakimimApp() {
       const moUygun = !secilenModel || item.model_format === secilenModel;
       const sUygun = !secilenSehir || item.sehir === secilenSehir;
       
-      // Filtreleme yaparken hem periyodik hem alt takımsa her ikisinde de görünmesini sağlıyoruz
       const m = (item.bakim_turu || "").toLocaleLowerCase('tr-TR');
       let kUygun = !secilenBakimKategorisi;
       
@@ -225,7 +207,6 @@ export default function BakimimApp() {
   const medYetkili = Math.round(getMedian(istatistikVerisi.filter(i => i.yetkili_mi)));
   const medOzel = Math.round(getMedian(istatistikVerisi.filter(i => !i.yetkili_mi)));
 
-  // YARDIMCI: KATEGORİYE GÖRE LİNK EKİ
   const getKategoriLinkEki = (item: any) => {
     const m = (item.bakim_turu || "").toLocaleLowerCase('tr-TR');
     if (m.includes("ağır") || m.includes("triger")) return "/agir-bakim-fiyatlari";
@@ -277,7 +258,6 @@ export default function BakimimApp() {
           </div>
         </div>
 
-        {/* SONUÇ KARTLARI */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20 text-left">
           {sonuclar.length > 0 ? sonuclar.map((item) => (
             <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
@@ -346,7 +326,7 @@ export default function BakimimApp() {
         </section>
       </div>
 
-      {/* FORM MODAL VE BLOG KISIMLARI AYNI KALIYOR... */}
+      {/* MODAL VE BLOG KISIMLARI BURADA DEVAM EDER... */}
     </main>
   );
 }
