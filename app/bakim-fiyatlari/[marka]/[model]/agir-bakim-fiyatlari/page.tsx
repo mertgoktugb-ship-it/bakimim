@@ -26,8 +26,8 @@ export default function AltKategoriDetaySayfasi() {
   // SIRALAMA STATE'İ (Varsayılan En Son Eklenenler)
   const [siralamaTipi, setSiralamaTipi] = useState("eklenme-yeni");
 
-  // BU SAYFA AĞIR BAKIMLARI GÖSTERİR (AKTİF KATEGORİ)
-  const aktifKategori = "agir";
+  // BU SAYFA AĞIR BAKIMLARI GÖSTERİR (TypeScript hatasını önlemek için : string eklendi)
+  const aktifKategori: string = "agir";
 
   // URL'den elde edilecek marka ve model slug'ları (Butonlar için)
   const markaSlug = params.marka as string;
@@ -101,6 +101,7 @@ export default function AltKategoriDetaySayfasi() {
     if (siralamaTipi === "fiyat-azalan") return (b.fiyat || 0) - (a.fiyat || 0);
     if (siralamaTipi === "tarih-yeni") return new Date(b.tarih || 0).getTime() - new Date(a.tarih || 0).getTime();
     if (siralamaTipi === "tarih-eski") return new Date(a.tarih || 0).getTime() - new Date(b.tarih || 0).getTime();
+    if (siralamaTipi === "model-a-z") return (a.model_format || "").localeCompare(b.model_format || "");
     return 0;
   });
 
@@ -168,6 +169,7 @@ export default function AltKategoriDetaySayfasi() {
                 <option value="tarih-eski">Bakım Tarihi (En Eski)</option>
                 <option value="fiyat-artan">Fiyat (En Düşük)</option>
                 <option value="fiyat-azalan">Fiyat (En Yüksek)</option>
+                <option value="model-a-z">Modele Göre (A-Z)</option>
               </select>
             </div>
           </div>
@@ -185,6 +187,7 @@ export default function AltKategoriDetaySayfasi() {
             const linkHref = `/bakim-fiyatlari/${slugify(item.marka_format)}/${slugify(item.model_format)}${kategoriPath}`;
 
             return (
+              {/* h-fit EKLENDİ - KARTLAR ESNEMEZ */}
               <div key={item.id} className={`rounded-[2.5rem] border overflow-hidden shadow-sm transition-all flex flex-col h-fit group ${isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'} ${acikKartId === item.id ? 'ring-2 ring-yellow-500 shadow-xl' : ''}`}>
                 <div onClick={() => setAcikKartId(acikKartId === item.id ? null : item.id)} className="p-8 cursor-pointer flex-1 flex flex-col relative">
                   
@@ -231,6 +234,7 @@ export default function AltKategoriDetaySayfasi() {
                   </div>
                 </div>
 
+                {/* KART AÇILINCA ÇIKAN MOTOR VE KM YAZI RENGİ DARK MOD İÇİN DÜZELTİLDİ */}
                 {acikKartId === item.id && (
                   <div className={`p-8 border-t space-y-6 animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
                     <div className={`space-y-4 text-left ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>
@@ -247,6 +251,7 @@ export default function AltKategoriDetaySayfasi() {
                        </div>
                        <p className="text-xs font-bold opacity-90 italic leading-relaxed mb-4">"{item.notlar || 'Kullanıcı notu bulunmuyor.'}"</p>
                        
+                       {/* ROZET YAZILARI DÜZELTİLDİ */}
                        {item.fatura_onayli ? (
                          <div className="bg-slate-900 text-white py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black tracking-widest uppercase"><ShieldCheck size={14} className="text-emerald-400" /> Belge Destekli Bildirim</div>
                        ) : (
@@ -256,9 +261,10 @@ export default function AltKategoriDetaySayfasi() {
                   </div>
                 )}
 
+                {/* DİNAMİK YÖNLENDİRME BUTONU (Altında) */}
                 <Link 
                   href={linkHref} 
-                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/80 hover:bg-slate-800 text-yellow-500 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
+                  className={`block w-full text-center py-5 text-[10px] font-black uppercase tracking-widest border-t transition-all ${isDarkMode ? 'bg-slate-800/50 text-yellow-500 border-slate-700 hover:bg-slate-700' : 'bg-slate-50 hover:bg-slate-100 text-yellow-600 border-slate-100'}`}
                 >
                   Tüm {item.marka_format} {item.model_format} Bakımlarını Gör
                 </Link>
